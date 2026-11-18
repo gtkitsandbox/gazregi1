@@ -1,0 +1,13 @@
+{
+  "country_code": "ZZ",
+  "name": "Coralia",
+  "region": "Oceania",
+  "languages": [
+    "en",
+    "co"
+  ],
+  "gazette_name": "Coralia Government Gazette",
+  "publisher_name": "Coralia Government Printing Office",
+  "default_language": "en",
+  "coverage_status": "verified"
+}

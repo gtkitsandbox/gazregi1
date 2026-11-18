@@ -1,0 +1,12 @@
+{
+  "country_code": "JP",
+  "name": "Japan",
+  "region": "East Asia",
+  "languages": [
+    "ja"
+  ],
+  "gazette_name": "Kanpō (官報)",
+  "publisher_name": "National Printing Bureau",
+  "default_language": "ja",
+  "coverage_status": "planned"
+}

@@ -11,6 +11,7 @@ import gzip
 import hashlib
 import json
 from dataclasses import dataclass, field
+from datetime import date
 from pathlib import Path
 from typing import Iterable, TypeVar
 
@@ -28,6 +29,8 @@ from .models import (
     PersonReference,
     SiteConfig,
     SourceDocument,
+    SourceDocumentSnapshot,
+    SourceRegistryEntry,
     normalise_name,
     normalise_text,
 )
@@ -70,6 +73,16 @@ class CountryData:
     people: list[PersonEntity] = field(default_factory=list)
     organisations: list[OrganisationEntity] = field(default_factory=list)
     variants: list[NameVariant] = field(default_factory=list)
+    documents: list[SourceDocumentSnapshot] = field(default_factory=list)
+    sources: list[SourceRegistryEntry] = field(default_factory=list)
+
+    def record_date(self, record: CuratedRecord) -> date | None:
+        if record.publication_date is not None:
+            return record.publication_date
+        for bundle in self.issues:
+            if bundle.issue.issue_id == record.issue_id:
+                return bundle.issue.publication_date
+        return None
 
 
 @dataclass
@@ -115,6 +128,14 @@ class SiteData:
         return [variant for country in self.countries for variant in country.variants]
 
     @property
+    def documents(self) -> list[SourceDocumentSnapshot]:
+        return [document for country in self.countries for document in country.documents]
+
+    @property
+    def source_registry(self) -> list[SourceRegistryEntry]:
+        return [source for country in self.countries for source in country.sources]
+
+    @property
     def published_people(self) -> list[PersonEntity]:
         return sorted(
             (person for person in self.people if person.identity_status == "operator_verified"),
@@ -150,6 +171,28 @@ class SiteData:
                 return record
         raise KeyError(uid)
 
+    def country_of_record(self, record: CuratedRecord) -> CountryData:
+        for country in self.countries:
+            if record in country.records:
+                return country
+        raise KeyError(record.uid)
+
+    def record_date(self, record: CuratedRecord) -> date | None:
+        return self.country_of_record(record).record_date(record)
+
+    def document_for(self, document_id: str) -> SourceDocumentSnapshot:
+        for document in self.documents:
+            if document.document_id == document_id:
+                return document
+        raise KeyError(document_id)
+
+    def records_by_date(self, records: list[CuratedRecord]) -> list[CuratedRecord]:
+        return sorted(
+            records,
+            key=lambda record: (self.record_date(record) or date.min, record.uid),
+            reverse=True,
+        )
+
     def person_for(self, person_id: str) -> PersonEntity:
         for person in self.people:
             if person.person_id == person_id:
@@ -168,7 +211,7 @@ class SiteData:
             for record in self.records
             if any(person.person_id == person_id for person in record.people)
         ]
-        return sorted(rows, key=lambda record: self.issue_for(record.issue_id).issue.publication_date, reverse=True)
+        return self.records_by_date(rows)
 
     def records_for_organisation(self, org_id: str) -> list[CuratedRecord]:
         rows = []
@@ -178,11 +221,11 @@ class SiteData:
             linked = linked or (record.tender is not None and record.tender.issuer_organisation_id == org_id)
             if linked:
                 rows.append(record)
-        return sorted(rows, key=lambda record: self.issue_for(record.issue_id).issue.publication_date, reverse=True)
+        return self.records_by_date(rows)
 
     def records_for_issue(self, issue_id: str) -> list[CuratedRecord]:
         rows = [record for record in self.records if record.issue_id == issue_id]
-        return sorted(rows, key=lambda record: (record.source.pdf_page, record.uid))
+        return sorted(rows, key=lambda record: (record.source.pdf_page or 0, record.uid))
 
     def verified_variants_for(self, person_id: str) -> list[NameVariant]:
         return sorted(
@@ -381,7 +424,28 @@ def load_site(
         country.variants = _load_ndjson(
             country_dir / "entities" / "name-variants.ndjson", NameVariant, errors
         )
+        country.documents = _load_ndjson(
+            country_dir / "sources" / "documents.ndjson", SourceDocumentSnapshot, errors
+        )
+        country.sources = _load_ndjson(
+            country_dir / "sources" / "registry.ndjson", SourceRegistryEntry, errors
+        )
         country.records = _load_ndjson(country_dir / "records" / "records.ndjson", CuratedRecord, errors)
+
+        documents_by_id = {document.document_id: document for document in country.documents}
+        if len(documents_by_id) != len(country.documents):
+            errors.append(f"{country_dir}: duplicate document_id in source documents")
+        for document in country.documents:
+            if document.country_code != country_config.country_code:
+                errors.append(f"{country_dir}: document {document.document_id} country mismatch")
+        for registry_entry in country.sources:
+            if registry_entry.country_code != country_config.country_code:
+                errors.append(f"{country_dir}: source {registry_entry.source_id} country mismatch")
+        seen_source_ids: set[str] = set()
+        for registry_entry in country.sources:
+            if registry_entry.source_id in seen_source_ids:
+                errors.append(f"{country_dir}: duplicate source_id {registry_entry.source_id}")
+            seen_source_ids.add(registry_entry.source_id)
 
         for person in country.people:
             if person.person_id in seen_person_ids:
@@ -412,27 +476,49 @@ def load_site(
                 errors.append(f"{country_dir}: duplicate record uid {record.uid}")
                 continue
             seen_record_uids.add(record.uid)
-            issue = issues_by_id.get(record.issue_id)
-            if issue is None:
-                errors.append(f"{record.uid}: unknown issue_id {record.issue_id}")
-                continue
             category = RECORD_TYPE_CATEGORY[record.record_type]
-            expected_prefix = f"{record.issue_id}-{category}-"
-            if not record.uid.startswith(expected_prefix):
-                errors.append(f"{record.uid}: UID must start with {expected_prefix}")
-            try:
-                source_page = issue.page(record.source.pdf_page)
-            except KeyError as exc:
-                errors.append(f"{record.uid}: {exc}")
-                continue
-            if record.source.printed_page is not None and source_page.printed_page != record.source.printed_page:
-                errors.append(
-                    f"{record.uid}: printed page {record.source.printed_page} does not match extracted page "
-                    f"{source_page.printed_page}"
-                )
             excerpt = normalise_text(record.source.excerpt)
-            if excerpt not in normalise_text(issue.texts[source_page.uid]):
-                errors.append(f"{record.uid}: source excerpt not found on extracted page {source_page.uid}")
+            if record.source.kind == "pdf":
+                issue = issues_by_id.get(record.issue_id)
+                if issue is None:
+                    errors.append(f"{record.uid}: unknown issue_id {record.issue_id}")
+                    continue
+                expected_prefix = f"{record.issue_id}-{category}-"
+                if not record.uid.startswith(expected_prefix):
+                    errors.append(f"{record.uid}: UID must start with {expected_prefix}")
+                try:
+                    source_page = issue.page(record.source.pdf_page)
+                except KeyError as exc:
+                    errors.append(f"{record.uid}: {exc}")
+                    continue
+                if record.source.printed_page is not None and source_page.printed_page != record.source.printed_page:
+                    errors.append(
+                        f"{record.uid}: printed page {record.source.printed_page} does not match extracted page "
+                        f"{source_page.printed_page}"
+                    )
+                if excerpt not in normalise_text(issue.texts[source_page.uid]):
+                    errors.append(f"{record.uid}: source excerpt not found on extracted page {source_page.uid}")
+            else:
+                document = documents_by_id.get(record.source.document_id or "")
+                if document is None:
+                    errors.append(f"{record.uid}: unknown source document {record.source.document_id}")
+                    continue
+                expected_uid = f"{country_config.country_code}-{document.publication_date.year if document.publication_date else (record.publication_date.year if record.publication_date else 0)}"
+                if not record.uid.startswith(expected_uid + "-") and not record.uid.startswith(f"{country_config.country_code}-"):
+                    errors.append(f"{record.uid}: UID must start with {country_config.country_code}-<YEAR>-")
+                if excerpt not in normalise_text(document.text):
+                    errors.append(f"{record.uid}: source excerpt not found in document {document.document_id}")
+                if record.source.sha256 and record.source.sha256 != document.source_sha256:
+                    errors.append(f"{record.uid}: source sha256 does not match document {document.document_id}")
+                if record.source.official_url and str(record.source.official_url) != str(document.official_url):
+                    errors.append(f"{record.uid}: source URL does not match document {document.document_id}")
+                if record.publication_date is None:
+                    errors.append(f"{record.uid}: non-PDF records require publication_date")
+                for registry_entry in country.sources:
+                    if registry_entry.source_id == document.source_id:
+                        break
+                else:
+                    errors.append(f"{record.uid}: document source {document.source_id} missing from registry")
             for person_ref in record.people:
                 _validate_person_reference(
                     record, person_ref, people_by_id, orgs_by_id, country_config, errors

@@ -7,15 +7,40 @@
   <header class="page-heading">
     <p class="eyebrow">REGULATIONS</p>
     <h1>Regulations</h1>
-    <p class="page-heading__lede">Acts, regulations, orders, rules and notifications published in indexed Gazettes, linked to the official source page.</p>
+    <p class="page-heading__lede">Acts, regulations, orders, rules, determinations and notifications published by official sources, linked to the original publication.</p>
   </header>
 
   {% if regulations %}
+  <form class="filter-bar" data-record-filters data-list="regulation-list" data-count="regulation-count" aria-label="Filter regulations">
+    <div class="filter-field filter-field--search">
+      <label for="regulation-query">Search</label>
+      <input id="regulation-query" data-filter="query" type="search" placeholder="Title, instrument or organisation" autocomplete="off">
+    </div>
+    <div class="filter-field">
+      <label for="regulation-country">Country</label>
+      <select id="regulation-country" data-filter="country">
+        <option value="">All countries</option>
+        {% for value, label in country_options %}<option value="{{ value }}">{{ label }}</option>{% endfor %}
+      </select>
+    </div>
+    <button class="button button--secondary" type="reset" data-filter-reset>Reset</button>
+  </form>
+  <div class="filter-summary">
+    <p id="regulation-count" aria-live="polite">{{ regulations|length }} record{% if regulations|length != 1 %}s{% endif %}</p>
+  </div>
+
   <div class="section-heading">
     <h2>All instruments</h2>
-    <span class="section-count">{{ regulations|length }} record{% if regulations|length != 1 %}s{% endif %}</span>
   </div>
-  <div class="record-list">{% for record in regulations %}{{ record_card(record) }}{% endfor %}</div>
+  <div class="record-list" id="regulation-list">
+    {% for record in regulations %}
+    <div data-record data-country="{{ record_country.get(record.uid, '') }}" data-text="{{ record.title|lower }} {{ record.summary or ''|lower }}">{{ record_card(record) }}</div>
+    {% endfor %}
+  </div>
+  <div class="empty-state" data-record-empty hidden>
+    <h2>No regulations match these filters</h2>
+    <p>Clear one or more filters to see published regulations.</p>
+  </div>
   {% else %}
     {{ empty_state("No regulation records published yet", "Regulation records appear only after an operator verifies the source excerpt. The full Gazette page index is available now.", "/gazettes/", "Browse Gazettes") }}
   {% endif %}

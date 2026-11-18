@@ -15,7 +15,9 @@ from pydantic import BaseModel, ConfigDict, Field, HttpUrl, PositiveInt, model_v
 
 COUNTRY_CODE_RE = r"^[A-Z]{2}$"
 ISSUE_ID_RE = r"^[A-Z]{2}-\d{4}-\d+$"
-RECORD_UID_RE = r"^[A-Z]{2}-\d{4}-\d+-(?:APPT|TEND|NOTC|REGL)-\d{3,}$"
+RECORD_UID_RE = r"^[A-Z]{2}-\d{4}(?:-[A-Za-z0-9]+)?-(?:APPT|TEND|NOTC|REGL)-\d{3,}$"
+DOCUMENT_ID_RE = r"^DOC-[A-Z]{2}-[0-9]{4,}$"
+SOURCE_ID_RE = r"^[a-z]{2}-[a-z0-9]+(?:-[a-z0-9]+)*$"
 PERSON_ID_RE = r"^person:[a-z]{2}:[a-z0-9]+(?:-[a-z0-9]+)*$"
 ORG_ID_RE = r"^org:[a-z]{2}:[a-z0-9]+(?:-[a-z0-9]+)*$"
 SLUG_RE = r"^[a-z0-9]+(?:-[a-z0-9]+)*$"
@@ -103,10 +105,12 @@ class SiteConfig(FrozenModel):
 class CountryConfig(FrozenModel):
     country_code: str = Field(pattern=COUNTRY_CODE_RE)
     name: str = Field(min_length=1)
+    region: str = Field(default="Other", min_length=1)
     languages: list[str] = Field(min_length=1)
     gazette_name: str = Field(min_length=1)
     publisher_name: str | None = None
     default_language: str = Field(min_length=2)
+    coverage_status: Literal["verified", "partial", "planned"] = "verified"
 
 
 class SourceRecord(FrozenModel):
@@ -174,11 +178,17 @@ class TenderDetail(FrozenModel):
     reference: str = Field(min_length=1)
     issuer_organisation_id: str | None = Field(default=None, pattern=ORG_ID_RE)
     sector: TenderSector
+    status: Literal["open", "closed", "awarded", "cancelled", "unknown"] = "unknown"
     location: str | None = None
     closing_date: date | None = None
     closing_time: str | None = Field(default=None, pattern=r"^([01]\d|2[0-3]):[0-5]\d$")
     document_deadline: date | None = None
     bid_security_lkr: int | None = Field(default=None, ge=0)
+    bid_security: float | None = Field(default=None, ge=0)
+    currency: str | None = Field(default=None, pattern=r"^[A-Z]{3}$")
+    awarded_to: str | None = None
+    award_amount: float | None = Field(default=None, ge=0)
+    award_date: date | None = None
 
 
 class RegulationDetail(FrozenModel):
@@ -191,11 +201,32 @@ class NoticeDetail(FrozenModel):
     category: NoticeCategory
 
 
+SourceFormat = Literal["pdf", "html", "xml", "json", "csv", "text"]
+
+
 class RecordSource(FrozenModel):
-    pdf_page: PositiveInt
+    kind: SourceFormat = "pdf"
+    pdf_page: PositiveInt | None = None
     printed_page: PositiveInt | None = None
+    document_id: str | None = Field(default=None, pattern=DOCUMENT_ID_RE)
     excerpt: str = Field(min_length=20)
     official_url: HttpUrl | None = None
+    sha256: str | None = Field(default=None, pattern=r"^[a-f0-9]{64}$")
+    retrieved_at: date | None = None
+
+    @model_validator(mode="after")
+    def _format(self) -> "RecordSource":
+        if self.kind == "pdf":
+            if self.pdf_page is None:
+                raise ValueError("pdf sources require pdf_page")
+            if self.document_id is not None:
+                raise ValueError("pdf sources must not carry a document_id")
+        else:
+            if self.document_id is None:
+                raise ValueError(f"{self.kind} sources require a document_id")
+            if self.pdf_page is not None or self.printed_page is not None:
+                raise ValueError(f"{self.kind} sources must not carry PDF page numbers")
+        return self
 
 
 class CuratedRecord(FrozenModel):
@@ -203,7 +234,10 @@ class CuratedRecord(FrozenModel):
     record_type: RecordType
     title: str = Field(min_length=1)
     summary: str | None = None
-    issue_id: str = Field(pattern=ISSUE_ID_RE)
+    issue_id: str | None = Field(default=None, pattern=ISSUE_ID_RE)
+    publication_date: date | None = None
+    language: str | None = Field(default=None, min_length=2)
+    issuing_organisation_name: str | None = None
     people: list[PersonReference] = Field(default_factory=list)
     organisation_ids: list[str] = Field(default_factory=list)
     location: str | None = None
@@ -212,6 +246,17 @@ class CuratedRecord(FrozenModel):
     regulation: RegulationDetail | None = None
     notice: NoticeDetail | None = None
     source: RecordSource
+
+    @model_validator(mode="after")
+    def _provenance_fields(self) -> "CuratedRecord":
+        if self.source.kind == "pdf":
+            if self.issue_id is None:
+                raise ValueError("pdf records require an issue_id")
+        elif self.issue_id is not None:
+            raise ValueError("non-PDF records must not reference a Gazette issue")
+        if self.issue_id is None and self.publication_date is None:
+            raise ValueError("records without an issue require a publication_date")
+        return self
 
     @model_validator(mode="after")
     def _type_specific_fields(self) -> "CuratedRecord":
@@ -312,3 +357,48 @@ def normalise_name(value: str) -> str:
 
 def slugify_id(value: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", value.casefold()).strip("-")
+
+
+class SourceDocumentSnapshot(FrozenModel):
+    """Normalised, citable text retrieved from an official source.
+
+    The fetched bytes are hashed; `text` is the readable rendering against
+    which curated excerpts are verified.  Raw source documents are not stored
+    in the repository or deployed.
+    """
+
+    document_id: str = Field(pattern=DOCUMENT_ID_RE)
+    country_code: str = Field(pattern=COUNTRY_CODE_RE)
+    source_id: str = Field(pattern=SOURCE_ID_RE)
+    official_url: HttpUrl
+    retrieved_at: date
+    content_type: str = Field(min_length=1)
+    language: str = Field(min_length=2)
+    title: str = Field(min_length=1)
+    publisher: str | None = None
+    publication_date: date | None = None
+    source_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+    source_bytes: int = Field(ge=0)
+    text: str = Field(min_length=1)
+
+
+class SourceRegistryEntry(FrozenModel):
+    """Reusable description of an official publication source."""
+
+    source_id: str = Field(pattern=SOURCE_ID_RE)
+    country_code: str = Field(pattern=COUNTRY_CODE_RE)
+    organisation: str = Field(min_length=1)
+    publication_type: Literal[
+        "gazette", "public_notice", "procurement", "procurement_awards", "legislation", "mixed"
+    ]
+    title: str = Field(min_length=1)
+    official_url: HttpUrl
+    formats: list[Literal["html", "xml", "json", "csv", "pdf", "odata", "sru", "atom", "rss"]]
+    languages: list[str] = Field(min_length=1)
+    access_method: str = Field(min_length=1)
+    reuse_restrictions: str = Field(min_length=1)
+    access_status: Literal["verified", "restricted", "unavailable", "planned"]
+    adapter: str | None = None
+    records_ingested: int = Field(default=0, ge=0)
+    last_checked: date
+    notes: str | None = None

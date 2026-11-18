@@ -1,0 +1,13 @@
+{
+  "country_code": "NZ",
+  "name": "New Zealand",
+  "region": "Oceania",
+  "languages": [
+    "en",
+    "mi"
+  ],
+  "gazette_name": "New Zealand Gazette",
+  "publisher_name": "Department of Internal Affairs",
+  "default_language": "en",
+  "coverage_status": "partial"
+}

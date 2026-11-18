@@ -1,0 +1,12 @@
+{
+  "country_code": "YY",
+  "name": "Nordmark",
+  "region": "Europe",
+  "languages": [
+    "en"
+  ],
+  "gazette_name": "Nordmark Official Register",
+  "publisher_name": "Nordmark Public Information Office",
+  "default_language": "en",
+  "coverage_status": "verified"
+}

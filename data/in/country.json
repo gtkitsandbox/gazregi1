@@ -1,0 +1,13 @@
+{
+  "country_code": "IN",
+  "name": "India",
+  "region": "South Asia",
+  "languages": [
+    "hi",
+    "en"
+  ],
+  "gazette_name": "The Gazette of India",
+  "publisher_name": "Department of Publication",
+  "default_language": "en",
+  "coverage_status": "planned"
+}

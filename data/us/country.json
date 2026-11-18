@@ -1,0 +1,12 @@
+{
+  "country_code": "US",
+  "name": "United States",
+  "region": "North America",
+  "languages": [
+    "en"
+  ],
+  "gazette_name": "Federal Register",
+  "publisher_name": "Office of the Federal Register",
+  "default_language": "en",
+  "coverage_status": "partial"
+}

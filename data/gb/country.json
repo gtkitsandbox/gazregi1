@@ -1,0 +1,12 @@
+{
+  "country_code": "GB",
+  "name": "United Kingdom",
+  "region": "Europe",
+  "languages": [
+    "en"
+  ],
+  "gazette_name": "The Gazette",
+  "publisher_name": "The Stationery Office",
+  "default_language": "en",
+  "coverage_status": "partial"
+}

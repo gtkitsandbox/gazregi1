@@ -1,34 +1,60 @@
 {% extends "base.html" %}
-{% from "_macros.html" import badge, empty_state, record_card, source_note %}
+{% from "_macros.html" import badge, empty_state, record_card %}
 {% block body_class %}page-home{% endblock %}
 {% block content %}
 <div class="shell">
   <section class="hero" aria-labelledby="page-title">
-    <p class="eyebrow">{{ country_names }} <span aria-hidden="true">/</span> PUBLIC RECORD INDEX</p>
+    <p class="eyebrow">INTERNATIONAL PUBLIC RECORD INDEX</p>
     <h1 id="page-title">Find the record, then the source.</h1>
-    <p class="hero__lede">Search indexed Gazette pages, official appointments, tenders, public notices and regulations. Every entry links back to its Gazette number, page and official source.</p>
+    <p class="hero__lede">Search official Gazette notices, appointments, regulations and procurement opportunities from {{ stats.countries }} countries. Every entry links back to its original publication and issuing organisation.</p>
 
     <form id="search-form" class="search-form" role="search">
-      <label class="field-label" for="search-query">Search indexed records</label>
+      <label class="field-label" for="search-query">Search all indexed records</label>
       <div class="search-control">
-        <input id="search-query" name="q" type="search" placeholder="Name, organisation, tender reference, topic" autocomplete="off">
+        <input id="search-query" name="q" type="search" placeholder="Name, organisation, tender reference, country or topic" autocomplete="off">
         <button type="submit">Search <span aria-hidden="true">→</span></button>
       </div>
     </form>
-    <p class="search-note" id="result-count" aria-live="polite">Showing the latest indexed material.</p>
+    <p class="search-note" id="result-count" aria-live="polite">Searching all countries by default. Showing the latest indexed material below.</p>
   </section>
 
   <div class="stat-grid" aria-label="Coverage">
-    <div class="stat"><span class="stat__value">{{ stats.issues }}</span><span class="stat__label">Gazette issues</span></div>
-    <div class="stat"><span class="stat__value">{{ stats.pages }}</span><span class="stat__label">Searchable pages</span></div>
+    <div class="stat"><span class="stat__value">{{ stats.with_records }}</span><span class="stat__label">Countries with records</span></div>
     <div class="stat"><span class="stat__value">{{ stats.records }}</span><span class="stat__label">Curated records</span></div>
-    <div class="stat"><span class="stat__value">{{ stats.people }}</span><span class="stat__label">Verified people</span></div>
+    <div class="stat"><span class="stat__value">{{ stats.tenders }}</span><span class="stat__label">Procurement records</span></div>
+    <div class="stat"><span class="stat__value">{{ stats.sources }}</span><span class="stat__label">Registered sources</span></div>
   </div>
+
+  <section class="explore" aria-labelledby="countries-title">
+    <div class="section-heading">
+      <h2 id="countries-title">Browse by country</h2>
+      <a class="text-link" href="/countries/">All country coverage</a>
+    </div>
+    <div class="country-strip" data-country-filters>
+      <div class="filter-field">
+        <label for="home-region">Region</label>
+        <select id="home-region" data-filter="region">
+          <option value="">All regions</option>
+          {% for region in regions %}<option value="{{ region }}">{{ region }}</option>{% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="country-grid" data-country-list>
+      {% for row in country_stats|sort(attribute="name") %}
+      <a class="section-card country-card" href="{{ row.path }}" data-country data-region="{{ row.region }}">
+        <span class="section-card__label">{{ row.name }}</span>
+        {{ badge(coverage_label(row.coverage), coverage_tone(row.coverage)) }}
+        <span class="section-card__value">{{ row.records }} records · {{ row.sources }} sources</span>
+        <span class="section-card__text">{{ row.region }}{% if row.latest_date %} · latest {{ row.latest_date|date_long }}{% endif %}</span>
+      </a>
+      {% endfor %}
+    </div>
+  </section>
 
   <div class="two-column">
     <section class="panel" aria-labelledby="results-title">
       <div class="section-heading">
-        <h2 id="results-title">Latest indexed material</h2>
+        <h2 id="results-title">Latest across countries</h2>
         <a class="text-link" href="/gazettes/">All Gazettes</a>
       </div>
       <div id="search-results" class="record-list" aria-live="polite">
@@ -50,22 +76,22 @@
           </article>
           {% endfor %}
         {% else %}
-          {{ empty_state("No Gazettes indexed yet", "Add extracted Gazette data under data/&lt;country&gt;/ and rebuild.", "/about/", "Read about the index") }}
+          {{ empty_state("No records indexed yet", "Add verified source data under data/&lt;country&gt;/ and rebuild.", "/about/", "Read about the index") }}
         {% endif %}
       </div>
     </section>
 
     <aside class="panel panel--muted" aria-labelledby="coverage-title">
-      <h2 id="coverage-title">Coverage</h2>
+      <h2 id="coverage-title">Coverage status</h2>
       <dl class="detail-list">
-        <div><dt>Countries</dt><dd>{{ country_names }}</dd></div>
-        <div><dt>Latest issue</dt><dd>{% if latest_issue %}No. {{ latest_issue.issue.gazette_no }}, {{ latest_issue.issue.publication_date|date_long }}{% else %}Not available{% endif %}</dd></div>
-        <div><dt>Official source</dt><dd>{% if latest_issue and latest_issue.issue.source_url %}Recorded{% else %}Not yet recorded{% endif %}</dd></div>
+        <div><dt>Verified coverage</dt><dd>{{ stats.verified }} countries</dd></div>
+        <div><dt>Partial coverage</dt><dd>{{ stats.partial }} countries</dd></div>
+        <div><dt>Planned coverage</dt><dd>{{ stats.planned }} countries</dd></div>
+        <div><dt>Official sources</dt><dd>{{ stats.sources }} registered</dd></div>
+        <div><dt>Latest publication</dt><dd>{% if latest_record_date %}{{ latest_record_date|date_long }}{% else %}Not available{% endif %}</dd></div>
         <div><dt>Search index</dt><dd>Pagefind, rebuilt with every deployment</dd></div>
       </dl>
-      {% if stats.records == 0 %}
-      <p class="panel__note">Curated appointments, tenders, notices and regulations appear only after an operator verifies the source excerpt. The Gazette page index is available now.</p>
-      {% endif %}
+      <p class="panel__note">Coverage flags describe verified data holdings, not the importance of a country. Records are published only after an operator verifies the source excerpt. Restricted or unavailable sources are listed on the <a href="/sources/">source registry</a>.</p>
       <a class="text-link" href="/about/">How the index works</a>
     </aside>
   </div>
@@ -74,11 +100,11 @@
     <h2 id="explore-title">Explore by record type</h2>
     <div class="card-grid">
       <a class="section-card" href="/gazettes/"><span class="section-card__label">Gazettes</span><span class="section-card__value">{{ stats.issues }} issues · {{ stats.pages }} pages</span><span class="section-card__text">Page-level index with source links.</span></a>
-      <a class="section-card" href="/people/"><span class="section-card__label">People &amp; Organisations</span><span class="section-card__value">{{ stats.people }} verified people</span><span class="section-card__text">Appointments, promotions and positions, linked to source pages.</span></a>
-      <a class="section-card" href="/tenders/"><span class="section-card__label">Tenders</span><span class="section-card__value">{{ stats.tenders }} records</span><span class="section-card__text">Supplier opportunities with industry, location and closing-date filters.</span></a>
-      <a class="section-card" href="/notices/"><span class="section-card__label">Public Notices</span><span class="section-card__value">{{ stats.notices }} records</span><span class="section-card__text">Land, insolvency, estate and court notices.</span></a>
-      <a class="section-card" href="/regulations/"><span class="section-card__label">Regulations</span><span class="section-card__value">{{ stats.regulations }} records</span><span class="section-card__text">Acts, regulations, orders and notifications.</span></a>
-      <a class="section-card" href="/about/"><span class="section-card__label">About</span><span class="section-card__text">Independence, methodology and limitations.</span></a>
+      <a class="section-card" href="/people/"><span class="section-card__label">People &amp; Organisations</span><span class="section-card__value">{{ stats.people }} verified people</span><span class="section-card__text">Appointments and positions, linked to source pages.</span></a>
+      <a class="section-card" href="/tenders/"><span class="section-card__label">Tenders</span><span class="section-card__value">{{ stats.tenders }} records</span><span class="section-card__text">Opportunities by country, sector and closing date.</span></a>
+      <a class="section-card" href="/notices/"><span class="section-card__label">Public Notices</span><span class="section-card__value">{{ stats.notices }} records</span><span class="section-card__text">Government, licensing, land and corporate notices.</span></a>
+      <a class="section-card" href="/regulations/"><span class="section-card__label">Regulations</span><span class="section-card__value">{{ stats.regulations }} records</span><span class="section-card__text">Acts, instruments, orders and notifications.</span></a>
+      <a class="section-card" href="/sources/"><span class="section-card__label">Source registry</span><span class="section-card__value">{{ stats.sources }} sources</span><span class="section-card__text">Official publishers, formats, access status and reuse terms.</span></a>
     </div>
   </section>
 </div>

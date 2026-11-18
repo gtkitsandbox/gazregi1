@@ -1,0 +1,12 @@
+{
+  "country_code": "KR",
+  "name": "South Korea",
+  "region": "East Asia",
+  "languages": [
+    "ko"
+  ],
+  "gazette_name": "Gwanbo (관보)",
+  "publisher_name": "Ministry of the Interior and Safety",
+  "default_language": "ko",
+  "coverage_status": "planned"
+}

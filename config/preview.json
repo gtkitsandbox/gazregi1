@@ -1,7 +1,11 @@
 {
   "site_name": "GazetteRegistry",
   "default_site_url": "https://preview.invalid",
-  "countries": ["xx"],
+  "countries": [
+    "xx",
+    "yy",
+    "zz"
+  ],
   "corrections_email": null,
   "corrections_note": "Designer preview only. Demonstration content is fictional."
 }

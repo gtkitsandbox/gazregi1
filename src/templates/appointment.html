@@ -5,9 +5,9 @@
 <div class="shell shell--narrow">
   {{ breadcrumbs(crumbs) }}
   <header class="page-heading page-heading--record">
-    <p class="eyebrow">{{ record_type_label(record.record_type)|upper }} <span aria-hidden="true">/</span> {{ issue.country.name|upper }}</p>
+    <p class="eyebrow">{{ record_type_label(record.record_type)|upper }} <span aria-hidden="true">/</span> {{ origin.country.name|upper }}</p>
     <h1>{{ record.title }}</h1>
-    <p class="meta-line">{{ badge(record_type_label(record.record_type), "appointment") }} <span aria-hidden="true">·</span> Published {{ issue.issue.publication_date|date_long }} <span aria-hidden="true">·</span> Gazette No. {{ issue.issue.gazette_no }}, PDF page {{ record.source.pdf_page }}</p>
+    <p class="meta-line">{{ badge(record_type_label(record.record_type), "appointment") }} <span aria-hidden="true">·</span> Published {{ origin.issue.publication_date|date_long }} <span aria-hidden="true">·</span> {{ origin.label }}{% if origin.is_pdf %}, PDF page {{ origin.pdf_page }}{% endif %}</p>
   </header>
 
   {% if record.summary %}<p class="lede">{{ record.summary }}</p>{% endif %}
@@ -36,7 +36,7 @@
   <section class="source-excerpt" aria-labelledby="excerpt-title">
     <div class="section-heading"><h2 id="excerpt-title">Source excerpt</h2>{{ record_source_link(record) }}</div>
     <blockquote>{{ record.source.excerpt }}</blockquote>
-    <p class="provenance">Verified against the extracted text of {{ issue.source.source_file }}, PDF page {{ record.source.pdf_page }}. SHA-256 <code class="checksum">{{ issue.source.sha256 or "Not recorded" }}</code>.</p>
+    <p class="provenance">Verified against the {% if origin.is_pdf %}extracted text of {{ origin.source.source_file }}, PDF page {{ origin.pdf_page }}{% else %}retrieved official source recorded as {{ origin.source.source_file }}{% endif %}. SHA-256 <code class="checksum">{{ origin.source.sha256 or "Not recorded" }}</code>.</p>
   </section>
 
   {% if related_orgs %}

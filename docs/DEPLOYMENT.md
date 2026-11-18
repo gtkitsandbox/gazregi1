@@ -45,6 +45,8 @@ The default is `https://gazetteregistry.com`, read from `config/site.json`.
 | `dist/CNAME` | GitHub Pages custom domain (retained for the existing workflow) |
 | `dist/_headers` | Static security headers |
 | `dist/404.html` | Static not-found page |
+| `dist/countries/` | Alphabetical country coverage index and per-country pages |
+| `dist/sources/` | Official source registry with access status and notes |
 
 `dist/` is ignored by Git. It is reproducible from tracked sources.
 

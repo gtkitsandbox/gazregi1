@@ -1,0 +1,12 @@
+{
+  "country_code": "NL",
+  "name": "Netherlands",
+  "region": "Europe",
+  "languages": [
+    "nl"
+  ],
+  "gazette_name": "Staatscourant",
+  "publisher_name": "KOOP",
+  "default_language": "nl",
+  "coverage_status": "partial"
+}

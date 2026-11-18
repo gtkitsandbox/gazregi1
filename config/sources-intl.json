@@ -1,0 +1,961 @@
+{
+  "sources": [
+    {
+      "source_id": "gb-the-gazette",
+      "country_code": "GB",
+      "organisation": "The Stationery Office / The Gazette",
+      "publication_type": "gazette",
+      "title": "The Gazette (UK official public record)",
+      "official_url": "https://www.thegazette.co.uk/",
+      "formats": [
+        "html",
+        "atom",
+        "xml"
+      ],
+      "languages": [
+        "en"
+      ],
+      "access_method": "Atom feed of notices with individual notice HTML pages",
+      "reuse_restrictions": "Crown copyright. The Gazette is reused by attribution with links to the official notice.",
+      "access_status": "verified",
+      "adapter": "uk_gazette_notices",
+      "records_ingested": 0,
+      "last_checked": "2026-11-18",
+      "notes": "Personal insolvency and deceased-estate categories are excluded from ingestion."
+    },
+    {
+      "source_id": "gb-find-a-tender",
+      "country_code": "GB",
+      "organisation": "UK Cabinet Office",
+      "publication_type": "procurement",
+      "title": "Find a Tender service (OCDS release packages)",
+      "official_url": "https://www.find-tender.service.gov.uk/",
+      "formats": [
+        "json"
+      ],
+      "languages": [
+        "en"
+      ],
+      "access_method": "OCDS 1.1 release packages API",
+      "reuse_restrictions": "Open Contracting Data Standard release; UK Open Government Licence where stated by the publisher.",
+      "access_status": "verified",
+      "adapter": "uk_find_a_tender",
+      "records_ingested": 0,
+      "last_checked": "2026-11-18",
+      "notes": null
+    },
+    {
+      "source_id": "us-federal-register",
+      "country_code": "US",
+      "organisation": "Office of the Federal Register",
+      "publication_type": "mixed",
+      "title": "Federal Register documents API",
+      "official_url": "https://www.federalregister.gov/",
+      "formats": [
+        "json",
+        "html",
+        "xml"
+      ],
+      "languages": [
+        "en"
+      ],
+      "access_method": "Public JSON API; full text from govinfo/Federal Register HTML",
+      "reuse_restrictions": "US Government work; not subject to copyright in the United States.",
+      "access_status": "verified",
+      "adapter": "us_federal_register_notices",
+      "records_ingested": 0,
+      "last_checked": "2026-11-18",
+      "notes": null
+    },
+    {
+      "source_id": "us-grants-gov",
+      "country_code": "US",
+      "organisation": "US Department of Health and Human Services / Grants.gov",
+      "publication_type": "procurement",
+      "title": "Grants.gov opportunity search API",
+      "official_url": "https://www.grants.gov/",
+      "formats": [
+        "json"
+      ],
+      "languages": [
+        "en"
+      ],
+      "access_method": "Public JSON search and opportunity APIs",
+      "reuse_restrictions": "US Government work; third-party content may carry separate terms.",
+      "access_status": "verified",
+      "adapter": "us_grants_gov",
+      "records_ingested": 0,
+      "last_checked": "2026-11-18",
+      "notes": "Only opportunity metadata is stored; no applicant or contact records."
+    },
+    {
+      "source_id": "us-usaspending",
+      "country_code": "US",
+      "organisation": "US Department of the Treasury",
+      "publication_type": "procurement_awards",
+      "title": "USAspending award data API",
+      "official_url": "https://www.usaspending.gov/",
+      "formats": [
+        "json"
+      ],
+      "languages": [
+        "en"
+      ],
+      "access_method": "Public JSON API",
+      "reuse_restrictions": "US Government work; not subject to copyright in the United States.",
+      "access_status": "verified",
+      "adapter": null,
+      "records_ingested": 0,
+      "last_checked": "2026-11-18",
+      "notes": "Award API verified reachable; award ingestion is not enabled in this phase."
+    },
+    {
+      "source_id": "ca-canada-gazette",
+      "country_code": "CA",
+      "organisation": "Public Services and Procurement Canada",
+      "publication_type": "gazette",
+      "title": "Canada Gazette, Part I",
+      "official_url": "https://gazette.gc.ca/",
+      "formats": [
+        "html",
+        "pdf"
+      ],
+      "languages": [
+        "en",
+        "fr"
+      ],
+      "access_method": "Issue index and government-notice HTML pages",
+      "reuse_restrictions": "Open Government Licence – Canada unless otherwise noted; attribution to the Government of Canada.",
+      "access_status": "verified",
+      "adapter": "ca_gazette_notices",
+      "records_ingested": 0,
+      "last_checked": "2026-11-18",
+      "notes": null
+    },
+    {
+      "source_id": "ca-canadabuys",
+      "country_code": "CA",
+      "organisation": "Public Services and Procurement Canada",
+      "publication_type": "procurement",
+      "title": "CanadaBuys tender notices open data",
+      "official_url": "https://canadabuys.canada.ca/",
+      "formats": [
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "fr"
+      ],
+      "access_method": "Daily open-data CSV export",
+      "reuse_restrictions": "Open Government Licence – Canada unless otherwise noted.",
+      "access_status": "verified",
+      "adapter": "ca_canadabuys",
+      "records_ingested": 0,
+      "last_checked": "2026-11-18",
+      "notes": "Only tender fields are retained; contact fields in the export are ignored."
+    },
+    {
+      "source_id": "au-legislation-register",
+      "country_code": "AU",
+      "organisation": "Australian Government Attorney-General's Department",
+      "publication_type": "legislation",
+      "title": "Federal Register of Legislation titles API",
+      "official_url": "https://www.legislation.gov.au/",
+      "formats": [
+        "odata",
+        "json"
+      ],
+      "languages": [
+        "en"
+      ],
+      "access_method": "OData titles endpoint",
+      "reuse_restrictions": "Commonwealth of Australia; CC BY 4.0 unless otherwise indicated.",
+      "access_status": "verified",
+      "adapter": "au_legislation",
+      "records_ingested": 0,
+      "last_checked": "2026-11-18",
+      "notes": null
+    },
+    {
+      "source_id": "au-austender",
+      "country_code": "AU",
+      "organisation": "Australian Government Department of Finance",
+      "publication_type": "procurement",
+      "title": "AusTender",
+      "official_url": "https://www.tenders.gov.au/",
+      "formats": [
+        "html",
+        "rss"
+      ],
+      "languages": [
+        "en"
+      ],
+      "access_method": "Public website and RSS",
+      "reuse_restrictions": "Official publication. Reuse is subject to the publisher's terms; records here paraphrase or quote briefly with attribution and link to the official source.",
+      "access_status": "restricted",
+      "adapter": null,
+      "records_ingested": 0,
+      "last_checked": "2026-11-18",
+      "notes": "Automated requests returned HTTP 403 during Phase 1C; no procurement records were ingested from this source."
+    },
+    {
+      "source_id": "nz-gets",
+      "country_code": "NZ",
+      "organisation": "New Zealand Ministry of Business, Innovation and Employment",
+      "publication_type": "procurement",
+      "title": "Government Electronic Tender Service (GETS)",
+      "official_url": "https://www.gets.govt.nz/",
+      "formats": [
+        "html"
+      ],
+      "languages": [
+        "en"
+      ],
+      "access_method": "Current-tender listing and tender detail HTML",
+      "reuse_restrictions": "Official publication. Reuse is subject to the publisher's terms; records here paraphrase or quote briefly with attribution and link to the official source.",
+      "access_status": "verified",
+      "adapter": "nz_gets",
+      "records_ingested": 0,
+      "last_checked": "2026-11-18",
+      "notes": "Contact details shown by GETS are deliberately excluded from stored snapshots."
+    },
+    {
+      "source_id": "nz-gazette",
+      "country_code": "NZ",
+      "organisation": "New Zealand Department of Internal Affairs",
+      "publication_type": "gazette",
+      "title": "New Zealand Gazette",
+      "official_url": "https://gazette.govt.nz/",
+      "formats": [
+        "html",
+        "pdf"
+      ],
+      "languages": [
+        "en"
+      ],
+      "access_method": "Notice pages; search endpoint is bot-protected",
+      "reuse_restrictions": "Official publication. Reuse is subject to the publisher's terms; records here paraphrase or quote briefly with attribution and link to the official source.",
+      "access_status": "restricted",
+      "adapter": null,
+      "records_ingested": 0,
+      "last_checked": "2026-11-18",
+      "notes": "The /find-a-notice search endpoint returned an Incapsula challenge; individual notice pages were reachable but no reliable listing could be verified."
+    },
+    {
+      "source_id": "sg-gebiz",
+      "country_code": "SG",
+      "organisation": "Singapore Ministry of Finance",
+      "publication_type": "procurement",
+      "title": "GeBIZ opportunities",
+      "official_url": "https://www.gebiz.gov.sg/",
+      "formats": [
+        "html"
+      ],
+      "languages": [
+        "en"
+      ],
+      "access_method": "Public opportunity listing HTML",
+      "reuse_restrictions": "Official publication. Reuse is subject to the publisher's terms; records here paraphrase or quote briefly with attribution and link to the official source.",
+      "access_status": "verified",
+      "adapter": "sg_gebiz",
+      "records_ingested": 0,
+      "last_checked": "2026-11-18",
+      "notes": "Detail pages are JavaScript-rendered; records use listing fields and the official direct link."
+    },
+    {
+      "source_id": "sg-sso",
+      "country_code": "SG",
+      "organisation": "Singapore Attorney-General's Chambers",
+      "publication_type": "legislation",
+      "title": "Singapore Statutes Online",
+      "official_url": "https://www.sso.agc.gov.sg/",
+      "formats": [
+        "html",
+        "xml"
+      ],
+      "languages": [
+        "en"
+      ],
+      "access_method": "Public website",
+      "reuse_restrictions": "Official publication. Reuse is subject to the publisher's terms; records here paraphrase or quote briefly with attribution and link to the official source.",
+      "access_status": "restricted",
+      "adapter": null,
+      "records_ingested": 0,
+      "last_checked": "2026-11-18",
+      "notes": "API requests returned empty responses during Phase 1C; no records were ingested."
+    },
+    {
+      "source_id": "za-etenders",
+      "country_code": "ZA",
+      "organisation": "South African National Treasury",
+      "publication_type": "procurement",
+      "title": "eTenders portal",
+      "official_url": "https://www.etenders.gov.za/",
+      "formats": [
+        "json",
+        "html"
+      ],
+      "languages": [
+        "en"
+      ],
+      "access_method": "Paginated tender-opportunity JSON endpoint",
+      "reuse_restrictions": "Official publication; reuse subject to the publisher's public-sector information terms.",
+      "access_status": "verified",
+      "adapter": "za_etenders",
+      "records_ingested": 0,
+      "last_checked": "2026-11-18",
+      "notes": "Contact person, email and telephone fields returned by the API are deliberately excluded."
+    },
+    {
+      "source_id": "za-gpw",
+      "country_code": "ZA",
+      "organisation": "Government Printing Works",
+      "publication_type": "gazette",
+      "title": "Government Gazette (GPW eGazettes)",
+      "official_url": "https://www.gpwonline.co.za/",
+      "formats": [
+        "html",
+        "pdf"
+      ],
+      "languages": [
+        "en"
+      ],
+      "access_method": "Gazette category pages",
+      "reuse_restrictions": "Official publication. Reuse is subject to the publisher's terms; records here paraphrase or quote briefly with attribution and link to the official source.",
+      "access_status": "restricted",
+      "adapter": null,
+      "records_ingested": 0,
+      "last_checked": "2026-11-18",
+      "notes": "Category pages are reachable but publish no static links to individual gazettes; no records were ingested."
+    },
+    {
+      "source_id": "ke-ppip",
+      "country_code": "KE",
+      "organisation": "Public Procurement Regulatory Authority",
+      "publication_type": "procurement",
+      "title": "Public Procurement Information Portal (PPIP)",
+      "official_url": "https://tenders.go.ke/",
+      "formats": [
+        "json"
+      ],
+      "languages": [
+        "en"
+      ],
+      "access_method": "Public tender API",
+      "reuse_restrictions": "Official publication; reuse subject to the publisher's terms.",
+      "access_status": "verified",
+      "adapter": "ke_ppip",
+      "records_ingested": 0,
+      "last_checked": "2026-11-18",
+      "notes": "Nested personal data (procurement officer name, email, phone, identifier) is deliberately excluded."
+    },
+    {
+      "source_id": "ke-kenyalaw",
+      "country_code": "KE",
+      "organisation": "National Council for Law Reporting",
+      "publication_type": "gazette",
+      "title": "Kenya Gazette (Kenya Law)",
+      "official_url": "https://www.kenyalaw.org/",
+      "formats": [
+        "html",
+        "pdf"
+      ],
+      "languages": [
+        "en",
+        "sw"
+      ],
+      "access_method": "Official gazette archive",
+      "reuse_restrictions": "Official publication. Reuse is subject to the publisher's terms; records here paraphrase or quote briefly with attribution and link to the official source.",
+      "access_status": "restricted",
+      "adapter": null,
+      "records_ingested": 0,
+      "last_checked": "2026-11-18",
+      "notes": "Gazette endpoints returned HTTP 403 during Phase 1C; no records were ingested."
+    },
+    {
+      "source_id": "de-ted",
+      "country_code": "DE",
+      "organisation": "EU Publications Office (TED)",
+      "publication_type": "procurement",
+      "title": "Tenders Electronic Daily (TED)",
+      "official_url": "https://ted.europa.eu/",
+      "formats": [
+        "json",
+        "xml",
+        "pdf"
+      ],
+      "languages": [
+        "de",
+        "en",
+        "mul"
+      ],
+      "access_method": "TED API v3 notice search",
+      "reuse_restrictions": "EU open data under Commission Decision 2011/833/EU; third-party rights may apply.",
+      "access_status": "verified",
+      "adapter": "de_ted",
+      "records_ingested": 0,
+      "last_checked": "2026-11-18",
+      "notes": null
+    },
+    {
+      "source_id": "de-bgbl",
+      "country_code": "DE",
+      "organisation": "Bundesministerium der Justiz",
+      "publication_type": "gazette",
+      "title": "Bundesgesetzblatt (BGBl)",
+      "official_url": "https://www.recht.bund.de/",
+      "formats": [
+        "html",
+        "pdf"
+      ],
+      "languages": [
+        "de"
+      ],
+      "access_method": "BGBl issue listing and HTML/PDF instruments",
+      "reuse_restrictions": "Official publication. Reuse is subject to the publisher's terms; records here paraphrase or quote briefly with attribution and link to the official source.",
+      "access_status": "verified",
+      "adapter": "de_bgbl",
+      "records_ingested": 0,
+      "last_checked": "2026-11-18",
+      "notes": "Listing and instrument pages verified reachable; regulation ingestion is not enabled in this phase."
+    },
+    {
+      "source_id": "ie-ted",
+      "country_code": "IE",
+      "organisation": "EU Publications Office (TED)",
+      "publication_type": "procurement",
+      "title": "Tenders Electronic Daily (TED)",
+      "official_url": "https://ted.europa.eu/",
+      "formats": [
+        "json",
+        "xml",
+        "pdf"
+      ],
+      "languages": [
+        "en",
+        "ga",
+        "mul"
+      ],
+      "access_method": "TED API v3 notice search",
+      "reuse_restrictions": "EU open data under Commission Decision 2011/833/EU; third-party rights may apply.",
+      "access_status": "verified",
+      "adapter": "ie_ted",
+      "records_ingested": 0,
+      "last_checked": "2026-11-18",
+      "notes": null
+    },
+    {
+      "source_id": "ie-iris-oifigiuil",
+      "country_code": "IE",
+      "organisation": "Office of Public Works / Government Publications",
+      "publication_type": "gazette",
+      "title": "Iris Oifigiúil (Irish State Gazette)",
+      "official_url": "https://www.irisoifigiuil.ie/",
+      "formats": [
+        "pdf",
+        "html"
+      ],
+      "languages": [
+        "en",
+        "ga"
+      ],
+      "access_method": "Current-issue PDFs and HTML index",
+      "reuse_restrictions": "Official publication. Reuse is subject to the publisher's terms; records here paraphrase or quote briefly with attribution and link to the official source.",
+      "access_status": "verified",
+      "adapter": null,
+      "records_ingested": 0,
+      "last_checked": "2026-11-18",
+      "notes": "Current-issue PDFs are reachable; PDF text ingestion is not enabled in this phase."
+    },
+    {
+      "source_id": "ie-irish-statute-book",
+      "country_code": "IE",
+      "organisation": "Office of the Attorney General",
+      "publication_type": "legislation",
+      "title": "Irish Statute Book",
+      "official_url": "https://www.irishstatutebook.ie/",
+      "formats": [
+        "html"
+      ],
+      "languages": [
+        "en",
+        "ga"
+      ],
+      "access_method": "Public HTML",
+      "reuse_restrictions": "Official publication. Reuse is subject to the publisher's terms; records here paraphrase or quote briefly with attribution and link to the official source.",
+      "access_status": "verified",
+      "adapter": null,
+      "records_ingested": 0,
+      "last_checked": "2026-11-18",
+      "notes": "Reachable; legislation ingestion is not enabled in this phase."
+    },
+    {
+      "source_id": "nl-ted",
+      "country_code": "NL",
+      "organisation": "EU Publications Office (TED)",
+      "publication_type": "procurement",
+      "title": "Tenders Electronic Daily (TED)",
+      "official_url": "https://ted.europa.eu/",
+      "formats": [
+        "json",
+        "xml",
+        "pdf"
+      ],
+      "languages": [
+        "nl",
+        "en",
+        "mul"
+      ],
+      "access_method": "TED API v3 notice search",
+      "reuse_restrictions": "EU open data under Commission Decision 2011/833/EU; third-party rights may apply.",
+      "access_status": "verified",
+      "adapter": "nl_ted",
+      "records_ingested": 0,
+      "last_checked": "2026-11-18",
+      "notes": null
+    },
+    {
+      "source_id": "nl-oep",
+      "country_code": "NL",
+      "organisation": "KOOP (Kennis- en Exploitatiecentrum Officiële Overheidspublicaties)",
+      "publication_type": "gazette",
+      "title": "Officiële bekendmakingen search (SRU)",
+      "official_url": "https://zoek.officielebekendmakingen.nl/",
+      "formats": [
+        "sru",
+        "xml",
+        "html"
+      ],
+      "languages": [
+        "nl"
+      ],
+      "access_method": "SRU 1.2 search endpoint",
+      "reuse_restrictions": "Official publication. Reuse is subject to the publisher's terms; records here paraphrase or quote briefly with attribution and link to the official source.",
+      "access_status": "restricted",
+      "adapter": null,
+      "records_ingested": 0,
+      "last_checked": "2026-11-18",
+      "notes": "The SRU endpoint answered once and then returned HTTP 429/500 rate-limit responses; no records were ingested."
+    },
+    {
+      "source_id": "jp-kanpo",
+      "country_code": "JP",
+      "organisation": "National Printing Bureau",
+      "publication_type": "gazette",
+      "title": "Kanpō (Official Gazette)",
+      "official_url": "https://www.kanpo.go.jp/",
+      "formats": [
+        "html",
+        "pdf"
+      ],
+      "languages": [
+        "ja"
+      ],
+      "access_method": "Daily gazette index and PDF editions",
+      "reuse_restrictions": "Official publication. Reuse is subject to the publisher's terms; records here paraphrase or quote briefly with attribution and link to the official source.",
+      "access_status": "verified",
+      "adapter": null,
+      "records_ingested": 0,
+      "last_checked": "2026-11-18",
+      "notes": "Daily index and article links are reachable; article pages are JavaScript PDF viewers, so HTML text extraction is not enabled in this phase."
+    },
+    {
+      "source_id": "jp-p-portal",
+      "country_code": "JP",
+      "organisation": "Digital Agency",
+      "publication_type": "procurement",
+      "title": "Government Procurement Portal (p-portal)",
+      "official_url": "https://www.p-portal.go.jp/",
+      "formats": [
+        "html"
+      ],
+      "languages": [
+        "ja"
+      ],
+      "access_method": "Public website",
+      "reuse_restrictions": "Official publication. Reuse is subject to the publisher's terms; records here paraphrase or quote briefly with attribution and link to the official source.",
+      "access_status": "planned",
+      "adapter": null,
+      "records_ingested": 0,
+      "last_checked": "2026-11-18",
+      "notes": "Not probed in Phase 1C; listed as planned coverage."
+    },
+    {
+      "source_id": "my-lom",
+      "country_code": "MY",
+      "organisation": "Attorney General's Chambers of Malaysia",
+      "publication_type": "legislation",
+      "title": "Laws of Malaysia (LOM)",
+      "official_url": "https://lom.agc.gov.my/",
+      "formats": [
+        "html",
+        "pdf"
+      ],
+      "languages": [
+        "ms",
+        "en"
+      ],
+      "access_method": "Public legislation index",
+      "reuse_restrictions": "Official publication. Reuse is subject to the publisher's terms; records here paraphrase or quote briefly with attribution and link to the official source.",
+      "access_status": "verified",
+      "adapter": null,
+      "records_ingested": 0,
+      "last_checked": "2026-11-18",
+      "notes": "Reachable; legislation ingestion is not enabled in this phase."
+    },
+    {
+      "source_id": "my-eperolehan",
+      "country_code": "MY",
+      "organisation": "Ministry of Finance",
+      "publication_type": "procurement",
+      "title": "ePerolehan",
+      "official_url": "https://www.eperolehan.gov.my/",
+      "formats": [
+        "html"
+      ],
+      "languages": [
+        "ms",
+        "en"
+      ],
+      "access_method": "Public procurement website",
+      "reuse_restrictions": "Official publication. Reuse is subject to the publisher's terms; records here paraphrase or quote briefly with attribution and link to the official source.",
+      "access_status": "planned",
+      "adapter": null,
+      "records_ingested": 0,
+      "last_checked": "2026-11-18",
+      "notes": "Not probed in Phase 1C; listed as planned coverage."
+    },
+    {
+      "source_id": "id-jdih",
+      "country_code": "ID",
+      "organisation": "Ministry of State Secretariat",
+      "publication_type": "legislation",
+      "title": "Jaringan Dokumentasi dan Informasi Hukum (JDIH)",
+      "official_url": "https://jdih.setneg.go.id/",
+      "formats": [
+        "html",
+        "json"
+      ],
+      "languages": [
+        "id"
+      ],
+      "access_method": "Public legislation portal",
+      "reuse_restrictions": "Official publication. Reuse is subject to the publisher's terms; records here paraphrase or quote briefly with attribution and link to the official source.",
+      "access_status": "verified",
+      "adapter": null,
+      "records_ingested": 0,
+      "last_checked": "2026-11-18",
+      "notes": "Reachable; legislation ingestion is not enabled in this phase."
+    },
+    {
+      "source_id": "id-lkpp",
+      "country_code": "ID",
+      "organisation": "LKPP",
+      "publication_type": "procurement",
+      "title": "LPSE / procurement portal",
+      "official_url": "https://lpse.lkpp.go.id/",
+      "formats": [
+        "html"
+      ],
+      "languages": [
+        "id"
+      ],
+      "access_method": "Public procurement portal",
+      "reuse_restrictions": "Official publication. Reuse is subject to the publisher's terms; records here paraphrase or quote briefly with attribution and link to the official source.",
+      "access_status": "planned",
+      "adapter": null,
+      "records_ingested": 0,
+      "last_checked": "2026-11-18",
+      "notes": "Not probed in Phase 1C; listed as planned coverage."
+    },
+    {
+      "source_id": "in-egazette",
+      "country_code": "IN",
+      "organisation": "Department of Publication, Ministry of Housing and Urban Affairs",
+      "publication_type": "gazette",
+      "title": "The Gazette of India (eGazette)",
+      "official_url": "https://egazette.gov.in/",
+      "formats": [
+        "html",
+        "pdf"
+      ],
+      "languages": [
+        "en",
+        "hi"
+      ],
+      "access_method": "ASP.NET search and PDF downloads",
+      "reuse_restrictions": "Official publication. Reuse is subject to the publisher's terms; records here paraphrase or quote briefly with attribution and link to the official source.",
+      "access_status": "restricted",
+      "adapter": null,
+      "records_ingested": 0,
+      "last_checked": "2026-11-18",
+      "notes": "Connections reset or required insecure TLS workarounds; no records were ingested."
+    },
+    {
+      "source_id": "in-cppp",
+      "country_code": "IN",
+      "organisation": "Central Public Procurement Portal",
+      "publication_type": "procurement",
+      "title": "CPPP / eProcurement",
+      "official_url": "https://eprocure.gov.in/cppp/",
+      "formats": [
+        "html",
+        "json"
+      ],
+      "languages": [
+        "en"
+      ],
+      "access_method": "Public procurement portal and internal API",
+      "reuse_restrictions": "Official publication. Reuse is subject to the publisher's terms; records here paraphrase or quote briefly with attribution and link to the official source.",
+      "access_status": "restricted",
+      "adapter": null,
+      "records_ingested": 0,
+      "last_checked": "2026-11-18",
+      "notes": "The internal API rejected guessed request payloads (ERR_001); no documented public feed was found."
+    },
+    {
+      "source_id": "bd-egp",
+      "country_code": "BD",
+      "organisation": "Central Procurement Technical Unit (CPTU)",
+      "publication_type": "procurement",
+      "title": "National e-Government Procurement (e-GP) portal",
+      "official_url": "https://www.eprocure.gov.bd/",
+      "formats": [
+        "html"
+      ],
+      "languages": [
+        "en",
+        "bn"
+      ],
+      "access_method": "Tender search served by a form-encoded HTML endpoint",
+      "reuse_restrictions": "Official publication. Reuse is subject to the publisher's terms; records here paraphrase or quote briefly with attribution and link to the official source.",
+      "access_status": "verified",
+      "adapter": "bd_egp",
+      "records_ingested": 0,
+      "last_checked": "2026-11-18",
+      "notes": "Listing and tender detail pages are publicly accessible; contact-person fields are removed from stored snapshots."
+    },
+    {
+      "source_id": "bd-bgpress",
+      "country_code": "BD",
+      "organisation": "Bangladesh Government Press",
+      "publication_type": "gazette",
+      "title": "Bangladesh Gazette",
+      "official_url": "http://www.dpp.gov.bd/bgpress/",
+      "formats": [
+        "html",
+        "pdf"
+      ],
+      "languages": [
+        "bn",
+        "en"
+      ],
+      "access_method": "Public gazette archive",
+      "reuse_restrictions": "Official publication. Reuse is subject to the publisher's terms; records here paraphrase or quote briefly with attribution and link to the official source.",
+      "access_status": "planned",
+      "adapter": null,
+      "records_ingested": 0,
+      "last_checked": "2026-11-18",
+      "notes": "Not probed in Phase 1C; listed as planned coverage."
+    },
+    {
+      "source_id": "ph-philgeps",
+      "country_code": "PH",
+      "organisation": "Procurement Service, Department of Budget and Management",
+      "publication_type": "procurement",
+      "title": "PhilGEPS",
+      "official_url": "https://www.philgeps.gov.ph/",
+      "formats": [
+        "html"
+      ],
+      "languages": [
+        "en"
+      ],
+      "access_method": "Public procurement website",
+      "reuse_restrictions": "Official publication. Reuse is subject to the publisher's terms; records here paraphrase or quote briefly with attribution and link to the official source.",
+      "access_status": "restricted",
+      "adapter": null,
+      "records_ingested": 0,
+      "last_checked": "2026-11-18",
+      "notes": "The notices portal timed out during Phase 1C; no records were ingested."
+    },
+    {
+      "source_id": "ph-official-gazette",
+      "country_code": "PH",
+      "organisation": "Office of the President",
+      "publication_type": "gazette",
+      "title": "Official Gazette of the Republic of the Philippines",
+      "official_url": "https://www.officialgazette.gov.ph/",
+      "formats": [
+        "html",
+        "pdf"
+      ],
+      "languages": [
+        "en",
+        "fil"
+      ],
+      "access_method": "Public website",
+      "reuse_restrictions": "Official publication. Reuse is subject to the publisher's terms; records here paraphrase or quote briefly with attribution and link to the official source.",
+      "access_status": "restricted",
+      "adapter": null,
+      "records_ingested": 0,
+      "last_checked": "2026-11-18",
+      "notes": "Returned HTTP 403 during Phase 1C; no records were ingested."
+    },
+    {
+      "source_id": "kr-gwanbo",
+      "country_code": "KR",
+      "organisation": "Ministry of the Interior and Safety",
+      "publication_type": "gazette",
+      "title": "Gwanbo (Official Gazette)",
+      "official_url": "https://www.gwanbo.go.kr/",
+      "formats": [
+        "html",
+        "pdf"
+      ],
+      "languages": [
+        "ko"
+      ],
+      "access_method": "Public gazette website",
+      "reuse_restrictions": "Official publication. Reuse is subject to the publisher's terms; records here paraphrase or quote briefly with attribution and link to the official source.",
+      "access_status": "unavailable",
+      "adapter": null,
+      "records_ingested": 0,
+      "last_checked": "2026-11-18",
+      "notes": "Returned an empty response body during Phase 1C."
+    },
+    {
+      "source_id": "kr-narajangteo",
+      "country_code": "KR",
+      "organisation": "Public Procurement Service",
+      "publication_type": "procurement",
+      "title": "Narajangteo (Korea ON-line E-Procurement System)",
+      "official_url": "https://www.g2b.go.kr/",
+      "formats": [
+        "html"
+      ],
+      "languages": [
+        "ko"
+      ],
+      "access_method": "Public procurement website",
+      "reuse_restrictions": "Official publication. Reuse is subject to the publisher's terms; records here paraphrase or quote briefly with attribution and link to the official source.",
+      "access_status": "planned",
+      "adapter": null,
+      "records_ingested": 0,
+      "last_checked": "2026-11-18",
+      "notes": "Not probed in Phase 1C; listed as planned coverage."
+    },
+    {
+      "source_id": "th-royal-gazette",
+      "country_code": "TH",
+      "organisation": "Secretariat of the Cabinet",
+      "publication_type": "gazette",
+      "title": "Royal Thai Government Gazette",
+      "official_url": "https://ratchakitcha.soc.go.th/",
+      "formats": [
+        "html",
+        "pdf"
+      ],
+      "languages": [
+        "th"
+      ],
+      "access_method": "Public gazette website",
+      "reuse_restrictions": "Official publication. Reuse is subject to the publisher's terms; records here paraphrase or quote briefly with attribution and link to the official source.",
+      "access_status": "restricted",
+      "adapter": null,
+      "records_ingested": 0,
+      "last_checked": "2026-11-18",
+      "notes": "Returned HTTP 403 during Phase 1C; no records were ingested."
+    },
+    {
+      "source_id": "th-gprocurement",
+      "country_code": "TH",
+      "organisation": "Comptroller General's Department",
+      "publication_type": "procurement",
+      "title": "Government Procurement e-GP",
+      "official_url": "https://www.gprocurement.go.th/",
+      "formats": [
+        "html"
+      ],
+      "languages": [
+        "th"
+      ],
+      "access_method": "Public procurement website",
+      "reuse_restrictions": "Official publication. Reuse is subject to the publisher's terms; records here paraphrase or quote briefly with attribution and link to the official source.",
+      "access_status": "planned",
+      "adapter": null,
+      "records_ingested": 0,
+      "last_checked": "2026-11-18",
+      "notes": "Not probed in Phase 1C; listed as planned coverage."
+    },
+    {
+      "source_id": "lk-documents",
+      "country_code": "LK",
+      "organisation": "Department of Government Printing",
+      "publication_type": "gazette",
+      "title": "Sri Lanka Government Gazette",
+      "official_url": "https://www.documents.gov.lk/",
+      "formats": [
+        "html",
+        "pdf"
+      ],
+      "languages": [
+        "en",
+        "si",
+        "ta"
+      ],
+      "access_method": "Official gazette downloads",
+      "reuse_restrictions": "Official publication. Reuse is subject to the publisher's terms; records here paraphrase or quote briefly with attribution and link to the official source.",
+      "access_status": "unavailable",
+      "adapter": null,
+      "records_ingested": 0,
+      "last_checked": "2026-11-18",
+      "notes": "Site did not respond during Phase 1C; the four existing tracked gazettes remain the verified source basis."
+    },
+    {
+      "source_id": "lk-procurement",
+      "country_code": "LK",
+      "organisation": "National Procurement Commission",
+      "publication_type": "procurement",
+      "title": "Sri Lanka procurement notices",
+      "official_url": "https://www.procurement.gov.lk/",
+      "formats": [
+        "html"
+      ],
+      "languages": [
+        "en",
+        "si",
+        "ta"
+      ],
+      "access_method": "Public procurement website",
+      "reuse_restrictions": "Official publication. Reuse is subject to the publisher's terms; records here paraphrase or quote briefly with attribution and link to the official source.",
+      "access_status": "unavailable",
+      "adapter": null,
+      "records_ingested": 0,
+      "last_checked": "2026-11-18",
+      "notes": "Site did not respond during Phase 1C; no procurement records were ingested."
+    },
+    {
+      "source_id": "au-legislation-notices",
+      "country_code": "AU",
+      "organisation": "Australian Government Attorney-General's Department",
+      "publication_type": "public_notice",
+      "title": "Federal Register of Legislation — notifiable instruments",
+      "official_url": "https://www.legislation.gov.au/",
+      "formats": [
+        "odata",
+        "json"
+      ],
+      "languages": [
+        "en"
+      ],
+      "access_method": "OData titles endpoint filtered to notifiable instruments",
+      "reuse_restrictions": "Commonwealth of Australia; CC BY 4.0 unless otherwise indicated.",
+      "access_status": "verified",
+      "adapter": "au_notices",
+      "records_ingested": 0,
+      "last_checked": "2026-11-18",
+      "notes": "Personal disqualification and estate notices are excluded."
+    }
+  ]
+}

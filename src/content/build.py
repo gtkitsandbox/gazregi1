@@ -26,6 +26,8 @@ from seo.structured_data import (
 
 from .loader import IssueBundle, SiteData, load_site
 from .models import (
+    SourceDocumentSnapshot,
+    SourceRegistryEntry,
     CuratedRecord,
     GazettePage,
     NameVariant,
@@ -40,10 +42,12 @@ ASSETS = Path(__file__).resolve().parents[1] / "assets"
 NAV = [
     {"label": "Home", "path": "/", "section": "home"},
     {"label": "Gazettes", "path": "/gazettes/", "section": "gazettes"},
+    {"label": "Countries", "path": "/countries/", "section": "countries"},
     {"label": "People & Organisations", "path": "/people/", "section": "people"},
     {"label": "Tenders", "path": "/tenders/", "section": "tenders"},
     {"label": "Public Notices", "path": "/notices/", "section": "notices"},
     {"label": "Regulations", "path": "/regulations/", "section": "regulations"},
+    {"label": "Sources", "path": "/sources/", "section": "sources"},
     {"label": "About", "path": "/about/", "section": "about"},
 ]
 
@@ -117,6 +121,39 @@ class BuildReport:
     warnings: list[str] = field(default_factory=list)
 
 
+@dataclass(frozen=True)
+class OriginHeader:
+    publication_date: date | None
+    gazette_no: str
+
+
+@dataclass(frozen=True)
+class OriginSource:
+    source_file: str
+    sha256: str | None
+
+
+@dataclass(frozen=True)
+class RecordOrigin:
+    """Uniform provenance view for PDF-gazette and international records."""
+
+    country: CountryConfig
+    issue: OriginHeader
+    source: OriginSource
+    path: str
+    label: str
+    kind: str
+    official_url: str | None = None
+    document: SourceDocumentSnapshot | None = None
+    pdf_page: int | None = None
+    printed_page: int | None = None
+    registry_source: SourceRegistryEntry | None = None
+
+    @property
+    def is_pdf(self) -> bool:
+        return self.document is None
+
+
 def _date_long(value: date | str | None) -> str:
     if value is None:
         return "Not stated"
@@ -175,11 +212,51 @@ def _page_label(issue: IssueBundle, page: GazettePage) -> str:
 
 
 def _record_official_url(site: SiteData, record: CuratedRecord) -> str | None:
+    if record.source.kind != "pdf":
+        return str(record.source.official_url) if record.source.official_url else None
     issue = site.issue_for(record.issue_id)
     source_url = record.source.official_url or issue.issue.source_url
     if not source_url:
         return None
     return f"{source_url}#page={record.source.pdf_page}"
+
+
+def _registry_source(site: SiteData, source_id: str) -> SourceRegistryEntry | None:
+    for entry in site.source_registry:
+        if entry.source_id == source_id:
+            return entry
+    return None
+
+
+def _origin(site: SiteData, record: CuratedRecord) -> RecordOrigin:
+    country = site.country_of_record(record).config
+    if record.source.kind == "pdf":
+        issue = site.issue_for(record.issue_id)
+        return RecordOrigin(
+            country=country,
+            issue=OriginHeader(issue.issue.publication_date, issue.issue.gazette_no),
+            source=OriginSource(issue.source.source_file, issue.source.sha256),
+            path=issue.path,
+            label=f"Gazette No. {issue.issue.gazette_no}",
+            kind="gazette",
+            official_url=_record_official_url(site, record),
+            pdf_page=record.source.pdf_page,
+            printed_page=record.source.printed_page,
+        )
+    document = site.document_for(record.source.document_id or "")
+    registry = _registry_source(site, document.source_id)
+    publisher = document.publisher or (registry.organisation if registry else document.source_id)
+    return RecordOrigin(
+        country=country,
+        issue=OriginHeader(record.publication_date or document.publication_date, publisher),
+        source=OriginSource(f"document {document.document_id}", document.source_sha256),
+        path=f"/sources/#source-{document.source_id}",
+        label=registry.title if registry else publisher,
+        kind=record.source.kind,
+        official_url=str(record.source.official_url) if record.source.official_url else None,
+        document=document,
+        registry_source=registry,
+    )
 
 
 def _page_official_url(issue: IssueBundle, page: GazettePage) -> str | None:
@@ -218,7 +295,8 @@ def _record_orgs(site: SiteData, record: CuratedRecord) -> list[OrganisationEnti
 
 
 def _latest_record_date(site: SiteData, records: list[CuratedRecord]) -> str | None:
-    dates = [site.issue_for(record.issue_id).issue.publication_date for record in records]
+    dates = [site.record_date(record) for record in records]
+    dates = [value for value in dates if value is not None]
     return max(dates).isoformat() if dates else None
 
 
@@ -238,6 +316,7 @@ def _build_env(site: SiteData) -> Environment:
     env.filters["money"] = _money
     env.globals.update(
         issue_for=site.issue_for,
+        record_origin=lambda record: _origin(site, record),
         record_path=_record_path,
         person_path=_person_path,
         org_path=_org_path,
@@ -249,6 +328,9 @@ def _build_env(site: SiteData) -> Environment:
         notice_category_label=lambda value: NOTICE_LABELS.get(value, value.title()),
         instrument_type_label=lambda value: INSTRUMENT_LABELS.get(value, value.title()),
         org_type_label=lambda value: ORG_TYPE_LABELS.get(value, value.title()),
+        coverage_label=lambda value: {"verified": "Verified data", "partial": "Partial coverage", "planned": "Planned coverage"}.get(value, value.title()),
+        coverage_tone=lambda value: {"verified": "verified", "partial": "warning", "planned": "neutral"}.get(value, "neutral"),
+        access_status_label=lambda value: {"verified": "Accessible", "restricted": "Restricted", "unavailable": "Unavailable", "planned": "Planned"}.get(value, value.title()),
         person_reference_label=lambda ref: ref.published_name,
         record_source_url=lambda record: _record_official_url(site, record),
         record_count_for_issue=lambda issue_id: len(site.records_for_issue(issue_id)),
@@ -298,11 +380,65 @@ def _write_page(
     destination.write_text(html, encoding="utf-8")
 
 
+def _record_country_map(site: SiteData, records: list[CuratedRecord]) -> dict[str, str]:
+    return {
+        record.uid: site.country_of_record(record).config.country_code.lower()
+        for record in records
+    }
+
+
+def _country_counts(country) -> dict[str, int]:
+    counts: dict[str, int] = {}
+    for record in country.records:
+        counts[record.record_type] = counts.get(record.record_type, 0) + 1
+    return counts
+
+
+def _country_stat(site: SiteData, country) -> dict[str, Any]:
+    counts = _country_counts(country)
+    dates = [date for record in country.records if (date := site.record_date(record))]
+    dates.extend(issue.issue.publication_date for issue in country.issues)
+    sources = sorted(country.sources, key=lambda source: source.source_id)
+    return {
+        "country": country,
+        "code": country.config.country_code,
+        "name": country.config.name,
+        "region": country.config.region,
+        "coverage": country.config.coverage_status,
+        "path": f"/countries/{country.config.country_code.lower()}/",
+        "records": len(country.records),
+        "tenders": counts.get("tender", 0),
+        "notices": counts.get("public_notice", 0),
+        "regulations": counts.get("regulation", 0),
+        "appointments": sum(count for kind, count in counts.items() if kind not in {"tender", "public_notice", "regulation"}),
+        "issues": len(country.issues),
+        "pages": sum(len(issue.pages) for issue in country.issues),
+        "documents": len(country.documents),
+        "sources": len(sources),
+        "verified_sources": sum(1 for source in sources if source.access_status == "verified"),
+        "restricted_sources": sum(1 for source in sources if source.access_status in {"restricted", "unavailable"}),
+        "source_rows": sources,
+        "latest_date": max(dates) if dates else None,
+        "languages": country.config.languages,
+    }
+
+
 def _home_context(site: SiteData) -> dict[str, Any]:
     counts = site.record_counts()
+    country_stats = sorted(
+        (_country_stat(site, country) for country in site.countries),
+        key=lambda row: (row["region"], row["name"].casefold()),
+    )
+    # Balanced home: at most one lead record per country before any second record.
+    latest_records: list[CuratedRecord] = []
+    per_country = []
+    for country in sorted(site.countries, key=lambda item: item.config.name.casefold()):
+        dated = site.records_by_date(country.records)
+        if dated:
+            per_country.append(dated[0])
     latest_records = sorted(
-        site.records,
-        key=lambda record: site.issue_for(record.issue_id).issue.publication_date,
+        per_country,
+        key=lambda record: (site.record_date(record) or date.min, record.uid),
         reverse=True,
     )[:6]
     latest_pages = []
@@ -315,6 +451,7 @@ def _home_context(site: SiteData) -> dict[str, Any]:
                     "excerpt": excerpt(issue.texts[page.uid], 220),
                 }
             )
+    dates = [row["latest_date"] for row in country_stats if row["latest_date"]]
     return {
         "stats": {
             "issues": len(site.issues),
@@ -326,9 +463,17 @@ def _home_context(site: SiteData) -> dict[str, Any]:
             "notices": counts.get("public_notice", 0),
             "regulations": counts.get("regulation", 0),
             "countries": len(site.countries),
+            "with_records": sum(1 for row in country_stats if row["records"]),
+            "verified": sum(1 for row in country_stats if row["coverage"] == "verified"),
+            "partial": sum(1 for row in country_stats if row["coverage"] == "partial"),
+            "planned": sum(1 for row in country_stats if row["coverage"] == "planned"),
+            "sources": len(site.source_registry),
         },
-        "country_names": ", ".join(country.config.name for country in site.countries),
+        "country_names": ", ".join(row["name"] for row in sorted(country_stats, key=lambda row: row["name"].casefold())),
+        "country_stats": country_stats,
+        "regions": sorted({row["region"] for row in country_stats}),
         "latest_issue": site.issues[0] if site.issues else None,
+        "latest_record_date": max(dates) if dates else None,
         "latest_records": latest_records,
         "latest_pages": latest_pages,
     }
@@ -365,13 +510,19 @@ def build_site(
     gazettes_crumb = Crumb("Gazettes", "/gazettes/")
     people_crumb = Crumb("People", "/people/")
     organisations_crumb = Crumb("Organisations", "/organisations/")
+    countries_crumb = Crumb("Countries", "/countries/")
+    sources_crumb = Crumb("Source registry", "/sources/")
     tenders_crumb = Crumb("Tenders", "/tenders/")
     notices_crumb = Crumb("Public notices", "/notices/")
     regulations_crumb = Crumb("Regulations", "/regulations/")
     about_crumb = Crumb("About", "/about/")
     corrections_crumb = Crumb("Corrections", "/corrections/")
 
-    latest_date = max((issue.issue.publication_date for issue in site.issues), default=None)
+    latest_date = max(
+        [issue.issue.publication_date for issue in site.issues]
+        + [value for record in site.records if (value := site.record_date(record))],
+        default=None,
+    )
     latest_iso = latest_date.isoformat() if latest_date else None
 
     # Home
@@ -540,7 +691,7 @@ def build_site(
             ref = next(ref for ref in record.people if ref.person_id == person.person_id)
             latest = {
                 "record": record,
-                "issue": site.issue_for(record.issue_id),
+                "origin": _origin(site, record),
                 "position": ref.position,
                 "organisations": [site.organisation_for(org_id) for org_id in ref.organisation_ids],
                 "path": _record_path(record),
@@ -595,7 +746,7 @@ def build_site(
                 {
                     "record": record,
                     "ref": ref,
-                    "issue": site.issue_for(record.issue_id),
+                    "origin": _origin(site, record),
                     "organisations": [site.organisation_for(org_id) for org_id in ref.organisation_ids],
                     "path": _record_path(record),
                     "source_url": _record_official_url(site, record),
@@ -666,7 +817,7 @@ def build_site(
         }
     ]
     for record in appointment_records:
-        issue = site.issue_for(record.issue_id)
+        origin = _origin(site, record)
         path = _record_path(record)
         people_items = []
         about_items: list[dict[str, Any]] = []
@@ -697,8 +848,8 @@ def build_site(
             about_items.append({"@type": "Organization", "name": org.name})
         title = f"{_record_type_label(record.record_type)}: {record.title}"
         description = (
-            f"{_record_type_label(record.record_type)} published in Gazette No. {issue.issue.gazette_no} "
-            f"on {_date_long(issue.issue.publication_date)}."
+            f"{_record_type_label(record.record_type)} published in {origin.label} "
+            f"on {_date_long(origin.issue.publication_date)}."
         )
         record_crumbs = [home_crumb, people_crumb, Crumb(record.title, path)]
         _write_page(
@@ -722,18 +873,18 @@ def build_site(
                 site_url=site.site_url,
                 about=about_items or None,
                 citation=_record_official_url(site, record),
-                date_published=issue.issue.publication_date.isoformat(),
+                date_published=origin.issue.publication_date.isoformat(),
             ),
             section="people",
             context={
                 "record": record,
-                "issue": issue,
+                "origin": origin,
                 "people_items": people_items,
                 "related_orgs": related_orgs,
             },
             site=site,
         )
-        sitemap.add(path, issue.issue.publication_date.isoformat())
+        sitemap.add(path, origin.issue.publication_date.isoformat() if origin.issue.publication_date else "")
 
     # Organisations index
     org_cards = []
@@ -744,7 +895,7 @@ def build_site(
             record = records[0]
             latest = {
                 "record": record,
-                "issue": site.issue_for(record.issue_id),
+                "origin": _origin(site, record),
                 "path": _record_path(record),
             }
         org_cards.append(
@@ -806,7 +957,7 @@ def build_site(
             history.append(
                 {
                     "record": record,
-                    "issue": site.issue_for(record.issue_id),
+                    "origin": _origin(site, record),
                     "people": people,
                     "tender_issuer": bool(
                         record.tender
@@ -864,8 +1015,9 @@ def build_site(
     tender_items = [
         {
             "record": record,
-            "issue": site.issue_for(record.issue_id),
+            "origin": _origin(site, record),
             "org": _record_issuer(site, record),
+            "country": site.country_of_record(record).config,
         }
         for record in tender_records
     ]
@@ -920,20 +1072,25 @@ def build_site(
             "sector_options": [(value, _sector_label(value)) for value in sector_values],
             "location_options": location_values,
             "organisation_options": organisation_values,
+            "country_options": [
+                (country.config.country_code.lower(), country.config.name)
+                for country in sorted(site.countries, key=lambda item: item.config.name.casefold())
+                if any(record for record in country.records if record.record_type == "tender")
+            ],
         },
         site=site,
     )
     sitemap.add("/tenders/", latest_iso)
 
     for record in tender_records:
-        issue = site.issue_for(record.issue_id)
+        origin = _origin(site, record)
         issuer = _record_issuer(site, record)
         related_orgs = _record_orgs(site, record)
         path = _record_path(record)
         title = f"Tender {record.tender.reference}: {record.title}"
         description = (
-            f"Tender {record.tender.reference} published in Gazette No. {issue.issue.gazette_no} on "
-            f"{_date_long(issue.issue.publication_date)}. Issuer: {issuer.name if issuer else 'not recorded'}. "
+            f"Tender {record.tender.reference} published in {origin.label} on "
+            f"{_date_long(origin.issue.publication_date)}. Issuer: {issuer.name if issuer else 'not recorded'}. "
             f"Closing: {_date_long_or_missing(record.tender.closing_date)}."
         )
         record_crumbs = [home_crumb, tenders_crumb, Crumb(record.title, path)]
@@ -963,19 +1120,17 @@ def build_site(
                 site_url=site.site_url,
                 about=about,
                 citation=_record_official_url(site, record),
-                date_published=issue.issue.publication_date.isoformat(),
+                date_published=origin.issue.publication_date.isoformat(),
             ),
             section="tenders",
-            context={"record": record, "issue": issue, "issuer": issuer, "related_orgs": related_orgs},
+            context={"record": record, "origin": origin, "issuer": issuer, "related_orgs": related_orgs},
             site=site,
         )
-        sitemap.add(path, issue.issue.publication_date.isoformat())
+        sitemap.add(path, origin.issue.publication_date.isoformat() if origin.issue.publication_date else "")
 
     # Public notices
-    notices = sorted(
-        [record for record in site.records if record.record_type == "public_notice"],
-        key=lambda record: site.issue_for(record.issue_id).issue.publication_date,
-        reverse=True,
+    notices = site.records_by_date(
+        [record for record in site.records if record.record_type == "public_notice"]
     )
     notice_description = (
         f"{len(notices)} land, insolvency, estate, court and licensing notices from indexed Gazettes, "
@@ -1002,13 +1157,21 @@ def build_site(
             items=[(record.title, _record_path(record)) for record in notices],
         ),
         section="notices",
-        context={"notices": notices},
+        context={
+            "notices": notices,
+            "country_options": [
+                (country.config.country_code.lower(), country.config.name)
+                for country in sorted(site.countries, key=lambda item: item.config.name.casefold())
+                if any(record for record in country.records if record.record_type == "public_notice")
+            ],
+            "record_country": _record_country_map(site, notices),
+        },
         site=site,
     )
     sitemap.add("/notices/", latest_iso)
 
     for record in notices:
-        issue = site.issue_for(record.issue_id)
+        origin = _origin(site, record)
         path = _record_path(record)
         related_orgs = _record_orgs(site, record)
         related_people = []
@@ -1022,7 +1185,7 @@ def build_site(
         title = f"Public notice: {record.title}"
         description = (
             f"{NOTICE_LABELS.get(record.notice.category, 'Public')} notice published in Gazette No. "
-            f"{issue.issue.gazette_no} on {_date_long(issue.issue.publication_date)}."
+            f"{origin.issue.gazette_no} on {_date_long(origin.issue.publication_date)}."
         )
         record_crumbs = [home_crumb, notices_crumb, Crumb(record.title, path)]
         _write_page(
@@ -1045,24 +1208,22 @@ def build_site(
                 site_name=site.config.site_name,
                 site_url=site.site_url,
                 citation=_record_official_url(site, record),
-                date_published=issue.issue.publication_date.isoformat(),
+                date_published=origin.issue.publication_date.isoformat(),
             ),
             section="notices",
             context={
                 "record": record,
-                "issue": issue,
+                "origin": origin,
                 "related_orgs": related_orgs,
                 "related_people": related_people,
             },
             site=site,
         )
-        sitemap.add(path, issue.issue.publication_date.isoformat())
+        sitemap.add(path, origin.issue.publication_date.isoformat() if origin.issue.publication_date else "")
 
     # Regulations
-    regulations = sorted(
-        [record for record in site.records if record.record_type == "regulation"],
-        key=lambda record: site.issue_for(record.issue_id).issue.publication_date,
-        reverse=True,
+    regulations = site.records_by_date(
+        [record for record in site.records if record.record_type == "regulation"]
     )
     regulation_description = (
         f"{len(regulations)} Acts, regulations, orders, rules and notifications from indexed Gazettes, "
@@ -1089,19 +1250,27 @@ def build_site(
             items=[(record.title, _record_path(record)) for record in regulations],
         ),
         section="regulations",
-        context={"regulations": regulations},
+        context={
+            "regulations": regulations,
+            "country_options": [
+                (country.config.country_code.lower(), country.config.name)
+                for country in sorted(site.countries, key=lambda item: item.config.name.casefold())
+                if any(record for record in country.records if record.record_type == "regulation")
+            ],
+            "record_country": _record_country_map(site, regulations),
+        },
         site=site,
     )
     sitemap.add("/regulations/", latest_iso)
 
     for record in regulations:
-        issue = site.issue_for(record.issue_id)
+        origin = _origin(site, record)
         path = _record_path(record)
         related_orgs = _record_orgs(site, record)
         title = f"Regulation: {record.title}"
         description = (
             f"{INSTRUMENT_LABELS.get(record.regulation.instrument_type, 'Instrument')} published in "
-            f"Gazette No. {issue.issue.gazette_no} on {_date_long(issue.issue.publication_date)}."
+            f"{origin.label} on {_date_long(origin.issue.publication_date)}."
         )
         record_crumbs = [home_crumb, regulations_crumb, Crumb(record.title, path)]
         _write_page(
@@ -1124,13 +1293,127 @@ def build_site(
                 site_name=site.config.site_name,
                 site_url=site.site_url,
                 citation=_record_official_url(site, record),
-                date_published=issue.issue.publication_date.isoformat(),
+                date_published=origin.issue.publication_date.isoformat(),
             ),
             section="regulations",
-            context={"record": record, "issue": issue, "related_orgs": related_orgs},
+            context={"record": record, "origin": origin, "related_orgs": related_orgs},
             site=site,
         )
-        sitemap.add(path, issue.issue.publication_date.isoformat())
+        sitemap.add(path, origin.issue.publication_date.isoformat() if origin.issue.publication_date else "")
+
+    # Countries index and country coverage pages
+    country_stats = home["country_stats"]
+    country_description = (
+        f"Alphabetical and regional coverage across {len(country_stats)} countries, distinguishing "
+        "verified data, partial coverage and planned coverage."
+    )
+    _write_page(
+        env,
+        output_dir,
+        "/countries/",
+        "countries.html",
+        meta=page_metadata(
+            site_name=site.config.site_name,
+            title="Country coverage",
+            description=country_description,
+        ),
+        crumbs=[home_crumb, countries_crumb],
+        structured_data=collection_page(
+            path="/countries/",
+            title="Country coverage",
+            description=country_description,
+            crumbs=[home_crumb, countries_crumb],
+            site_name=site.config.site_name,
+            site_url=site.site_url,
+            items=[(row["name"], row["path"]) for row in sorted(country_stats, key=lambda row: row["name"].casefold())],
+        ),
+        section="countries",
+        context={"country_stats": country_stats, "regions": home["regions"]},
+        site=site,
+    )
+    sitemap.add("/countries/", latest_iso)
+
+    for row in country_stats:
+        country = row["country"]
+        recent = site.records_by_date(country.records)[:8]
+        country_path = row["path"]
+        ctitle = f"{row['name']} — official records and procurement"
+        cdesc = (
+            f"{row['records']} curated records and {row['sources']} registered official sources "
+            f"for {row['name']}. Coverage status: {row['coverage']}."
+        )
+        ccrumbs = [home_crumb, countries_crumb, Crumb(row["name"], country_path)]
+        _write_page(
+            env,
+            output_dir,
+            country_path,
+            "country.html",
+            meta=page_metadata(
+                site_name=site.config.site_name,
+                title=ctitle,
+                description=cdesc,
+            ),
+            crumbs=ccrumbs,
+            structured_data=collection_page(
+                path=country_path,
+                title=ctitle,
+                description=cdesc,
+                crumbs=ccrumbs,
+                site_name=site.config.site_name,
+                site_url=site.site_url,
+                items=[(record.title, _record_path(record)) for record in recent],
+            ),
+            section="countries",
+            context={"row": row, "recent_records": recent},
+            site=site,
+        )
+        sitemap.add(country_path, row["latest_date"].isoformat() if row["latest_date"] else None)
+
+    # Source registry
+    country_by_code = {
+        country.config.country_code: country.config.name for country in site.countries
+    }
+    source_items = []
+    for entry in sorted(
+        site.source_registry,
+        key=lambda item: (country_by_code.get(item.country_code, item.country_code), item.title.casefold()),
+    ):
+        source_items.append(
+            {
+                "source": entry,
+                "country_code": entry.country_code,
+                "country_name": country_by_code.get(entry.country_code, entry.country_code),
+            }
+        )
+    sources_description = (
+        f"{len(source_items)} official gazette, public-notice, legislation and procurement sources "
+        "across the indexed countries, including restricted and unavailable publishers."
+    )
+    _write_page(
+        env,
+        output_dir,
+        "/sources/",
+        "sources.html",
+        meta=page_metadata(
+            site_name=site.config.site_name,
+            title="Official source registry",
+            description=sources_description,
+        ),
+        crumbs=[home_crumb, sources_crumb],
+        structured_data=collection_page(
+            path="/sources/",
+            title="Official source registry",
+            description=sources_description,
+            crumbs=[home_crumb, sources_crumb],
+            site_name=site.config.site_name,
+            site_url=site.site_url,
+            items=[(item["source"].title, f"/sources/#source-{item['source'].source_id}") for item in source_items],
+        ),
+        section="sources",
+        context={"sources": source_items, "country_stats": country_stats},
+        site=site,
+    )
+    sitemap.add("/sources/", latest_iso)
 
     # About and corrections
     about_description = (

@@ -35,7 +35,7 @@
       <ol class="timeline">
         {% for item in history %}
         <li class="timeline__item">
-          <div class="timeline__date">{{ item.issue.issue.publication_date|date_long }}</div>
+          <div class="timeline__date">{{ item.origin.issue.publication_date|date_long }}</div>
           <div class="timeline__body">
             <div class="timeline__top">
               {{ badge(record_type_label(item.record.record_type), record_type_tone(item.record.record_type)) }}
@@ -46,8 +46,8 @@
               {% if item.organisations %} at {% for org in item.organisations %}<a href="{{ org_path(org) }}">{{ org.name }}</a>{% if not loop.last %}, {% endif %}{% endfor %}{% endif %}
             </p>
             <p class="timeline__meta">
-              Gazette <a href="{{ item.issue.path }}">No. {{ item.issue.issue.gazette_no }}</a>
-              <span aria-hidden="true">·</span> PDF page {{ item.record.source.pdf_page }}
+              {% if item.origin.is_pdf %}Gazette <a href="{{ item.origin.path }}">No. {{ item.origin.issue.gazette_no }}</a>
+              <span aria-hidden="true">·</span> PDF page {{ item.origin.pdf_page }}{% else %}<a href="{{ item.origin.path }}">{{ item.origin.label }}</a>{% endif %}
               {% if item.ref.published_name != person.canonical_name %}<span aria-hidden="true">·</span> Published as “{{ item.ref.published_name }}”{% endif %}
               {% if item.source_url %}<span aria-hidden="true">·</span> <a href="{{ item.source_url }}" target="_blank" rel="noopener">Official source ↗</a>{% endif %}
             </p>

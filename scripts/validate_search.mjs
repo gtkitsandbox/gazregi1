@@ -58,10 +58,18 @@ try {
         { term: "A. Example", includes: "/people/xx/a-example-001/" },
         { term: "A. Example", includes: "/people/xx/a-example-002/" },
         { term: "Example Community Drainage Scheme", includes: "/tenders/XX-2099-9999-TEND-002/" },
+        { term: "DEMO-YY-001", includes: "/tenders/YY-2099-TEND-001/" },
+        { term: "Nordmark", includes: "/countries/yy/" },
+        { term: "Coralia", includes: "/countries/zz/" },
       ]
     : [
         { term: "2502", includes: "/records/LK-2026-2502-" },
         { term: "Gazette", includes: "/gazettes/" },
+        { term: "Seelotsenausbildung", includes: "/regulations/DE-2026-REGL-001/" },
+        { term: "UCDOPP5639", includes: "/tenders/IE-2026-TEND-001/" },
+        { term: "NETWORK EQUIPMENT AND SMART BOARDROOMS", includes: "/tenders/ZA-2026-TEND-001/" },
+        { term: "United Kingdom", includes: "/countries/gb/" },
+        { term: "1374249", includes: "/tenders/BD-2026-TEND-001/" },
       ];
 
   const failures = [];

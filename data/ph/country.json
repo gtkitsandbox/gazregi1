@@ -1,0 +1,13 @@
+{
+  "country_code": "PH",
+  "name": "Philippines",
+  "region": "Southeast Asia",
+  "languages": [
+    "en",
+    "fil"
+  ],
+  "gazette_name": "Official Gazette",
+  "publisher_name": "Office of the President",
+  "default_language": "en",
+  "coverage_status": "planned"
+}

@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% from "_macros.html" import badge, breadcrumbs, empty_state, record_card %}
+{% block body_class %}page-country{% endblock %}
+{% block content %}
+<div class="shell">
+  {{ breadcrumbs(crumbs) }}
+  <header class="page-heading">
+    <p class="eyebrow">{{ row.region|upper }} <span aria-hidden="true">/</span> COUNTRY COVERAGE</p>
+    <h1>{{ row.name }}</h1>
+    <p class="meta-line">{{ badge(coverage_label(row.coverage), coverage_tone(row.coverage)) }} <span aria-hidden="true">·</span> {{ row.languages|join(", ") }} <span aria-hidden="true">·</span> {{ row.records }} curated records</p>
+    <p class="page-heading__lede">{{ row.country.config.gazette_name }}{% if row.country.config.publisher_name %} · {{ row.country.config.publisher_name }}{% endif %}</p>
+  </header>
+
+  <div class="stat-grid" aria-label="Country coverage">
+    <div class="stat"><span class="stat__value">{{ row.records }}</span><span class="stat__label">Curated records</span></div>
+    <div class="stat"><span class="stat__value">{{ row.sources }}</span><span class="stat__label">Registered sources</span></div>
+    <div class="stat"><span class="stat__value">{{ row.tenders }}</span><span class="stat__label">Procurement records</span></div>
+    <div class="stat"><span class="stat__value">{{ row.notices + row.regulations }}</span><span class="stat__label">Notices &amp; regulations</span></div>
+  </div>
+
+  <section class="explore">
+    <div class="section-heading"><h2>Browse {{ row.name }} records</h2></div>
+    <div class="card-grid">
+      {% if row.issues %}<a class="section-card" href="/gazettes/"><span class="section-card__label">Gazettes</span><span class="section-card__value">{{ row.issues }} issues · {{ row.pages }} pages</span><span class="section-card__text">Page-level index with source links.</span></a>{% endif %}
+      <a class="section-card" href="/tenders/?country={{ row.code|lower }}"><span class="section-card__label">Tenders</span><span class="section-card__value">{{ row.tenders }} records</span><span class="section-card__text">Procurement opportunities with closing dates.</span></a>
+      <a class="section-card" href="/notices/?country={{ row.code|lower }}"><span class="section-card__label">Public notices</span><span class="section-card__value">{{ row.notices }} records</span><span class="section-card__text">Official public notices and announcements.</span></a>
+      <a class="section-card" href="/regulations/?country={{ row.code|lower }}"><span class="section-card__label">Regulations</span><span class="section-card__value">{{ row.regulations }} records</span><span class="section-card__text">Instruments, orders and notifications.</span></a>
+    </div>
+  </section>
+
+  <section class="explore">
+    <div class="section-heading">
+      <h2>Official sources</h2>
+      <a class="text-link" href="/sources/">Full source registry</a>
+    </div>
+    {% if row.source_rows %}
+    <div class="source-list">
+      {% for source in row.source_rows %}
+      <article class="source-item" id="source-{{ source.source_id }}">
+        <div class="source-item__heading">
+          <h3><a href="{{ source.official_url }}" target="_blank" rel="noopener">{{ source.title }}</a></h3>
+          {{ badge(access_status_label(source.access_status), "verified" if source.access_status == "verified" else ("warning" if source.access_status == "restricted" else "neutral")) }}
+        </div>
+        <dl class="detail-list">
+          <div><dt>Organisation</dt><dd>{{ source.organisation }}</dd></div>
+          <div><dt>Publication type</dt><dd>{{ source.publication_type|replace("_", " ")|title }}</dd></div>
+          <div><dt>Formats</dt><dd>{{ source.formats|join(", ")|upper }}</dd></div>
+          <div><dt>Languages</dt><dd>{{ source.languages|join(", ") }}</dd></div>
+          <div><dt>Access</dt><dd>{{ source.access_method }}</dd></div>
+          <div><dt>Records ingested</dt><dd>{{ source.records_ingested }}</dd></div>
+          <div><dt>Reuse</dt><dd>{{ source.reuse_restrictions }}</dd></div>
+          {% if source.notes %}<div><dt>Notes</dt><dd>{{ source.notes }}</dd></div>{% endif %}
+        </dl>
+      </article>
+      {% endfor %}
+    </div>
+    {% else %}
+      {{ empty_state("No sources registered", "Source definitions appear here when an official publisher is registered for this country.", "/sources/", "View the source registry") }}
+    {% endif %}
+  </section>
+
+  <section class="explore">
+    <div class="section-heading"><h2>Latest records</h2></div>
+    {% if recent_records %}
+    <div class="record-list">{% for record in recent_records %}{{ record_card(record) }}{% endfor %}</div>
+    {% else %}
+      {% if row.issues %}
+        {{ empty_state("No curated records published yet", "This country has indexed Gazette issues and page-level source references, but no operator-curated records yet. The page index remains searchable.", "/gazettes/", "Browse Gazettes") }}
+      {% else %}
+        {{ empty_state("No records published yet", "This country is tracked as planned coverage. No records are shown until an official source is verified and ingested.", "/sources/", "Review source status") }}
+      {% endif %}
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

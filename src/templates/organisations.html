@@ -26,7 +26,7 @@
       {% if card.latest %}
       <dl class="record-card__meta">
         <div><dt>Most recent</dt><dd><a href="{{ card.latest.path }}">{{ card.latest.record.title }}</a></dd></div>
-        <div><dt>Gazette</dt><dd>No. {{ card.latest.issue.issue.gazette_no }}, {{ card.latest.issue.issue.publication_date|date_long }}</dd></div>
+        <div><dt>Gazette</dt><dd>{{ card.latest.origin.label }}, {{ card.latest.origin.issue.publication_date|date_long }}</dd></div>
       </dl>
       {% endif %}
     </article>

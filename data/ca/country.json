@@ -1,0 +1,13 @@
+{
+  "country_code": "CA",
+  "name": "Canada",
+  "region": "North America",
+  "languages": [
+    "en",
+    "fr"
+  ],
+  "gazette_name": "Canada Gazette",
+  "publisher_name": "Public Services and Procurement Canada",
+  "default_language": "en",
+  "coverage_status": "partial"
+}

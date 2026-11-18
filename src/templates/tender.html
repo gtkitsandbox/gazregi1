@@ -7,7 +7,7 @@
   <header class="page-heading page-heading--record">
     <p class="eyebrow">TENDER <span aria-hidden="true">/</span> {{ record.tender.reference }}</p>
     <h1>{{ record.title }}</h1>
-    <p class="meta-line">{{ badge(sector_label(record.tender.sector), "sector") }} <span aria-hidden="true">·</span> Published {{ issue.issue.publication_date|date_long }} <span aria-hidden="true">·</span> Closing {{ record.tender.closing_date|date_long_or_missing }}{% if record.tender.closing_time %} at {{ record.tender.closing_time }}{% endif %}</p>
+    <p class="meta-line">{{ badge(sector_label(record.tender.sector), "sector") }} {{ badge(record.tender.status|title, "verified" if record.tender.status == "open" else ("warning" if record.tender.status in ["closed", "cancelled"] else "neutral")) }} <span aria-hidden="true">·</span> Published {{ origin.issue.publication_date|date_long }} <span aria-hidden="true">·</span> Closing {{ record.tender.closing_date|date_long_or_missing }}{% if record.tender.closing_time %} at {{ record.tender.closing_time }}{% endif %}</p>
   </header>
 
   {% if record.summary %}<p class="lede">{{ record.summary }}</p>{% endif %}
@@ -21,8 +21,12 @@
       <div><dt>Location</dt><dd>{{ record.tender.location or "Not recorded" }}</dd></div>
       <div><dt>Closing date</dt><dd>{{ record.tender.closing_date|date_long_or_missing }}{% if record.tender.closing_time %} at {{ record.tender.closing_time }}{% endif %}</dd></div>
       <div><dt>Document deadline</dt><dd>{{ record.tender.document_deadline|date_long_or_missing }}</dd></div>
-      <div><dt>Bid security</dt><dd>{% if record.tender.bid_security_lkr is not none %}LKR {{ record.tender.bid_security_lkr|money }}{% else %}Not stated{% endif %}</dd></div>
-      <div><dt>Gazette</dt><dd><a href="{{ issue.path }}">No. {{ issue.issue.gazette_no }}</a>, PDF page {{ record.source.pdf_page }}</dd></div>
+      <div><dt>Bid security</dt><dd>{% if record.tender.bid_security_lkr is not none %}LKR {{ record.tender.bid_security_lkr|money }}{% elif record.tender.bid_security is not none %}{% if record.tender.currency %}{{ record.tender.currency }} {% endif %}{{ record.tender.bid_security|money }}{% else %}Not stated{% endif %}</dd></div>
+      <div><dt>Source</dt><dd>{% if origin.is_pdf %}<a href="{{ origin.path }}">Gazette No. {{ origin.issue.gazette_no }}</a>, PDF page {{ origin.pdf_page }}{% else %}<a href="{{ origin.path }}">{{ origin.label }}</a>{% endif %}</dd></div>
+      <div><dt>Language</dt><dd>{{ record.language or origin.country.default_language }}</dd></div>
+      <div><dt>Status</dt><dd>{{ record.tender.status|capitalize }}</dd></div>
+      {% if record.tender.awarded_to %}<div><dt>Awarded to</dt><dd>{{ record.tender.awarded_to }}</dd></div>{% endif %}
+      {% if record.tender.award_amount is not none %}<div><dt>Award amount</dt><dd>{% if record.tender.currency %}{{ record.tender.currency }} {% endif %}{{ record.tender.award_amount|money }}</dd></div>{% endif %}
     </dl>
   </section>
 
@@ -32,7 +36,7 @@
       {{ record_source_link(record) }}
     </div>
     <blockquote>{{ record.source.excerpt }}</blockquote>
-    <p class="provenance">Verified against the extracted text of {{ issue.source.source_file }}, PDF page {{ record.source.pdf_page }}. SHA-256 <code class="checksum">{{ issue.source.sha256 or "Not recorded" }}</code>.</p>
+    <p class="provenance">Verified against the {% if origin.is_pdf %}extracted text of {{ origin.source.source_file }}, PDF page {{ origin.pdf_page }}{% else %}retrieved official source recorded as {{ origin.source.source_file }}{% endif %}. SHA-256 <code class="checksum">{{ origin.source.sha256 or "Not recorded" }}</code>.</p>
   </section>
 
   {% if record.organisation_ids|length > 1 or record.keywords %}

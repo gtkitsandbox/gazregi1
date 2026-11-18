@@ -21,6 +21,8 @@ from content.models import (  # noqa: E402
     PersonEntity,
     SiteConfig,
     SourceDocument,
+    SourceDocumentSnapshot,
+    SourceRegistryEntry,
 )
 
 MODELS: dict[str, type[BaseModel]] = {
@@ -29,6 +31,8 @@ MODELS: dict[str, type[BaseModel]] = {
     "issue": GazetteIssue,
     "page-record": GazettePage,
     "source": SourceDocument,
+    "source-document": SourceDocumentSnapshot,
+    "source-registry": SourceRegistryEntry,
     "record": CuratedRecord,
     "person": PersonEntity,
     "organisation": OrganisationEntity,

@@ -7,7 +7,7 @@
   <header class="page-heading page-heading--record">
     <p class="eyebrow">REGULATION <span aria-hidden="true">/</span> {{ instrument_type_label(record.regulation.instrument_type)|upper }}</p>
     <h1>{{ record.title }}</h1>
-    <p class="meta-line">{{ badge(instrument_type_label(record.regulation.instrument_type), "regulation") }} <span aria-hidden="true">·</span> Published {{ issue.issue.publication_date|date_long }} <span aria-hidden="true">·</span> Gazette No. {{ issue.issue.gazette_no }}, PDF page {{ record.source.pdf_page }}</p>
+    <p class="meta-line">{{ badge(instrument_type_label(record.regulation.instrument_type), "regulation") }} <span aria-hidden="true">·</span> Published {{ origin.issue.publication_date|date_long }} <span aria-hidden="true">·</span> {{ origin.label }}{% if origin.is_pdf %}, PDF page {{ origin.pdf_page }}{% endif %}</p>
   </header>
 
   {% if record.summary %}<p class="lede">{{ record.summary }}</p>{% endif %}
@@ -18,14 +18,15 @@
       <div><dt>Instrument type</dt><dd>{{ instrument_type_label(record.regulation.instrument_type) }}</dd></div>
       <div><dt>Instrument number</dt><dd>{{ record.regulation.instrument_number or "Not stated" }}</dd></div>
       <div><dt>Effective date</dt><dd>{{ record.regulation.effective_date|date_long_or_missing }}</dd></div>
-      <div><dt>Gazette</dt><dd><a href="{{ issue.path }}">No. {{ issue.issue.gazette_no }}</a>, {{ issue.issue.publication_date|date_long }}</dd></div>
+      <div><dt>Language</dt><dd>{{ record.language or origin.country.default_language }}</dd></div>
+      <div><dt>Source</dt><dd><a href="{{ origin.path }}">{{ origin.label }}</a>, {{ origin.issue.publication_date|date_long }}</dd></div>
     </dl>
   </section>
 
   <section class="source-excerpt" aria-labelledby="excerpt-title">
     <div class="section-heading"><h2 id="excerpt-title">Source excerpt</h2>{{ record_source_link(record) }}</div>
     <blockquote>{{ record.source.excerpt }}</blockquote>
-    <p class="provenance">Verified against the extracted text of {{ issue.source.source_file }}, PDF page {{ record.source.pdf_page }}. SHA-256 <code class="checksum">{{ issue.source.sha256 or "Not recorded" }}</code>.</p>
+    <p class="provenance">Verified against the {% if origin.is_pdf %}extracted text of {{ origin.source.source_file }}, PDF page {{ origin.pdf_page }}{% else %}retrieved official source recorded as {{ origin.source.source_file }}{% endif %}. SHA-256 <code class="checksum">{{ origin.source.sha256 or "Not recorded" }}</code>.</p>
   </section>
 
   {% if related_orgs %}

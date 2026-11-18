@@ -1,0 +1,13 @@
+{
+  "country_code": "ZA",
+  "name": "South Africa",
+  "region": "Africa",
+  "languages": [
+    "en",
+    "af"
+  ],
+  "gazette_name": "Government Gazette",
+  "publisher_name": "Government Printing Works",
+  "default_language": "en",
+  "coverage_status": "partial"
+}

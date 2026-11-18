@@ -1,0 +1,12 @@
+{
+  "country_code": "AU",
+  "name": "Australia",
+  "region": "Oceania",
+  "languages": [
+    "en"
+  ],
+  "gazette_name": "Commonwealth of Australia Gazette",
+  "publisher_name": "Australian Government",
+  "default_language": "en",
+  "coverage_status": "partial"
+}

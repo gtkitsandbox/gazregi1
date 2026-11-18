@@ -50,16 +50,16 @@
 {%- endmacro %}
 
 {% macro record_card(record, show_excerpt=True) -%}
-{% set issue = issue_for(record.issue_id) %}
+{% set origin = record_origin(record) %}
 <article class="record-card">
   <div class="record-card__top">
     {{ record_type_badge(record.record_type) }}
-    <span class="record-card__date">{{ issue.issue.publication_date|date_long }}</span>
+    <span class="record-card__date">{{ origin.issue.publication_date|date_long }}</span>
   </div>
   <h3 class="record-card__title"><a href="{{ record_path(record) }}">{{ record.title }}</a></h3>
   {% if show_excerpt and record.summary %}<p class="record-card__summary">{{ record.summary }}</p>{% endif %}
   <dl class="record-card__meta">
-    <div><dt>Gazette</dt><dd><a href="{{ issue.path }}">No. {{ issue.issue.gazette_no }}</a></dd></div>
+    <div><dt>Source</dt><dd>{% if origin.is_pdf %}<a href="{{ origin.path }}">Gazette No. {{ origin.issue.gazette_no }}</a>{% else %}<a href="{{ origin.path }}">{{ origin.label }}</a>{% endif %}</dd></div>
     {% if record.people %}
     <div><dt>People</dt><dd>{% for ref in record.people %}{% if not loop.first %}, {% endif %}{{ person_reference_label(ref) }}{% endfor %}</dd></div>
     {% endif %}
@@ -68,7 +68,7 @@
     <div><dt>Closing</dt><dd>{{ record.tender.closing_date|date_long_or_missing }}</dd></div>
     {% endif %}
     {% if record.location %}<div><dt>Location</dt><dd>{{ record.location }}</dd></div>{% endif %}
-    <div><dt>Source</dt><dd>{{ issue.country.name }}, PDF page {{ record.source.pdf_page }}</dd></div>
+    <div><dt>Provenance</dt><dd>{{ origin.country.name }}{% if origin.is_pdf %}, PDF page {{ origin.pdf_page }}{% else %}, retrieved official source{% endif %}</dd></div>
   </dl>
 </article>
 {%- endmacro %}

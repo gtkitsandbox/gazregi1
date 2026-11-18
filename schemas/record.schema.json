@@ -89,10 +89,31 @@
     "RecordSource": {
       "additionalProperties": false,
       "properties": {
+        "kind": {
+          "default": "pdf",
+          "enum": [
+            "pdf",
+            "html",
+            "xml",
+            "json",
+            "csv",
+            "text"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
         "pdf_page": {
-          "exclusiveMinimum": 0,
-          "title": "Pdf Page",
-          "type": "integer"
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Pdf Page"
         },
         "printed_page": {
           "anyOf": [
@@ -106,6 +127,19 @@
           ],
           "default": null,
           "title": "Printed Page"
+        },
+        "document_id": {
+          "anyOf": [
+            {
+              "pattern": "^DOC-[A-Z]{2}-[0-9]{4,}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Document Id"
         },
         "excerpt": {
           "minLength": 20,
@@ -126,10 +160,35 @@
           ],
           "default": null,
           "title": "Official Url"
+        },
+        "sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Sha256"
+        },
+        "retrieved_at": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Retrieved At"
         }
       },
       "required": [
-        "pdf_page",
         "excerpt"
       ],
       "title": "RecordSource",
@@ -218,6 +277,18 @@
           "title": "Sector",
           "type": "string"
         },
+        "status": {
+          "default": "unknown",
+          "enum": [
+            "open",
+            "closed",
+            "awarded",
+            "cancelled",
+            "unknown"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
         "location": {
           "anyOf": [
             {
@@ -281,6 +352,70 @@
           ],
           "default": null,
           "title": "Bid Security Lkr"
+        },
+        "bid_security": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Bid Security"
+        },
+        "currency": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Z]{3}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Currency"
+        },
+        "awarded_to": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Awarded To"
+        },
+        "award_amount": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Award Amount"
+        },
+        "award_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Award Date"
         }
       },
       "required": [
@@ -294,7 +429,7 @@
   "additionalProperties": false,
   "properties": {
     "uid": {
-      "pattern": "^[A-Z]{2}-\\d{4}-\\d+-(?:APPT|TEND|NOTC|REGL)-\\d{3,}$",
+      "pattern": "^[A-Z]{2}-\\d{4}(?:-[A-Za-z0-9]+)?-(?:APPT|TEND|NOTC|REGL)-\\d{3,}$",
       "title": "Uid",
       "type": "string"
     },
@@ -330,9 +465,55 @@
       "title": "Summary"
     },
     "issue_id": {
-      "pattern": "^[A-Z]{2}-\\d{4}-\\d+$",
-      "title": "Issue Id",
-      "type": "string"
+      "anyOf": [
+        {
+          "pattern": "^[A-Z]{2}-\\d{4}-\\d+$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Issue Id"
+    },
+    "publication_date": {
+      "anyOf": [
+        {
+          "format": "date",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Publication Date"
+    },
+    "language": {
+      "anyOf": [
+        {
+          "minLength": 2,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Language"
+    },
+    "issuing_organisation_name": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Issuing Organisation Name"
     },
     "people": {
       "items": {
@@ -408,7 +589,6 @@
     "uid",
     "record_type",
     "title",
-    "issue_id",
     "source"
   ],
   "title": "CuratedRecord",

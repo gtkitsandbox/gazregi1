@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gazetteregistry.com/schemas/source-document.schema.json",
+  "additionalProperties": false,
+  "description": "Normalised, citable text retrieved from an official source.\n\nThe fetched bytes are hashed; `text` is the readable rendering against\nwhich curated excerpts are verified.  Raw source documents are not stored\nin the repository or deployed.",
+  "properties": {
+    "document_id": {
+      "pattern": "^DOC-[A-Z]{2}-[0-9]{4,}$",
+      "title": "Document Id",
+      "type": "string"
+    },
+    "country_code": {
+      "pattern": "^[A-Z]{2}$",
+      "title": "Country Code",
+      "type": "string"
+    },
+    "source_id": {
+      "pattern": "^[a-z]{2}-[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "title": "Source Id",
+      "type": "string"
+    },
+    "official_url": {
+      "format": "uri",
+      "maxLength": 2083,
+      "minLength": 1,
+      "title": "Official Url",
+      "type": "string"
+    },
+    "retrieved_at": {
+      "format": "date",
+      "title": "Retrieved At",
+      "type": "string"
+    },
+    "content_type": {
+      "minLength": 1,
+      "title": "Content Type",
+      "type": "string"
+    },
+    "language": {
+      "minLength": 2,
+      "title": "Language",
+      "type": "string"
+    },
+    "title": {
+      "minLength": 1,
+      "title": "Title",
+      "type": "string"
+    },
+    "publisher": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Publisher"
+    },
+    "publication_date": {
+      "anyOf": [
+        {
+          "format": "date",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Publication Date"
+    },
+    "source_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Source Sha256",
+      "type": "string"
+    },
+    "source_bytes": {
+      "minimum": 0,
+      "title": "Source Bytes",
+      "type": "integer"
+    },
+    "text": {
+      "minLength": 1,
+      "title": "Text",
+      "type": "string"
+    }
+  },
+  "required": [
+    "document_id",
+    "country_code",
+    "source_id",
+    "official_url",
+    "retrieved_at",
+    "content_type",
+    "language",
+    "title",
+    "source_sha256",
+    "source_bytes",
+    "text"
+  ],
+  "title": "SourceDocumentSnapshot",
+  "type": "object"
+}

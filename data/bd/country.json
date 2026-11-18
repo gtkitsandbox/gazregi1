@@ -1,0 +1,13 @@
+{
+  "country_code": "BD",
+  "name": "Bangladesh",
+  "region": "South Asia",
+  "languages": [
+    "bn",
+    "en"
+  ],
+  "gazette_name": "Bangladesh Gazette",
+  "publisher_name": "Bangladesh Government Press",
+  "default_language": "bn",
+  "coverage_status": "partial"
+}

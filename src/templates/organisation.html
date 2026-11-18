@@ -25,7 +25,7 @@
       <ol class="timeline">
         {% for item in history %}
         <li class="timeline__item">
-          <div class="timeline__date">{{ item.issue.issue.publication_date|date_long }}</div>
+          <div class="timeline__date">{{ item.origin.issue.publication_date|date_long }}</div>
           <div class="timeline__body">
             <div class="timeline__top">
               {{ badge(record_type_label(item.record.record_type), record_type_tone(item.record.record_type)) }}
@@ -36,8 +36,8 @@
             {% endif %}
             {% if item.tender_issuer %}<p class="timeline__role">Issuing organisation for tender {{ item.record.tender.reference }}.</p>{% endif %}
             <p class="timeline__meta">
-              Gazette <a href="{{ item.issue.path }}">No. {{ item.issue.issue.gazette_no }}</a>
-              <span aria-hidden="true">·</span> PDF page {{ item.record.source.pdf_page }}
+              {% if item.origin.is_pdf %}Gazette <a href="{{ item.origin.path }}">No. {{ item.origin.issue.gazette_no }}</a>
+              <span aria-hidden="true">·</span> PDF page {{ item.origin.pdf_page }}{% else %}<a href="{{ item.origin.path }}">{{ item.origin.label }}</a>{% endif %}
               {% if item.source_url %}<span aria-hidden="true">·</span> <a href="{{ item.source_url }}" target="_blank" rel="noopener">Official source ↗</a>{% endif %}
             </p>
           </div>

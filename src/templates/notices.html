@@ -7,15 +7,40 @@
   <header class="page-heading">
     <p class="eyebrow">PUBLIC NOTICES</p>
     <h1>Public notices</h1>
-    <p class="page-heading__lede">Land, insolvency, estate, court and licensing notices extracted from indexed Gazettes, with the exact source page preserved.</p>
+    <p class="page-heading__lede">Official government, licensing, land, estate and corporate notices from indexed sources across countries. Filter by country to see one jurisdiction at a time.</p>
   </header>
 
   {% if notices %}
+  <form class="filter-bar" data-record-filters data-list="notice-list" data-count="notice-count" aria-label="Filter public notices">
+    <div class="filter-field filter-field--search">
+      <label for="notice-query">Search</label>
+      <input id="notice-query" data-filter="query" type="search" placeholder="Title, organisation or topic" autocomplete="off">
+    </div>
+    <div class="filter-field">
+      <label for="notice-country">Country</label>
+      <select id="notice-country" data-filter="country">
+        <option value="">All countries</option>
+        {% for value, label in country_options %}<option value="{{ value }}">{{ label }}</option>{% endfor %}
+      </select>
+    </div>
+    <button class="button button--secondary" type="reset" data-filter-reset>Reset</button>
+  </form>
+  <div class="filter-summary">
+    <p id="notice-count" aria-live="polite">{{ notices|length }} record{% if notices|length != 1 %}s{% endif %}</p>
+  </div>
+
   <div class="section-heading">
     <h2>All notices</h2>
-    <span class="section-count">{{ notices|length }} record{% if notices|length != 1 %}s{% endif %}</span>
   </div>
-  <div class="record-list">{% for record in notices %}{{ record_card(record) }}{% endfor %}</div>
+  <div class="record-list" id="notice-list">
+    {% for record in notices %}
+    <div data-record data-country="{{ record_country.get(record.uid, '') }}" data-text="{{ record.title|lower }} {{ record.summary or ''|lower }}">{{ record_card(record) }}</div>
+    {% endfor %}
+  </div>
+  <div class="empty-state" data-record-empty hidden>
+    <h2>No notices match these filters</h2>
+    <p>Clear one or more filters to see published notices.</p>
+  </div>
   {% else %}
     {{ empty_state("No public notices published yet", "Public-notice records appear only after an operator verifies the source excerpt. The full Gazette page index is available now.", "/gazettes/", "Browse Gazettes") }}
   {% endif %}

@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gazetteregistry.com/schemas/source-registry.schema.json",
+  "additionalProperties": false,
+  "description": "Reusable description of an official publication source.",
+  "properties": {
+    "source_id": {
+      "pattern": "^[a-z]{2}-[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "title": "Source Id",
+      "type": "string"
+    },
+    "country_code": {
+      "pattern": "^[A-Z]{2}$",
+      "title": "Country Code",
+      "type": "string"
+    },
+    "organisation": {
+      "minLength": 1,
+      "title": "Organisation",
+      "type": "string"
+    },
+    "publication_type": {
+      "enum": [
+        "gazette",
+        "public_notice",
+        "procurement",
+        "procurement_awards",
+        "legislation",
+        "mixed"
+      ],
+      "title": "Publication Type",
+      "type": "string"
+    },
+    "title": {
+      "minLength": 1,
+      "title": "Title",
+      "type": "string"
+    },
+    "official_url": {
+      "format": "uri",
+      "maxLength": 2083,
+      "minLength": 1,
+      "title": "Official Url",
+      "type": "string"
+    },
+    "formats": {
+      "items": {
+        "enum": [
+          "html",
+          "xml",
+          "json",
+          "csv",
+          "pdf",
+          "odata",
+          "sru",
+          "atom",
+          "rss"
+        ],
+        "type": "string"
+      },
+      "title": "Formats",
+      "type": "array"
+    },
+    "languages": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Languages",
+      "type": "array"
+    },
+    "access_method": {
+      "minLength": 1,
+      "title": "Access Method",
+      "type": "string"
+    },
+    "reuse_restrictions": {
+      "minLength": 1,
+      "title": "Reuse Restrictions",
+      "type": "string"
+    },
+    "access_status": {
+      "enum": [
+        "verified",
+        "restricted",
+        "unavailable",
+        "planned"
+      ],
+      "title": "Access Status",
+      "type": "string"
+    },
+    "adapter": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Adapter"
+    },
+    "records_ingested": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Records Ingested",
+      "type": "integer"
+    },
+    "last_checked": {
+      "format": "date",
+      "title": "Last Checked",
+      "type": "string"
+    },
+    "notes": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Notes"
+    }
+  },
+  "required": [
+    "source_id",
+    "country_code",
+    "organisation",
+    "publication_type",
+    "title",
+    "official_url",
+    "formats",
+    "languages",
+    "access_method",
+    "reuse_restrictions",
+    "access_status",
+    "last_checked"
+  ],
+  "title": "SourceRegistryEntry",
+  "type": "object"
+}

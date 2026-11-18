@@ -1,0 +1,13 @@
+{
+  "country_code": "MY",
+  "name": "Malaysia",
+  "region": "Southeast Asia",
+  "languages": [
+    "ms",
+    "en"
+  ],
+  "gazette_name": "Warta Kerajaan Persekutuan",
+  "publisher_name": "Attorney General's Chambers",
+  "default_language": "ms",
+  "coverage_status": "planned"
+}

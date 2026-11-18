@@ -1,0 +1,12 @@
+{
+  "country_code": "DE",
+  "name": "Germany",
+  "region": "Europe",
+  "languages": [
+    "de"
+  ],
+  "gazette_name": "Bundesgesetzblatt",
+  "publisher_name": "Bundesministerium der Justiz",
+  "default_language": "de",
+  "coverage_status": "partial"
+}

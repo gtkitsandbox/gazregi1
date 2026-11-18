@@ -1,0 +1,12 @@
+{
+  "country_code": "TH",
+  "name": "Thailand",
+  "region": "Southeast Asia",
+  "languages": [
+    "th"
+  ],
+  "gazette_name": "Royal Thai Government Gazette",
+  "publisher_name": "Secretariat of the Cabinet",
+  "default_language": "th",
+  "coverage_status": "planned"
+}

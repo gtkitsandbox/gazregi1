@@ -1,0 +1,13 @@
+{
+  "country_code": "IE",
+  "name": "Ireland",
+  "region": "Europe",
+  "languages": [
+    "en",
+    "ga"
+  ],
+  "gazette_name": "Iris Oifigiúil",
+  "publisher_name": "Government Publications",
+  "default_language": "en",
+  "coverage_status": "partial"
+}

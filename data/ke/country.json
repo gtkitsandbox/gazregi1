@@ -1,0 +1,13 @@
+{
+  "country_code": "KE",
+  "name": "Kenya",
+  "region": "Africa",
+  "languages": [
+    "en",
+    "sw"
+  ],
+  "gazette_name": "Kenya Gazette",
+  "publisher_name": "Government Printer",
+  "default_language": "en",
+  "coverage_status": "partial"
+}

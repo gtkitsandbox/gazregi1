@@ -17,6 +17,13 @@
       <input id="tender-query" data-filter="query" type="search" placeholder="Title, reference, issuer" autocomplete="off">
     </div>
     <div class="filter-field">
+      <label for="tender-country">Country</label>
+      <select id="tender-country" data-filter="country">
+        <option value="">All countries</option>
+        {% for value, label in country_options %}<option value="{{ value }}">{{ label }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="filter-field">
       <label for="tender-sector">Industry</label>
       <select id="tender-sector" data-filter="sector">
         <option value="">All industries</option>
@@ -56,9 +63,9 @@
 
   <div class="tender-list" data-tender-list>
     {% for item in tenders %}
-    <article class="tender-card" data-tender data-sector="{{ item.record.tender.sector }}" data-location="{{ item.record.tender.location or '' }}" data-organisation="{{ item.record.tender.issuer_organisation_id or '' }}" data-closing="{{ item.record.tender.closing_date or '' }}" data-closing-time="{{ item.record.tender.closing_time or '' }}">
+    <article class="tender-card" data-tender data-sector="{{ item.record.tender.sector }}" data-location="{{ item.record.tender.location or '' }}" data-organisation="{{ item.record.tender.issuer_organisation_id or '' }}" data-country="{{ item.country.country_code|lower }}" data-closing="{{ item.record.tender.closing_date or '' }}" data-closing-time="{{ item.record.tender.closing_time or '' }}">
       <div class="tender-card__top">
-        {{ badge(sector_label(item.record.tender.sector), "sector") }}
+        <span>{{ badge(sector_label(item.record.tender.sector), "sector") }} {{ badge(item.record.tender.status|title, "verified" if item.record.tender.status == "open" else ("warning" if item.record.tender.status in ["closed", "cancelled"] else "neutral")) }}</span>
         <span class="tender-card__reference">{{ item.record.tender.reference }}</span>
       </div>
       <h2><a href="{{ record_path(item.record) }}">{{ item.record.title }}</a></h2>
@@ -67,7 +74,7 @@
         <div><dt>Issuer</dt><dd>{% if item.org %}<a href="{{ org_path(item.org) }}">{{ item.org.name }}</a>{% else %}Not recorded{% endif %}</dd></div>
         <div><dt>Location</dt><dd>{{ item.record.tender.location or "Not recorded" }}</dd></div>
         <div><dt>Closing</dt><dd>{{ item.record.tender.closing_date|date_long_or_missing }}{% if item.record.tender.closing_time %} at {{ item.record.tender.closing_time }}{% endif %}</dd></div>
-        <div><dt>Gazette</dt><dd><a href="{{ item.issue.path }}">No. {{ item.issue.issue.gazette_no }}</a></dd></div>
+        <div><dt>Source</dt><dd><a href="{{ item.origin.path }}">{{ item.origin.label }}</a></dd></div>
       </dl>
     </article>
     {% endfor %}

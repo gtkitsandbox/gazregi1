@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% from "_macros.html" import badge, breadcrumbs, empty_state %}
+{% block body_class %}page-sources{% endblock %}
+{% block content %}
+<div class="shell">
+  {{ breadcrumbs(crumbs) }}
+  <header class="page-heading">
+    <p class="eyebrow">PROVENANCE</p>
+    <h1>Source registry</h1>
+    <p class="page-heading__lede">Every official publisher used by the index, with publication type, supported formats, access method, reuse restrictions and current access status. Sources marked restricted or unavailable are documented, not silently omitted.</p>
+  </header>
+
+  <form class="filter-bar" data-source-filters aria-label="Filter sources">
+    <div class="filter-field filter-field--search">
+      <label for="source-query">Search sources</label>
+      <input id="source-query" data-filter="query" type="search" placeholder="Country, organisation or publication" autocomplete="off">
+    </div>
+    <div class="filter-field">
+      <label for="source-country">Country</label>
+      <select id="source-country" data-filter="country">
+        <option value="">All countries</option>
+        {% for row in country_stats %}<option value="{{ row.code|lower }}">{{ row.name }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="filter-field">
+      <label for="source-status">Access status</label>
+      <select id="source-status" data-filter="status">
+        <option value="">All statuses</option>
+        <option value="verified">Accessible</option>
+        <option value="restricted">Restricted</option>
+        <option value="unavailable">Unavailable</option>
+        <option value="planned">Planned</option>
+      </select>
+    </div>
+    <button class="button button--secondary" type="reset" data-filter-reset>Reset</button>
+  </form>
+  <div class="filter-summary"><p id="source-count" aria-live="polite">{{ sources|length }} sources</p></div>
+
+  {% if sources %}
+  <div class="source-list" data-source-list>
+    {% for item in sources %}{% set source = item.source %}
+    <article class="source-item" id="source-{{ source.source_id }}" data-source data-country="{{ item.country_code|lower }}" data-status="{{ source.access_status }}">
+      <div class="source-item__heading">
+        <h2><a href="{{ source.official_url }}" target="_blank" rel="noopener">{{ source.title }}</a></h2>
+        {{ badge(access_status_label(source.access_status), "verified" if source.access_status == "verified" else ("warning" if source.access_status == "restricted" else "neutral")) }}
+      </div>
+      <dl class="detail-list detail-list--two">
+        <div><dt>Country</dt><dd><a href="/countries/{{ item.country_code|lower }}/">{{ item.country_name }}</a></dd></div>
+        <div><dt>Organisation</dt><dd>{{ source.organisation }}</dd></div>
+        <div><dt>Publication type</dt><dd>{{ source.publication_type|replace("_", " ")|title }}</dd></div>
+        <div><dt>Formats</dt><dd>{{ source.formats|join(", ")|upper }}</dd></div>
+        <div><dt>Languages</dt><dd>{{ source.languages|join(", ") }}</dd></div>
+        <div><dt>Access method</dt><dd>{{ source.access_method }}</dd></div>
+        <div><dt>Records ingested</dt><dd>{{ source.records_ingested }}</dd></div>
+        <div><dt>Last checked</dt><dd>{{ source.last_checked|date_long }}</dd></div>
+        <div class="detail-list__wide"><dt>Reuse restrictions</dt><dd>{{ source.reuse_restrictions }}</dd></div>
+        {% if source.notes %}<div class="detail-list__wide"><dt>Notes</dt><dd>{{ source.notes }}</dd></div>{% endif %}
+      </dl>
+    </article>
+    {% endfor %}
+  </div>
+  <div class="empty-state" data-source-empty hidden>
+    <h2>No sources match these filters</h2>
+    <p>Clear one or more filters to see the registry.</p>
+  </div>
+  {% else %}
+    {{ empty_state("No sources registered yet", "The registry is populated from config/sources-intl.json.", "/about/", "Read about the index") }}
+  {% endif %}
+</div>
+{% endblock %}

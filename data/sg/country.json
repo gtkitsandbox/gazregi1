@@ -1,0 +1,12 @@
+{
+  "country_code": "SG",
+  "name": "Singapore",
+  "region": "Southeast Asia",
+  "languages": [
+    "en"
+  ],
+  "gazette_name": "Republic of Singapore Government Gazette",
+  "publisher_name": "Attorney-General's Chambers",
+  "default_language": "en",
+  "coverage_status": "partial"
+}

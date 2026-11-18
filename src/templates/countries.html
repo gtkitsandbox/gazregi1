@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% from "_macros.html" import badge, breadcrumbs %}
+{% block body_class %}page-countries{% endblock %}
+{% block content %}
+<div class="shell">
+  {{ breadcrumbs(crumbs) }}
+  <header class="page-heading">
+    <p class="eyebrow">COVERAGE</p>
+    <h1>Countries</h1>
+    <p class="page-heading__lede">Coverage is listed alphabetically by country and grouped by region. A verified flag means records have been retrieved from an official source and passed provenance checks; planned countries have no published records yet.</p>
+  </header>
+
+  <form class="filter-bar" data-country-filters aria-label="Filter countries">
+    <div class="filter-field filter-field--search">
+      <label for="country-query">Search countries</label>
+      <input id="country-query" data-filter="query" type="search" placeholder="Country or region" autocomplete="off">
+    </div>
+    <div class="filter-field">
+      <label for="country-region">Region</label>
+      <select id="country-region" data-filter="region">
+        <option value="">All regions</option>
+        {% for region in regions %}<option value="{{ region }}">{{ region }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="filter-field">
+      <label for="country-coverage">Coverage</label>
+      <select id="country-coverage" data-filter="coverage">
+        <option value="">All coverage</option>
+        <option value="verified">Verified data</option>
+        <option value="partial">Partial coverage</option>
+        <option value="planned">Planned coverage</option>
+      </select>
+    </div>
+    <button class="button button--secondary" type="reset" data-filter-reset>Reset</button>
+  </form>
+  <div class="filter-summary"><p id="country-count" aria-live="polite">{{ country_stats|length }} countries</p></div>
+
+  {% for region in regions %}
+  <section class="explore" data-country-section data-region="{{ region }}">
+    <h2>{{ region }}</h2>
+    <div class="country-grid" data-country-list>
+      {% for row in country_stats if row.region == region %}
+      <a class="section-card country-card" href="{{ row.path }}" data-country data-region="{{ row.region }}" data-coverage="{{ row.coverage }}">
+        <span class="section-card__label">{{ row.name }}</span>
+        {{ badge(coverage_label(row.coverage), coverage_tone(row.coverage)) }}
+        <span class="section-card__value">{{ row.records }} records · {{ row.sources }} sources · {{ row.languages|join(", ") }}</span>
+        <span class="section-card__text">{% if row.latest_date %}Latest publication {{ row.latest_date|date_long }}{% else %}No verified records published yet{% endif %}</span>
+        <span class="section-card__text">{{ row.tenders }} tenders · {{ row.notices }} notices · {{ row.regulations }} regulations</span>
+      </a>
+      {% endfor %}
+    </div>
+  </section>
+  {% endfor %}
+  <div class="empty-state" data-country-empty hidden>
+    <h2>No countries match these filters</h2>
+    <p>Clear one or more filters to see all countries.</p>
+  </div>
+</div>
+{% endblock %}

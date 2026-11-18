@@ -264,6 +264,42 @@ def build_validation_report(
             if not issue_path.exists():
                 errors.append(f"Missing Gazette issue page: {issue.issue.issue_id}")
 
+        for country in site.countries:
+            code = country.config.country_code.lower()
+            country_path = output_dir / "countries" / code / "index.html"
+            if not country_path.exists():
+                errors.append(f"Missing country page: /countries/{code}/")
+                continue
+            country_text = html.unescape(country_path.read_text(encoding="utf-8"))
+            if country.config.name not in country_text:
+                errors.append(f"/countries/{code}/: country name missing")
+            for record in country.records:
+                if record.source.kind != "pdf":
+                    document = site.document_for(record.source.document_id or "")
+                    if str(record.source.official_url) != str(document.official_url):
+                        errors.append(f"{record.uid}: official URL differs from document snapshot")
+                    if record.source.sha256 != document.source_sha256:
+                        errors.append(f"{record.uid}: checksum differs from document snapshot")
+            record_path = output_dir / "countries" / code / "index.html"
+            if record_path.exists() and f">{len(country.records)}<" not in record_path.read_text(encoding="utf-8"):
+                warnings.append(f"/countries/{code}/: record count not found as a standalone statistic")
+
+        source_path = output_dir / "sources" / "index.html"
+        if not source_path.exists():
+            errors.append("Missing source registry page: /sources/")
+        else:
+            source_text = source_path.read_text(encoding="utf-8")
+            for entry in site.source_registry:
+                if f'id="source-{entry.source_id}"' not in source_text:
+                    errors.append(f"/sources/: missing anchor for {entry.source_id}")
+
+        for record in site.records:
+            if record.source.kind == "pdf":
+                continue
+            document = site.document_for(record.source.document_id or "")
+            if document.country_code != site.country_of_record(record).config.country_code:
+                errors.append(f"{record.uid}: document country mismatch")
+
         # Deployment metadata
         if preview_mode:
             robots = (output_dir / "robots.txt").read_text(encoding="utf-8") if (output_dir / "robots.txt").exists() else ""
@@ -283,6 +319,9 @@ def build_validation_report(
                     errors.append(f"Preview contains production marker: {forbidden}")
             if "Designer preview" not in preview_text:
                 errors.append("Designer preview banner is missing")
+            for required in ("Nordmark", "Coralia"):
+                if required not in preview_text:
+                    errors.append(f"Preview multi-country coverage is missing: {required}")
         else:
             sitemap_path = output_dir / "sitemap.xml"
             if not sitemap_path.exists():
@@ -319,6 +358,10 @@ def build_validation_report(
                 "A. Example",
                 "preview.invalid",
                 "XX-2099-9999",
+                "Nordmark",
+                "Coralia",
+                "DEMO-YY-001",
+                "example.invalid",
             ):
                 if forbidden in production_text:
                     errors.append(f"Production build contains demonstration marker: {forbidden}")

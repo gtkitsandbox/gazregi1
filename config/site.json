@@ -1,7 +1,28 @@
 {
   "site_name": "GazetteRegistry",
   "default_site_url": "https://gazetteregistry.com",
-  "countries": ["lk"],
+  "countries": [
+    "au",
+    "bd",
+    "ca",
+    "de",
+    "gb",
+    "id",
+    "ie",
+    "in",
+    "jp",
+    "ke",
+    "kr",
+    "lk",
+    "my",
+    "nl",
+    "nz",
+    "ph",
+    "sg",
+    "th",
+    "us",
+    "za"
+  ],
   "corrections_email": null,
   "corrections_note": null
 }

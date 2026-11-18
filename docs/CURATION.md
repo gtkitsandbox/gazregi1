@@ -4,20 +4,43 @@ All examples in this document are fictional. Do not copy demonstration names or 
 
 ## 1. Prerequisites
 
+There are two supported ways to add records.
+
+### PDF gazette pages
+
 1. Extract the official PDF into `data/<country>/<year>/<issue-dir>/` with `scripts/extract_pdf.py`.
 2. Refresh provenance with `npm run sources`.
-3. Add curated rows to the country's NDJSON files.
+3. Add curated rows to the country's `records/records.ndjson`.
 4. Run `npm run build`. The build rejects unsupported records before publishing anything.
 
-A new record requires:
+A PDF record requires:
 
 - `issue_id` that already exists;
+- `source.kind` of `pdf` (or omitted);
 - `source.pdf_page` that exists in `pages.ndjson`;
 - `source.printed_page` matching the extracted page if supplied;
 - `source.excerpt` copied verbatim from that page's extracted text;
-- a stable UID in the form `<COUNTRY>-<YEAR>-<GAZETTE>-<CATEGORY>-<SEQUENCE>`, where category is `APPT`, `TEND`, `NOTC` or `REGL`.
+- a stable UID in the form `<COUNTRY>-<YEAR>-<CATEGORY>-<SEQUENCE>`, where category is `APPT`, `TEND`, `NOTC` or `REGL`.
 
-Whitespace is normalised before the excerpt check, but the words and order must match. If a PDF has a malformed text layer, correct the extraction or choose a shorter verbatim excerpt; do not paraphrase the excerpt.
+### HTML, XML, JSON, CSV or text sources
+
+1. Confirm the publisher and official URL are described in `config/sources-intl.json`.
+2. Ingest with an adapter: `npm run ingest -- --country <cc> --source <source-id> --limit 10`.
+3. The adapter writes a text snapshot to `data/<cc>/sources/documents.ndjson`, a registry row to `sources/registry.ndjson`, and records to `records/records.ndjson`.
+4. Run `npm run build`.
+
+A non-PDF record requires:
+
+- `source.kind` of `html`, `xml`, `json`, `csv` or `text`;
+- `source.document_id` identifying a snapshot in `sources/documents.ndjson`;
+- `publication_date` on the record (the document date may be used as a fallback only when the record date is genuinely unknown);
+- `source.official_url` and `source.sha256` matching the snapshot exactly;
+- `source.excerpt` present verbatim in the snapshot text;
+- the snapshot's `source_id` present in the country's source registry.
+
+PDF page numbers are forbidden on non-PDF records, and `issue_id` is forbidden. This keeps the permanent URL and provenance rules intact without forcing every country through PDF extraction.
+
+Whitespace is normalised before either excerpt check, but the words and order must match. If a PDF has a malformed text layer, correct the extraction or choose a shorter verbatim excerpt; do not paraphrase the excerpt.
 
 ## 2. Record types
 
@@ -203,3 +226,24 @@ Files are written to `schemas/` and checked into the repository. The build uses 
 ## 7. Official PDF URLs
 
 `/extract_pdf.py --source-url <verified-url>` stores the URL in `issue.json`; `npm run sources` preserves it. The build appends `#page=<physical-page>` for page links. Never guess or construct a URL from a filename. If no verified URL exists, the site says so.
+
+
+## 8. International source registry
+
+`config/sources-intl.json` is the reusable registry of official publishers. Each entry records:
+
+- country code, organisation, publication type and title;
+- official URL, supported formats, languages and access method;
+- reuse restrictions;
+- access status: `verified`, `restricted`, `unavailable` or `planned`;
+- optional adapter name, ingested record count, last-checked date and notes.
+
+The build copies these rows into `/sources/`, so a source that is restricted or unavailable is disclosed rather than omitted. When adding an adapter, set `adapter` to the function name registered in `src/ingest/adapters.py`, ingest records, then run `npm run ingest -- --sync-registry` to refresh counts.
+
+Adapters must not ingest:
+
+- personal notices, deceased-estate notices, bankruptcy notices or similar personal records;
+- contact-person names, e-mail addresses, telephone numbers or private addresses;
+- bidder personal data.
+
+Facts that are not present in the official source stay `null`. Do not infer a closing date, award value, reference number or organisation identity.
