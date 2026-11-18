@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% from "_macros.html" import badge, breadcrumbs, record_source_link %}
+{% block body_class %}page-notice{% endblock %}
+{% block content %}
+<div class="shell shell--narrow">
+  {{ breadcrumbs(crumbs) }}
+  <header class="page-heading page-heading--record">
+    <p class="eyebrow">PUBLIC NOTICE <span aria-hidden="true">/</span> {{ notice_category_label(record.notice.category)|upper }}</p>
+    <h1>{{ record.title }}</h1>
+    <p class="meta-line">{{ badge(notice_category_label(record.notice.category), "notice") }} <span aria-hidden="true">·</span> Published {{ issue.issue.publication_date|date_long }} <span aria-hidden="true">·</span> Gazette No. {{ issue.issue.gazette_no }}, PDF page {{ record.source.pdf_page }}</p>
+  </header>
+
+  {% if record.summary %}<p class="lede">{{ record.summary }}</p>{% endif %}
+
+  <section class="detail-panel" aria-labelledby="notice-title">
+    <div class="section-heading"><h2 id="notice-title">Notice details</h2></div>
+    <dl class="detail-list detail-list--two">
+      <div><dt>Category</dt><dd>{{ notice_category_label(record.notice.category) }}</dd></div>
+      <div><dt>Location</dt><dd>{{ record.location or "Not stated" }}</dd></div>
+      <div><dt>Gazette</dt><dd><a href="{{ issue.path }}">No. {{ issue.issue.gazette_no }}</a>, {{ issue.issue.publication_date|date_long }}</dd></div>
+      <div><dt>Source page</dt><dd>PDF page {{ record.source.pdf_page }}{% if record.source.printed_page %}, printed page {{ record.source.printed_page }}{% endif %}</dd></div>
+    </dl>
+  </section>
+
+  <section class="source-excerpt" aria-labelledby="excerpt-title">
+    <div class="section-heading"><h2 id="excerpt-title">Source excerpt</h2>{{ record_source_link(record) }}</div>
+    <blockquote>{{ record.source.excerpt }}</blockquote>
+    <p class="provenance">Verified against the extracted text of {{ issue.source.source_file }}, PDF page {{ record.source.pdf_page }}. SHA-256 <code class="checksum">{{ issue.source.sha256 or "Not recorded" }}</code>.</p>
+  </section>
+
+  {% if related_orgs or related_people %}
+  <section class="detail-panel" aria-labelledby="related-title">
+    <div class="section-heading"><h2 id="related-title">Referenced entities</h2></div>
+    <div class="chip-row">
+      {% for org in related_orgs %}<a class="chip" href="{{ org_path(org) }}">{{ org.name }}</a>{% endfor %}
+      {% for ref in related_people %}{% if ref.person_path %}<a class="chip" href="{{ ref.person_path }}">{{ ref.published_name }}</a>{% else %}<span class="chip chip--muted">{{ ref.published_name }} (identity not published)</span>{% endif %}{% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <p class="inline-note"><a href="/corrections/">Request a correction</a> <span aria-hidden="true">·</span> <a href="/notices/">Back to public notices</a></p>
+</div>
+{% endblock %}

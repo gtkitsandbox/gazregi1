@@ -1,0 +1,8 @@
+{
+  "country_code": "XX",
+  "name": "Demo Republic",
+  "languages": ["en"],
+  "gazette_name": "The Example Gazette",
+  "publisher_name": null,
+  "default_language": "en"
+}

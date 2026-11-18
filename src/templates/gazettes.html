@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% from "_macros.html" import badge, breadcrumbs, empty_state %}
+{% block body_class %}page-gazettes{% endblock %}
+{% block content %}
+<div class="shell">
+  {{ breadcrumbs(crumbs) }}
+  <header class="page-heading">
+    <p class="eyebrow">GAZETTE ARCHIVE</p>
+    <h1>Gazettes</h1>
+    <p class="page-heading__lede">Every indexed issue, ordered by publication date. Issue pages preserve the page-level index and link to the official source document where recorded.</p>
+  </header>
+
+  {% if countries_with_issues %}
+    {% for country in countries_with_issues %}
+    <section class="stack" aria-labelledby="country-{{ country.config.country_code }}">
+      <div class="section-heading">
+        <h2 id="country-{{ country.config.country_code }}">{{ country.config.name }}</h2>
+        <span class="section-count">{{ country.issues|length }} issues</span>
+      </div>
+      <div class="record-list">
+        {% for issue in country.issues|sort(attribute="issue.publication_date", reverse=true) %}
+        <article class="record-card">
+          <div class="record-card__top">
+            {{ badge(country.config.country_code, "neutral") }}
+            <span class="record-card__date">{{ issue.issue.publication_date|date_long }}</span>
+          </div>
+          <h3 class="record-card__title"><a href="{{ issue.path }}">Gazette No. {{ issue.issue.gazette_no }}</a></h3>
+          <dl class="record-card__meta">
+            <div><dt>Edition</dt><dd>{{ issue.issue.edition }} · {{ issue.issue.gazette_type|capitalize }}</dd></div>
+            <div><dt>Pages</dt><dd>{{ issue.pages|length }}</dd></div>
+            <div><dt>Records</dt><dd>{{ record_count_for_issue(issue.issue.issue_id) }}</dd></div>
+            <div><dt>Official source</dt><dd>{% if issue.issue.source_url %}Recorded{% else %}Not recorded{% endif %}</dd></div>
+          </dl>
+        </article>
+        {% endfor %}
+      </div>
+    </section>
+    {% endfor %}
+  {% else %}
+    {{ empty_state("No Gazettes indexed yet", "The archive has no extracted issues. Build from data/&lt;country&gt;/ once extraction is complete.") }}
+  {% endif %}
+</div>
+{% endblock %}

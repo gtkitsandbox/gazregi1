@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block body_class %}page-404{% endblock %}
+{% block content %}
+<div class="shell shell--narrow">
+  <header class="page-heading">
+    <p class="eyebrow">404</p>
+    <h1>Page not found</h1>
+    <p class="page-heading__lede">The requested page does not exist in this build. Records may have moved only when a permanent URL changed; indexed record URLs are intended to remain stable.</p>
+  </header>
+  <div class="card-grid">
+    <a class="section-card" href="/"><span class="section-card__label">Home</span><span class="section-card__text">Search the index.</span></a>
+    <a class="section-card" href="/gazettes/"><span class="section-card__label">Gazettes</span><span class="section-card__text">Browse indexed issues.</span></a>
+    <a class="section-card" href="/about/"><span class="section-card__label">About</span><span class="section-card__text">Methodology and limitations.</span></a>
+    <a class="section-card" href="/corrections/"><span class="section-card__label">Corrections</span><span class="section-card__text">Report a broken link.</span></a>
+  </div>
+</div>
+{% endblock %}

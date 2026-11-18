@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gazetteregistry.com/schemas/country.schema.json",
+  "additionalProperties": false,
+  "properties": {
+    "country_code": {
+      "pattern": "^[A-Z]{2}$",
+      "title": "Country Code",
+      "type": "string"
+    },
+    "name": {
+      "minLength": 1,
+      "title": "Name",
+      "type": "string"
+    },
+    "languages": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Languages",
+      "type": "array"
+    },
+    "gazette_name": {
+      "minLength": 1,
+      "title": "Gazette Name",
+      "type": "string"
+    },
+    "publisher_name": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Publisher Name"
+    },
+    "default_language": {
+      "minLength": 2,
+      "title": "Default Language",
+      "type": "string"
+    }
+  },
+  "required": [
+    "country_code",
+    "name",
+    "languages",
+    "gazette_name",
+    "default_language"
+  ],
+  "title": "CountryConfig",
+  "type": "object"
+}

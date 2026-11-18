@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% from "_macros.html" import badge, breadcrumbs, empty_state %}
+{% block body_class %}page-tenders{% endblock %}
+{% block content %}
+<div class="shell">
+  {{ breadcrumbs(crumbs) }}
+  <header class="page-heading">
+    <p class="eyebrow">PROCUREMENT</p>
+    <h1>Tenders</h1>
+    <p class="page-heading__lede">Supplier opportunities published in indexed Gazettes. Filter by industry, location, issuing organisation and closing date. GazetteRegistry does not receive bids, run accounts or send alerts.</p>
+  </header>
+
+  {% if tenders %}
+  <form class="filter-bar" data-tender-filters aria-label="Filter tenders">
+    <div class="filter-field filter-field--search">
+      <label for="tender-query">Search</label>
+      <input id="tender-query" data-filter="query" type="search" placeholder="Title, reference, issuer" autocomplete="off">
+    </div>
+    <div class="filter-field">
+      <label for="tender-sector">Industry</label>
+      <select id="tender-sector" data-filter="sector">
+        <option value="">All industries</option>
+        {% for value, label in sector_options %}<option value="{{ value }}">{{ label }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="filter-field">
+      <label for="tender-location">Location</label>
+      <select id="tender-location" data-filter="location">
+        <option value="">All locations</option>
+        {% for value in location_options %}<option value="{{ value }}">{{ value }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="filter-field">
+      <label for="tender-org">Organisation</label>
+      <select id="tender-org" data-filter="organisation">
+        <option value="">All organisations</option>
+        {% for value, label in organisation_options %}<option value="{{ value }}">{{ label }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="filter-field">
+      <label for="tender-closing">Closing date</label>
+      <select id="tender-closing" data-filter="closing">
+        <option value="">Any closing date</option>
+        <option value="open">Open now</option>
+        <option value="soon">Closing within 30 days</option>
+        <option value="closed">Closed</option>
+        <option value="unknown">Date not stated</option>
+      </select>
+    </div>
+    <button class="button button--secondary" type="reset" data-filter-reset>Reset</button>
+  </form>
+  <div class="filter-summary">
+    <p id="tender-count" aria-live="polite">{{ tenders|length }} tender{% if tenders|length != 1 %}s{% endif %}</p>
+    <p class="filter-hint">Closing status is calculated in your browser from the published date.</p>
+  </div>
+
+  <div class="tender-list" data-tender-list>
+    {% for item in tenders %}
+    <article class="tender-card" data-tender data-sector="{{ item.record.tender.sector }}" data-location="{{ item.record.tender.location or '' }}" data-organisation="{{ item.record.tender.issuer_organisation_id or '' }}" data-closing="{{ item.record.tender.closing_date or '' }}" data-closing-time="{{ item.record.tender.closing_time or '' }}">
+      <div class="tender-card__top">
+        {{ badge(sector_label(item.record.tender.sector), "sector") }}
+        <span class="tender-card__reference">{{ item.record.tender.reference }}</span>
+      </div>
+      <h2><a href="{{ record_path(item.record) }}">{{ item.record.title }}</a></h2>
+      {% if item.record.summary %}<p class="tender-card__summary">{{ item.record.summary }}</p>{% endif %}
+      <dl class="tender-facts">
+        <div><dt>Issuer</dt><dd>{% if item.org %}<a href="{{ org_path(item.org) }}">{{ item.org.name }}</a>{% else %}Not recorded{% endif %}</dd></div>
+        <div><dt>Location</dt><dd>{{ item.record.tender.location or "Not recorded" }}</dd></div>
+        <div><dt>Closing</dt><dd>{{ item.record.tender.closing_date|date_long_or_missing }}{% if item.record.tender.closing_time %} at {{ item.record.tender.closing_time }}{% endif %}</dd></div>
+        <div><dt>Gazette</dt><dd><a href="{{ item.issue.path }}">No. {{ item.issue.issue.gazette_no }}</a></dd></div>
+      </dl>
+    </article>
+    {% endfor %}
+  </div>
+  <div class="empty-state" data-tender-empty hidden>
+    <h2>No tenders match these filters</h2>
+    <p>Clear one or more filters to see published tender records.</p>
+  </div>
+  {% else %}
+    {{ empty_state("No tender records published yet", "Tender records appear only after an operator verifies the source excerpt and publishes the structured record. No placeholder opportunities are shown.", "/gazettes/", "Browse Gazettes") }}
+  {% endif %}
+</div>
+{% endblock %}

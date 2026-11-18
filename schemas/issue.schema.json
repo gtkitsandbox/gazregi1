@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gazetteregistry.com/schemas/issue.schema.json",
+  "additionalProperties": false,
+  "properties": {
+    "issue_id": {
+      "pattern": "^[A-Z]{2}-\\d{4}-\\d+$",
+      "title": "Issue Id",
+      "type": "string"
+    },
+    "country": {
+      "pattern": "^[A-Z]{2}$",
+      "title": "Country",
+      "type": "string"
+    },
+    "gazette_no": {
+      "title": "Gazette No",
+      "type": "string"
+    },
+    "gazette_type": {
+      "title": "Gazette Type",
+      "type": "string"
+    },
+    "edition": {
+      "title": "Edition",
+      "type": "string"
+    },
+    "publication_date": {
+      "format": "date",
+      "title": "Publication Date",
+      "type": "string"
+    },
+    "source_url": {
+      "anyOf": [
+        {
+          "format": "uri",
+          "maxLength": 2083,
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Source Url"
+    },
+    "source_file": {
+      "title": "Source File",
+      "type": "string"
+    },
+    "page_count": {
+      "exclusiveMinimum": 0,
+      "title": "Page Count",
+      "type": "integer"
+    },
+    "parser_version": {
+      "title": "Parser Version",
+      "type": "string"
+    },
+    "extraction_method": {
+      "title": "Extraction Method",
+      "type": "string"
+    },
+    "extracted_at": {
+      "title": "Extracted At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "issue_id",
+    "country",
+    "gazette_no",
+    "gazette_type",
+    "edition",
+    "publication_date",
+    "source_url",
+    "source_file",
+    "page_count",
+    "parser_version",
+    "extraction_method",
+    "extracted_at"
+  ],
+  "title": "GazetteIssue",
+  "type": "object"
+}

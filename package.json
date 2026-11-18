@@ -1,11 +1,23 @@
 {
   "name": "gazetteregistry",
   "private": true,
+  "type": "module",
   "scripts": {
-    "build": "python scripts/build_site.py && pagefind --site dist",
-    "serve": "python -m http.server 4173 --directory dist"
+    "build": "python scripts/build_site.py && pagefind --site dist && python scripts/validate_site.py && node scripts/validate_search.mjs",
+    "build:site": "python scripts/build_site.py",
+    "build:preview": "python scripts/build_site.py --preview && pagefind --site dist-preview && python scripts/validate_site.py --preview && node scripts/validate_search.mjs --preview",
+    "preview": "wrangler dev",
+    "preview:serve": "python -m http.server 4174 --directory dist-preview",
+    "validate": "python scripts/validate_site.py",
+    "validate:preview": "python scripts/validate_site.py --preview",
+    "validate:search": "node scripts/validate_search.mjs",
+    "validate:search:preview": "node scripts/validate_search.mjs --preview",
+    "schemas": "python scripts/export_schemas.py",
+    "sources": "python scripts/record_sources.py",
+    "deploy": "wrangler deploy"
   },
   "devDependencies": {
-    "pagefind": "^1.3.0"
+    "pagefind": "^1.3.0",
+    "wrangler": "4.164.0"
   }
 }

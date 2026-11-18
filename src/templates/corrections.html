@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% from "_macros.html" import breadcrumbs %}
+{% block body_class %}page-corrections{% endblock %}
+{% block content %}
+<div class="shell shell--narrow">
+  {{ breadcrumbs(crumbs) }}
+  <header class="page-heading">
+    <p class="eyebrow">CORRECTIONS</p>
+    <h1>Request a correction</h1>
+    <p class="page-heading__lede">Correction requests cover indexing errors, broken source links, transcription problems and identity mappings. They do not change the official publication.</p>
+  </header>
+
+  <aside class="callout">
+    <strong>Submission channel.</strong>
+    {% if site.corrections_email %}
+    Email <a href="mailto:{{ site.corrections_email }}">{{ site.corrections_email }}</a>.
+    {% else %}
+    A public submission channel has not yet been enabled for this deployment. The operator will publish a verified contact route before public launch; no address is invented here.
+    {% endif %}
+    {% if site.corrections_note %}<span class="muted">{{ site.corrections_note }}</span>{% endif %}
+  </aside>
+
+  <section class="prose" aria-labelledby="include-title">
+    <h2 id="include-title">What to include</h2>
+    <ul>
+      <li>The page URL and the record or person identifier shown on the page.</li>
+      <li>The Gazette number, publication date, PDF page and printed page where available.</li>
+      <li>A clear description of the error and the correction requested.</li>
+      <li>A link to, or copy of, the relevant official source passage.</li>
+      <li>For identity corrections: the specific record references and the name variant at issue. Do not send private personal information.</li>
+    </ul>
+  </section>
+
+  <section class="prose" aria-labelledby="process-title">
+    <h2 id="process-title">How requests are handled</h2>
+    <ol>
+      <li>The cited source page is checked against the stored extraction and checksum.</li>
+      <li>If the index is wrong, the record is corrected and the build is regenerated.</li>
+      <li>If an identity mapping cannot be supported, the mapping is withdrawn from publication and the record remains with its published name.</li>
+      <li>If the official publication itself is disputed, the requester must pursue that with the official publisher. This site does not alter official records.</li>
+    </ol>
+    <p>No response-time commitment is published. Requests are handled by the site operator; operator identity is not published on this site.</p>
+  </section>
+
+  <section class="prose" aria-labelledby="not-title">
+    <h2 id="not-title">What this process does not do</h2>
+    <ul>
+      <li>It does not remove accurate records of official publications.</li>
+      <li>It does not provide legal advice or determine legal rights.</li>
+      <li>It does not accept bids, payments or account requests.</li>
+      <li>It does not publish private contact details or unsupported personal claims.</li>
+    </ul>
+  </section>
+</div>
+{% endblock %}

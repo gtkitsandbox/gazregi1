@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import os
 
-# Override with the real production domain before deploying.
+# Override with SITE_URL or the build --site-url flag before deploying.
 DEFAULT_SITE_URL = "https://gazetteregistry.com"
 
 
@@ -12,7 +12,7 @@ def site_base_url() -> str:
     return os.environ.get("SITE_URL", DEFAULT_SITE_URL).rstrip("/")
 
 
-def canonical_url(path: str) -> str:
+def canonical_url(path: str, base_url: str | None = None) -> str:
     if not path.startswith("/"):
         path = f"/{path}"
-    return f"{site_base_url()}{path}"
+    return f"{(base_url or site_base_url()).rstrip('/')}{path}"

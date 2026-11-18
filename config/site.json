@@ -1,0 +1,7 @@
+{
+  "site_name": "GazetteRegistry",
+  "default_site_url": "https://gazetteregistry.com",
+  "countries": ["lk"],
+  "corrections_email": null,
+  "corrections_note": null
+}

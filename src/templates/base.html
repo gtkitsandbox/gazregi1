@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="{{ meta.description }}">
+  <meta name="robots" content="{{ meta.robots }}">
+  <title>{{ meta.title }}</title>
+  <link rel="canonical" href="{{ canonical }}">
+  <meta property="og:type" content="{{ meta.og_type }}">
+  <meta property="og:site_name" content="{{ site.site_name }}">
+  <meta property="og:title" content="{{ meta.title }}">
+  <meta property="og:description" content="{{ meta.description }}">
+  <meta property="og:url" content="{{ canonical }}">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="{{ meta.title }}">
+  <meta name="twitter:description" content="{{ meta.description }}">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/assets/styles.css">
+  <script type="application/ld+json">{{ structured_data|safe }}</script>
+</head>
+<body class="{% block body_class %}{% endblock %}">
+  <a class="skip-link" href="#main">Skip to main content</a>
+  {% if preview %}
+  <div class="preview-banner" role="status">
+    <strong>Designer preview.</strong> All records on this site are fictional demonstration content. This build is not for publication or indexing.
+  </div>
+  {% endif %}
+  <header class="site-header" data-pagefind-ignore>
+    <div class="site-header__inner">
+      <a class="wordmark" href="/" aria-label="{{ site.site_name }} home">{{ site.site_name }}</a>
+      <nav class="primary-nav" aria-label="Primary">
+        {% for item in nav %}
+        <a href="{{ item.path }}"{% if item.section == current_section %} aria-current="page"{% endif %}>{{ item.label }}</a>
+        {% endfor %}
+      </nav>
+      <form class="header-search" action="/" method="get" role="search">
+        <label class="visually-hidden" for="global-search">Search indexed records</label>
+        <input id="global-search" name="q" type="search" placeholder="Search records" autocomplete="off">
+        <button type="submit">Search</button>
+      </form>
+    </div>
+  </header>
+
+  <main id="main"{% if pagefind_body %} data-pagefind-body{% else %} data-pagefind-ignore{% endif %}>
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer" data-pagefind-ignore>
+    <div class="site-footer__inner">
+      <div>
+        <p class="site-footer__brand">{{ site.site_name }}</p>
+        <p>An independent public-record and procurement discovery service. Not affiliated with any government. Source documents remain with their official publisher.</p>
+      </div>
+      <nav aria-label="Footer">
+        <a href="/gazettes/">Gazettes</a>
+        <a href="/about/">About</a>
+        <a href="/corrections/">Corrections</a>
+      </nav>
+      <p class="site-footer__note">
+        {% if preview %}Fictional demonstration build. Not indexed.{% else %}Indexed from official Gazette publications with page-level source references.{% endif %}
+      </p>
+    </div>
+  </footer>
+  <script type="module" src="/assets/app.js"></script>
+</body>
+</html>

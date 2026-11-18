@@ -1,4 +1,4 @@
-"""Minimal XML sitemap builder (single file; well under the 50,000 URL limit)."""
+"""Minimal XML sitemap builder with a URL-count guard."""
 
 from __future__ import annotations
 
@@ -9,20 +9,35 @@ from .canonical import canonical_url
 
 
 class SitemapBuilder:
-    def __init__(self) -> None:
-        self._paths: list[str] = []
+    MAX_URLS = 50_000
 
-    def add(self, path: str) -> None:
-        self._paths.append(path)
+    def __init__(self, site_url: str) -> None:
+        self._site_url = site_url
+        self._entries: list[tuple[str, str | None]] = []
+        self._seen: set[str] = set()
+
+    def add(self, path: str, lastmod: str | None = None) -> None:
+        if path in self._seen:
+            return
+        self._seen.add(path)
+        self._entries.append((path, lastmod))
 
     def write(self, output_path: Path) -> None:
-        urls = "\n".join(
-            f"  <url><loc>{html.escape(canonical_url(path), quote=True)}</loc></url>" for path in self._paths
-        )
+        if len(self._entries) > self.MAX_URLS:
+            raise ValueError(
+                f"Sitemap has {len(self._entries)} URLs; split into a sitemap index above {self.MAX_URLS}."
+            )
+        urls = []
+        for path, lastmod in self._entries:
+            lastmod_xml = f"<lastmod>{html.escape(lastmod)}</lastmod>" if lastmod else ""
+            urls.append(
+                f"  <url><loc>{html.escape(canonical_url(path, self._site_url), quote=True)}</loc>"
+                f"{lastmod_xml}</url>"
+            )
         content = (
             '<?xml version="1.0" encoding="UTF-8"?>\n'
             '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
-            f"{urls}\n"
-            "</urlset>\n"
+            + "\n".join(urls)
+            + "\n</urlset>\n"
         )
         output_path.write_text(content, encoding="utf-8")

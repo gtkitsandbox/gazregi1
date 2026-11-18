@@ -1,0 +1,165 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gazetteregistry.com/schemas/page-record.schema.json",
+  "$defs": {
+    "SourceRecord": {
+      "additionalProperties": false,
+      "properties": {
+        "url": {
+          "anyOf": [
+            {
+              "format": "uri",
+              "maxLength": 2083,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Url"
+        },
+        "gazette_no": {
+          "title": "Gazette No",
+          "type": "string"
+        },
+        "page_start": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Page Start"
+        },
+        "page_end": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Page End"
+        },
+        "language": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Language"
+        }
+      },
+      "required": [
+        "url",
+        "gazette_no",
+        "page_start",
+        "page_end",
+        "language"
+      ],
+      "title": "SourceRecord",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "uid": {
+      "title": "Uid",
+      "type": "string"
+    },
+    "issue_id": {
+      "title": "Issue Id",
+      "type": "string"
+    },
+    "physical_pdf_page": {
+      "exclusiveMinimum": 0,
+      "title": "Physical Pdf Page",
+      "type": "integer"
+    },
+    "printed_page": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Printed Page"
+    },
+    "section": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Section"
+    },
+    "category": {
+      "title": "Category",
+      "type": "string"
+    },
+    "subcategory": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Subcategory"
+    },
+    "title": {
+      "title": "Title",
+      "type": "string"
+    },
+    "summary": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Summary"
+    },
+    "keywords": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Keywords",
+      "type": "array"
+    },
+    "source": {
+      "$ref": "#/$defs/SourceRecord"
+    }
+  },
+  "required": [
+    "uid",
+    "issue_id",
+    "physical_pdf_page",
+    "printed_page",
+    "section",
+    "category",
+    "subcategory",
+    "title",
+    "summary",
+    "keywords",
+    "source"
+  ],
+  "title": "GazettePage",
+  "type": "object"
+}

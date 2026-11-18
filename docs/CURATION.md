@@ -1,0 +1,205 @@
+# Curating records and identities
+
+All examples in this document are fictional. Do not copy demonstration names or values into production data.
+
+## 1. Prerequisites
+
+1. Extract the official PDF into `data/<country>/<year>/<issue-dir>/` with `scripts/extract_pdf.py`.
+2. Refresh provenance with `npm run sources`.
+3. Add curated rows to the country's NDJSON files.
+4. Run `npm run build`. The build rejects unsupported records before publishing anything.
+
+A new record requires:
+
+- `issue_id` that already exists;
+- `source.pdf_page` that exists in `pages.ndjson`;
+- `source.printed_page` matching the extracted page if supplied;
+- `source.excerpt` copied verbatim from that page's extracted text;
+- a stable UID in the form `<COUNTRY>-<YEAR>-<GAZETTE>-<CATEGORY>-<SEQUENCE>`, where category is `APPT`, `TEND`, `NOTC` or `REGL`.
+
+Whitespace is normalised before the excerpt check, but the words and order must match. If a PDF has a malformed text layer, correct the extraction or choose a shorter verbatim excerpt; do not paraphrase the excerpt.
+
+## 2. Record types
+
+| `record_type` | Category code | Required detail |
+| --- | --- | --- |
+| `appointment` | APPT | people with position + organisation |
+| `commissioning` | APPT | people with position + organisation |
+| `promotion` | APPT | people with position + organisation |
+| `professional_position` | APPT | people with position + organisation |
+| `organisational_appointment` | APPT | people with position + organisation |
+| `tender` | TEND | `tender` object |
+| `public_notice` | NOTC | `notice` object |
+| `regulation` | REGL | `regulation` object |
+
+### 2.1 Appointment example (fictional)
+
+```json
+{
+  "uid": "XX-2099-9999-APPT-001",
+  "record_type": "appointment",
+  "title": "Appointment of Chairperson, Example Authority",
+  "summary": null,
+  "issue_id": "XX-2099-9999",
+  "people": [
+    {
+      "person_id": "person:xx:a-example-001",
+      "published_name": "A. Example",
+      "position": "Chairperson",
+      "position_kind": "appointment",
+      "organisation_ids": ["org:xx:example-authority"]
+    }
+  ],
+  "organisation_ids": ["org:xx:example-authority"],
+  "location": "Sample District",
+  "keywords": ["appointment"],
+  "source": {
+    "pdf_page": 2,
+    "printed_page": 2,
+    "excerpt": "A. Example has been appointed Chairperson of the Example Authority with effect from 1 January 2099."
+  }
+}
+```
+
+`published_name` is exactly what the notice printed. It may differ from the verified canonical name; the person page shows both transparently. Do not add a biography, address, age, family relationship or inferred role.
+
+### 2.2 Tender example (fictional)
+
+```json
+{
+  "uid": "XX-2099-9999-TEND-001",
+  "record_type": "tender",
+  "title": "Supply of office stationery",
+  "issue_id": "XX-2099-9999",
+  "organisation_ids": ["org:xx:example-procurement-authority"],
+  "location": "Sample District",
+  "keywords": ["stationery", "supply"],
+  "tender": {
+    "reference": "DEMO/TEND/2099/001",
+    "issuer_organisation_id": "org:xx:example-procurement-authority",
+    "sector": "goods",
+    "location": "Sample District",
+    "closing_date": "2099-02-15",
+    "closing_time": "14:00",
+    "document_deadline": null,
+    "bid_security_lkr": 250000
+  },
+  "source": {
+    "pdf_page": 1,
+    "printed_page": 1,
+    "excerpt": "The Example Procurement Authority invites sealed bids for the supply of office stationery. Tender reference DEMO/TEND/2099/001. Bids close on 15 February 2099 at 14:00. Bid security: LKR 250,000."
+  }
+}
+```
+
+Sectors: `civil_works`, `goods`, `consultancy`, `services`, `it`, `maintenance`, `auction`, `other`. Use `null` for unavailable facts; never estimate a closing date or bid security.
+
+### 2.3 Public notice example (fictional)
+
+```json
+{
+  "uid": "XX-2099-9999-NOTC-001",
+  "record_type": "public_notice",
+  "title": "Statutory declaration affecting land in Sample District",
+  "issue_id": "XX-2099-9999",
+  "location": "Sample District",
+  "keywords": ["land"],
+  "notice": {"category": "land"},
+  "source": {
+    "pdf_page": 2,
+    "printed_page": 2,
+    "excerpt": "Notice is given that the land described in Schedule A in Sample District is subject to a statutory declaration."
+  }
+}
+```
+
+Notice categories: `land`, `insolvency`, `estate`, `court`, `licensing`, `professional`, `other`.
+
+### 2.4 Regulation example (fictional)
+
+```json
+{
+  "uid": "XX-2099-9999-REGL-001",
+  "record_type": "regulation",
+  "title": "The Example Regulation No. 1 of 2099",
+  "issue_id": "XX-2099-9999",
+  "organisation_ids": ["org:xx:example-authority"],
+  "regulation": {
+    "instrument_type": "regulation",
+    "instrument_number": "1 of 2099",
+    "effective_date": "2099-02-01"
+  },
+  "source": {
+    "pdf_page": 2,
+    "printed_page": 2,
+    "excerpt": "The Example Regulation No. 1 of 2099 comes into effect on 1 February 2099."
+  }
+}
+```
+
+Instrument types: `act`, `regulation`, `order`, `rule`, `notification`, `by_law`, `other`.
+
+## 3. People and identity verification
+
+### 3.1 Person entity (fictional)
+
+```json
+{"person_id": "person:xx:a-example-001", "country_code": "XX", "canonical_name": "A. Example", "identity_status": "operator_verified", "verified_at": "2099-01-01", "basis": "Reviewed against the cited appointment notice."}
+```
+
+Rules:
+
+- `person_id` format: `person:<lowercase-country>:<slug>`.
+- Only `operator_verified` people receive public pages, sitemap entries and record links.
+- `unverified` people remain in the file for review but are not published.
+- Never combine two people because their names match. Create separate `person_id` values and, if a reviewer confirms they are the same person, update the record references explicitly.
+- `basis` is an internal/public explanation of the review. Do not add private data or the operator's identity.
+
+### 3.2 Name variants (fictional)
+
+```json
+{"variant_id": "VAR-XX-001", "person_id": "person:xx:a-example-001", "name": "A. E. Example", "verification": "operator_verified", "basis": "Reviewer matched the initialised form in the cited notice.", "reviewed_at": "2099-01-01", "source_record_uids": ["XX-2099-9999-APPT-001"]}
+```
+
+Only `operator_verified` variants appear in HTML, structured data and search. `unverified` variants are held. A variant is a name form, never a separate identity.
+
+### 3.3 Same-name disambiguation
+
+Two verified people may share a published name. They receive separate URLs and pages. Each page renders a "Same published name, different identity" notice linking the other. No records move between them automatically.
+
+Run:
+
+```bash
+python scripts/report_name_candidates.py
+```
+
+The report is written to `reports/name-candidates.ndjson` (ignored by Git). It is advisory only and never edits data.
+
+## 4. Organisations
+
+```json
+{"organisation_id": "org:xx:example-authority", "country_code": "XX", "name": "Example Authority", "type": "statutory_body", "aliases": [], "identity_status": "operator_verified", "verified_at": "2099-01-01", "basis": "Reviewed against the cited notice."}
+```
+
+Types: `government_body`, `company`, `professional_body`, `statutory_body`, `other`. Organisation pages are generated for all curated organisations; unverified organisation pages are `noindex` and excluded from the sitemap. Do not infer ownership, government affiliation or current status beyond the cited notice.
+
+## 5. Adding a country
+
+1. Create `data/<cc>/country.json` with the ISO alpha-2 code, name, languages and Gazette title.
+2. Add the code to `countries` in `config/site.json`.
+3. Add extraction output under `data/<cc>/<year>/`, plus source, entity and record files.
+4. Build. Existing records and URLs do not change.
+
+## 6. Schemas
+
+Regenerate JSON Schema from the Python models:
+
+```bash
+npm run schemas
+```
+
+Files are written to `schemas/` and checked into the repository. The build uses the Python models directly, so schema and validation cannot drift silently.
+
+## 7. Official PDF URLs
+
+`/extract_pdf.py --source-url <verified-url>` stores the URL in `issue.json`; `npm run sources` preserves it. The build appends `#page=<physical-page>` for page links. Never guess or construct a URL from a filename. If no verified URL exists, the site says so.

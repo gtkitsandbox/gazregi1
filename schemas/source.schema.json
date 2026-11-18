@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gazetteregistry.com/schemas/source.schema.json",
+  "additionalProperties": false,
+  "description": "Checksum/provenance for a local extraction input.\n\n`sha256` may be null only for isolated demonstration data.  Production\nbuilds reject demonstration documents.",
+  "properties": {
+    "source_file": {
+      "minLength": 1,
+      "title": "Source File",
+      "type": "string"
+    },
+    "issue_id": {
+      "pattern": "^[A-Z]{2}-\\d{4}-\\d+$",
+      "title": "Issue Id",
+      "type": "string"
+    },
+    "sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Sha256"
+    },
+    "bytes": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Bytes"
+    },
+    "official_url": {
+      "anyOf": [
+        {
+          "format": "uri",
+          "maxLength": 2083,
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Official Url"
+    },
+    "checked_at": {
+      "format": "date",
+      "title": "Checked At",
+      "type": "string"
+    },
+    "demo": {
+      "default": false,
+      "title": "Demo",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "source_file",
+    "issue_id",
+    "checked_at"
+  ],
+  "title": "SourceDocument",
+  "type": "object"
+}

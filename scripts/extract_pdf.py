@@ -18,11 +18,16 @@ GAZETTE_NUMBER_PATTERN = re.compile(r"\bNo\.\s*([\d,]+)", re.IGNORECASE)
 HEADER_PATTERN = re.compile(r"GAZETTE OF THE DEMOCRATIC SOCIALIST REPUBLIC", re.IGNORECASE)
 
 
-def extract_issue(pdf_path: Path, output_root: Path, source_url: str | None = None) -> Path:
+def extract_issue(
+    pdf_path: Path, output_root: Path, source_url: str | None = None, country_code: str = "lk"
+) -> Path:
     match = FILENAME_PATTERN.fullmatch(pdf_path.name)
     if match is None:
         raise ValueError(f"Expected a Gazette-YYYY-MM-DD-edition.pdf filename: {pdf_path.name}")
 
+    country_code = country_code.strip().lower()
+    if not re.fullmatch(r"[a-z]{2}", country_code):
+        raise ValueError("--country must be a two-letter country code")
     year, month, day, edition = match.groups()
     publication_date = f"{year}-{month}-{day}"
     document = pymupdf.open(pdf_path)
@@ -32,14 +37,14 @@ def extract_issue(pdf_path: Path, output_root: Path, source_url: str | None = No
         raise ValueError(f"Could not determine Gazette number from {pdf_path.name}")
 
     gazette_number = number_match.group(1).replace(",", "")
-    issue_id = f"LK-{year}-{gazette_number}"
-    output_dir = output_root / "lk" / year / f"{publication_date}-{gazette_number}"
+    issue_id = f"{country_code.upper()}-{year}-{gazette_number}"
+    output_dir = output_root / country_code / year / f"{publication_date}-{gazette_number}"
     output_dir.mkdir(parents=True, exist_ok=True)
 
     extracted_at = datetime.now(timezone.utc).isoformat(timespec="seconds")
     issue = {
         "issue_id": issue_id,
-        "country": "LK",
+        "country": country_code.upper(),
         "gazette_no": gazette_number,
         "gazette_type": "regular" if edition.lower() == "e" else "extraordinary",
         "edition": edition,
@@ -125,9 +130,10 @@ def main() -> None:
     parser.add_argument("pdf", type=Path, help="Path to an official Gazette PDF")
     parser.add_argument("--output", type=Path, default=Path("data"), help="Output data directory")
     parser.add_argument("--source-url", help="Verified official URL for this Gazette PDF")
+    parser.add_argument("--country", default="lk", help="Two-letter country code (default: lk)")
     args = parser.parse_args()
 
-    output_dir = extract_issue(args.pdf, args.output, args.source_url)
+    output_dir = extract_issue(args.pdf, args.output, args.source_url, args.country)
     print(f"Extracted Gazette pages to {output_dir}")
 
 

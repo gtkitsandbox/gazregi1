@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% from "_macros.html" import badge, breadcrumbs, record_source_link %}
+{% block body_class %}page-record{% endblock %}
+{% block content %}
+<div class="shell shell--narrow">
+  {{ breadcrumbs(crumbs) }}
+  <header class="page-heading page-heading--record">
+    <p class="eyebrow">{{ issue.country.name|upper }} GAZETTE <span aria-hidden="true">/</span> NO. {{ issue.issue.gazette_no }}</p>
+    <h1>{{ page_heading }}</h1>
+    <p class="meta-line">Published {{ issue.issue.publication_date|date_long }} <span aria-hidden="true">·</span> PDF page {{ page.physical_pdf_page }}{% if page.printed_page %} <span aria-hidden="true">·</span> printed page {{ page.printed_page }}{% endif %}</p>
+  </header>
+
+  <section class="source-strip" data-pagefind-ignore>
+    <div>
+      <span class="label">Official source</span>
+      <p>{% if source_url %}<code>{{ source_url }}</code>{% else %}{{ issue.source.source_file }}{% endif %}</p>
+      <p class="source-strip__checksum">SHA-256 <code class="checksum">{{ issue.source.sha256 or "Not recorded" }}</code></p>
+    </div>
+    {{ record_source_link_detail }}
+  </section>
+
+  <p class="inline-note"><a href="{{ issue.path }}">View all pages in Gazette No. {{ issue.issue.gazette_no }}</a> <span aria-hidden="true">·</span> <a href="/corrections/">Request a correction</a></p>
+
+  <section class="transcription" aria-labelledby="text-title">
+    <div class="section-heading">
+      <h2 id="text-title">Extracted page text</h2>
+      {{ badge("Unclassified page", "neutral") }}
+    </div>
+    <pre>{{ text }}</pre>
+  </section>
+</div>
+{% endblock %}

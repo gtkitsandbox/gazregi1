@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gazetteregistry.com/schemas/name-variant.schema.json",
+  "additionalProperties": false,
+  "properties": {
+    "variant_id": {
+      "minLength": 1,
+      "title": "Variant Id",
+      "type": "string"
+    },
+    "person_id": {
+      "pattern": "^person:[a-z]{2}:[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "title": "Person Id",
+      "type": "string"
+    },
+    "name": {
+      "minLength": 1,
+      "title": "Name",
+      "type": "string"
+    },
+    "verification": {
+      "enum": [
+        "operator_verified",
+        "unverified"
+      ],
+      "title": "Verification",
+      "type": "string"
+    },
+    "basis": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Basis"
+    },
+    "reviewed_at": {
+      "anyOf": [
+        {
+          "format": "date",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Reviewed At"
+    },
+    "source_record_uids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Source Record Uids",
+      "type": "array"
+    }
+  },
+  "required": [
+    "variant_id",
+    "person_id",
+    "name",
+    "verification"
+  ],
+  "title": "NameVariant",
+  "type": "object"
+}

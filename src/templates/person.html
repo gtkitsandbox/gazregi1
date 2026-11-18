@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% from "_macros.html" import badge, breadcrumbs, verification %}
+{% block body_class %}page-person{% endblock %}
+{% block content %}
+<div class="shell">
+  {{ breadcrumbs(crumbs) }}
+  <header class="page-heading page-heading--record">
+    <p class="eyebrow">PERSON RECORD <span aria-hidden="true">/</span> {{ person.country_code }}</p>
+    <h1>{{ person.canonical_name }}</h1>
+    <p class="meta-line">{{ verification(person.identity_status) }} <span aria-hidden="true">·</span> Identity verified {{ person.verified_at|date_long }}</p>
+    {% if aliases %}
+    <p class="alias-line">Also published as: {% for alias in aliases %}<span class="chip">{{ alias.name }}</span>{% endfor %}</p>
+    {% endif %}
+  </header>
+
+  <aside class="callout">
+    <strong>Reference page.</strong> This page lists source-backed Gazette notices linked to one verified identity. It contains no biography, contact details, family relationships or inferred personal information.
+  </aside>
+
+  {% if same_name %}
+  <section class="callout callout--warning" aria-labelledby="same-name-title">
+    <strong id="same-name-title">Same published name, different identity.</strong>
+    Another verified person shares a published name with this person. They are deliberately kept separate. Review each record before drawing any connection:
+    {% for other in same_name %}<a href="{{ person_path(other) }}">{{ other.canonical_name }} ({{ other.person_id }})</a>{% if not loop.last %}; {% endif %}{% endfor %}.
+  </section>
+  {% endif %}
+
+  <div class="two-column">
+    <section class="panel" aria-labelledby="history-title">
+      <div class="section-heading">
+        <h2 id="history-title">Record history</h2>
+        <span class="section-count">{{ history|length }} record{% if history|length != 1 %}s{% endif %}</span>
+      </div>
+      {% if history %}
+      <ol class="timeline">
+        {% for item in history %}
+        <li class="timeline__item">
+          <div class="timeline__date">{{ item.issue.issue.publication_date|date_long }}</div>
+          <div class="timeline__body">
+            <div class="timeline__top">
+              {{ badge(record_type_label(item.record.record_type), record_type_tone(item.record.record_type)) }}
+              <a class="text-link" href="{{ item.path }}">{{ item.record.title }}</a>
+            </div>
+            <p class="timeline__role">
+              {% if item.ref.position %}{{ item.ref.position }}{% else %}Position not stated{% endif %}
+              {% if item.organisations %} at {% for org in item.organisations %}<a href="{{ org_path(org) }}">{{ org.name }}</a>{% if not loop.last %}, {% endif %}{% endfor %}{% endif %}
+            </p>
+            <p class="timeline__meta">
+              Gazette <a href="{{ item.issue.path }}">No. {{ item.issue.issue.gazette_no }}</a>
+              <span aria-hidden="true">·</span> PDF page {{ item.record.source.pdf_page }}
+              {% if item.ref.published_name != person.canonical_name %}<span aria-hidden="true">·</span> Published as “{{ item.ref.published_name }}”{% endif %}
+              {% if item.source_url %}<span aria-hidden="true">·</span> <a href="{{ item.source_url }}" target="_blank" rel="noopener">Official source ↗</a>{% endif %}
+            </p>
+          </div>
+        </li>
+        {% endfor %}
+      </ol>
+      {% else %}
+      <p class="empty-inline">No published records reference this identity.</p>
+      {% endif %}
+    </section>
+
+    <aside class="panel panel--muted" aria-labelledby="identity-title">
+      <h2 id="identity-title">Identity details</h2>
+      <dl class="detail-list">
+        <div><dt>Published name</dt><dd>{{ person.canonical_name }}</dd></div>
+        <div><dt>Identity ID</dt><dd><code>{{ person.person_id }}</code></dd></div>
+        <div><dt>Verification</dt><dd>{{ person.identity_status|replace("_", " ")|capitalize }}</dd></div>
+        <div><dt>Verified</dt><dd>{{ person.verified_at|date_long }}</dd></div>
+        {% if person.basis %}<div><dt>Verification basis</dt><dd>{{ person.basis }}</dd></div>{% endif %}
+        <div><dt>Records</dt><dd>{{ history|length }}</dd></div>
+      </dl>
+      {% if aliases %}
+      <h3 class="subheading">Verified name variants</h3>
+      <ul class="plain-list">
+        {% for alias in aliases %}<li>{{ alias.name }}{% if alias.basis %}<span class="muted"> — {{ alias.basis }}</span>{% endif %}</li>{% endfor %}
+      </ul>
+      {% endif %}
+      {% if published_names|length > 1 %}
+      <h3 class="subheading">Names as published</h3>
+      <ul class="plain-list">{% for name in published_names %}<li>{{ name }}</li>{% endfor %}</ul>
+      {% endif %}
+      <p class="panel__note"><a href="/corrections/">Request a correction or identity review</a>.</p>
+    </aside>
+  </div>
+</div>
+{% endblock %}

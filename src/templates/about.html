@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% from "_macros.html" import breadcrumbs %}
+{% block body_class %}page-about{% endblock %}
+{% block content %}
+<div class="shell shell--narrow">
+  {{ breadcrumbs(crumbs) }}
+  <header class="page-heading">
+    <p class="eyebrow">ABOUT</p>
+    <h1>About {{ site.site_name }}</h1>
+    <p class="page-heading__lede">{{ site.site_name }} is an independent search and discovery layer over official government Gazette publications. It is not affiliated with, endorsed by or operated by any government.</p>
+  </header>
+
+  <section class="prose" aria-labelledby="what-title">
+    <h2 id="what-title">What the index contains</h2>
+    <p>The current build covers {{ country_names }}: {{ stats.issues }} Gazette issues and {{ stats.pages }} searchable pages. {{ stats.records }} structured records have passed source-excerpt validation. {{ stats.people }} person identities are operator-verified and published.</p>
+    <p>Every indexed page preserves the Gazette number, publication date, physical PDF page, printed page where available, source filename, source checksum and official document URL where recorded. Original PDFs are not hosted here; links point to the official publisher when a verified URL is available.</p>
+  </section>
+
+  <section class="prose" aria-labelledby="method-title">
+    <h2 id="method-title">How records are published</h2>
+    <ol>
+      <li>The official PDF is extracted with PyMuPDF into page-level NDJSON and compressed source text.</li>
+      <li>A structured record stores a verbatim source excerpt and the exact PDF page.</li>
+      <li>The build rejects the record if the excerpt is not present in the extracted page text.</li>
+      <li>The source document checksum is checked against the extraction provenance registry.</li>
+      <li>Names and organisations are linked only through explicit operator-maintained identifiers, never through automatic name matching.</li>
+    </ol>
+    <p>Summaries and keywords are editorial aids only. Dates, numbers, positions, organisations and references are taken from the cited source excerpt.</p>
+  </section>
+
+  <section class="prose" aria-labelledby="identity-title">
+    <h2 id="identity-title">People and identity</h2>
+    <p>A person page is a navigation layer, not a biography. It contains only the published name, operator-verified name variants, official positions and the Gazette records that support them. It does not contain contact details, family relationships, estimated assets, political views or speculative relationships.</p>
+    <p>Two people with the same or similar published name are kept separate unless an operator explicitly verifies that they are the same identity. When a name is shared, each identity page links to the other with a disambiguation notice. Unverified identity mappings are held out of the public index.</p>
+  </section>
+
+  <section class="prose" aria-labelledby="limits-title">
+    <h2 id="limits-title">Limitations</h2>
+    <ul>
+      <li>Page text is extracted automatically and can contain OCR or layout artefacts. The official PDF remains authoritative.</li>
+      <li>Not every Gazette page has been split into notice-level records. Unstructured pages remain searchable as page records.</li>
+      <li>Official PDF URLs are shown only when recorded; an absent URL is displayed as not recorded rather than guessed.</li>
+      <li>Closing dates and tender details are published as stated in the Gazette. Verify them with the issuing organisation before relying on them.</li>
+      <li>This site does not provide legal, procurement or financial advice.</li>
+    </ul>
+  </section>
+
+  <section class="prose" aria-labelledby="privacy-title">
+    <h2 id="privacy-title">Accounts, tracking and submissions</h2>
+    <p>There are no user accounts, saved searches, alerts, payments or tender submissions. The site does not load advertising or analytics scripts. Search runs in the browser against a prebuilt Pagefind index.</p>
+    <p>Correction requests are described on the <a href="/corrections/">corrections page</a>. Source documents remain with their official publisher.</p>
+  </section>
+
+  <section class="prose" aria-labelledby="coverage-title">
+    <h2 id="coverage-title">Country coverage</h2>
+    <p>The architecture is country-independent. {{ country_names }} is the initial country; additional countries can be added under <code>data/&lt;country-code&gt;/</code> without changing the templates or URL structure for existing records.</p>
+  </section>
+</div>
+{% endblock %}

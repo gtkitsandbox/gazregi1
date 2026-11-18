@@ -11,13 +11,5 @@ class Crumb:
     path: str
 
 
-def home_crumb() -> Crumb:
-    return Crumb("GazetteRegistry", "/")
-
-
-def issue_breadcrumbs(gazette_no: str, issue_path: str) -> list[Crumb]:
-    return [home_crumb(), Crumb(f"Gazette No. {gazette_no}", issue_path)]
-
-
-def record_breadcrumbs(gazette_no: str, issue_path: str, page_label: str, record_path: str) -> list[Crumb]:
-    return [*issue_breadcrumbs(gazette_no, issue_path), Crumb(page_label, record_path)]
+def crumbs(*items: tuple[str, str]) -> list[Crumb]:
+    return [Crumb(label=label, path=path) for label, path in items]

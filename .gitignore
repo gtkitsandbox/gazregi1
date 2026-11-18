@@ -2,3 +2,11 @@
 __pycache__/
 node_modules/
 dist/
+dist-preview/
+.wrangler/
+reports/
+
+# New extraction inputs stay local. Existing tracked PDFs are preserved.
+raw/*.pdf
+
+.DS_Store

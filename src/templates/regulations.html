@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% from "_macros.html" import breadcrumbs, empty_state, record_card %}
+{% block body_class %}page-regulations{% endblock %}
+{% block content %}
+<div class="shell">
+  {{ breadcrumbs(crumbs) }}
+  <header class="page-heading">
+    <p class="eyebrow">REGULATIONS</p>
+    <h1>Regulations</h1>
+    <p class="page-heading__lede">Acts, regulations, orders, rules and notifications published in indexed Gazettes, linked to the official source page.</p>
+  </header>
+
+  {% if regulations %}
+  <div class="section-heading">
+    <h2>All instruments</h2>
+    <span class="section-count">{{ regulations|length }} record{% if regulations|length != 1 %}s{% endif %}</span>
+  </div>
+  <div class="record-list">{% for record in regulations %}{{ record_card(record) }}{% endfor %}</div>
+  {% else %}
+    {{ empty_state("No regulation records published yet", "Regulation records appear only after an operator verifies the source excerpt. The full Gazette page index is available now.", "/gazettes/", "Browse Gazettes") }}
+  {% endif %}
+</div>
+{% endblock %}

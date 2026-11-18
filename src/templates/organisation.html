@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% from "_macros.html" import badge, breadcrumbs, verification %}
+{% block body_class %}page-organisation{% endblock %}
+{% block content %}
+<div class="shell">
+  {{ breadcrumbs(crumbs) }}
+  <header class="page-heading page-heading--record">
+    <p class="eyebrow">ORGANISATION RECORD <span aria-hidden="true">/</span> {{ org.country_code }}</p>
+    <h1>{{ org.name }}</h1>
+    <p class="meta-line">{{ org_type_label(org.type) }} <span aria-hidden="true">·</span> {{ verification(org.identity_status) }}</p>
+    {% if org.aliases %}<p class="alias-line">Also published as: {% for alias in org.aliases %}<span class="chip">{{ alias }}</span>{% endfor %}</p>{% endif %}
+  </header>
+
+  <aside class="callout">
+    <strong>Reference page.</strong> This page lists source-backed records that name this organisation. It does not assert current status, ownership, financial position or any relationship not stated in the cited Gazette notice.
+  </aside>
+
+  <div class="two-column">
+    <section class="panel" aria-labelledby="history-title">
+      <div class="section-heading">
+        <h2 id="history-title">Record history</h2>
+        <span class="section-count">{{ history|length }} record{% if history|length != 1 %}s{% endif %}</span>
+      </div>
+      {% if history %}
+      <ol class="timeline">
+        {% for item in history %}
+        <li class="timeline__item">
+          <div class="timeline__date">{{ item.issue.issue.publication_date|date_long }}</div>
+          <div class="timeline__body">
+            <div class="timeline__top">
+              {{ badge(record_type_label(item.record.record_type), record_type_tone(item.record.record_type)) }}
+              <a class="text-link" href="{{ item.path }}">{{ item.record.title }}</a>
+            </div>
+            {% if item.people %}
+            <p class="timeline__role">{% for ref in item.people %}{% if not loop.first %}; {% endif %}{% if ref.person_path %}<a href="{{ ref.person_path }}">{{ ref.published_name }}</a>{% else %}{{ ref.published_name }}{% endif %}{% if ref.position %}, {{ ref.position }}{% endif %}{% endfor %}</p>
+            {% endif %}
+            {% if item.tender_issuer %}<p class="timeline__role">Issuing organisation for tender {{ item.record.tender.reference }}.</p>{% endif %}
+            <p class="timeline__meta">
+              Gazette <a href="{{ item.issue.path }}">No. {{ item.issue.issue.gazette_no }}</a>
+              <span aria-hidden="true">·</span> PDF page {{ item.record.source.pdf_page }}
+              {% if item.source_url %}<span aria-hidden="true">·</span> <a href="{{ item.source_url }}" target="_blank" rel="noopener">Official source ↗</a>{% endif %}
+            </p>
+          </div>
+        </li>
+        {% endfor %}
+      </ol>
+      {% else %}
+      <p class="empty-inline">No published records reference this organisation.</p>
+      {% endif %}
+    </section>
+
+    <aside class="panel panel--muted" aria-labelledby="org-title">
+      <h2 id="org-title">Organisation details</h2>
+      <dl class="detail-list">
+        <div><dt>Name</dt><dd>{{ org.name }}</dd></div>
+        <div><dt>Type</dt><dd>{{ org_type_label(org.type) }}</dd></div>
+        <div><dt>Identity ID</dt><dd><code>{{ org.organisation_id }}</code></dd></div>
+        <div><dt>Verification</dt><dd>{{ org.identity_status|replace("_", " ")|capitalize }}</dd></div>
+        {% if org.verified_at %}<div><dt>Verified</dt><dd>{{ org.verified_at|date_long }}</dd></div>{% endif %}
+        {% if org.basis %}<div><dt>Verification basis</dt><dd>{{ org.basis }}</dd></div>{% endif %}
+      </dl>
+      <p class="panel__note"><a href="/corrections/">Request a correction</a>.</p>
+    </aside>
+  </div>
+</div>
+{% endblock %}

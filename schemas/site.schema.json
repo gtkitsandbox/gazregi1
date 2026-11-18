@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gazetteregistry.com/schemas/site.schema.json",
+  "additionalProperties": false,
+  "properties": {
+    "site_name": {
+      "minLength": 1,
+      "title": "Site Name",
+      "type": "string"
+    },
+    "default_site_url": {
+      "minLength": 1,
+      "title": "Default Site Url",
+      "type": "string"
+    },
+    "countries": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Countries",
+      "type": "array"
+    },
+    "corrections_email": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Corrections Email"
+    },
+    "corrections_note": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Corrections Note"
+    }
+  },
+  "required": [
+    "site_name",
+    "default_site_url",
+    "countries"
+  ],
+  "title": "SiteConfig",
+  "type": "object"
+}

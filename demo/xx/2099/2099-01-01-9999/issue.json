@@ -1,0 +1,14 @@
+{
+  "issue_id": "XX-2099-9999",
+  "country": "XX",
+  "gazette_no": "9999",
+  "gazette_type": "regular",
+  "edition": "E",
+  "publication_date": "2099-01-01",
+  "source_url": null,
+  "source_file": "demo-gazette.pdf",
+  "page_count": 2,
+  "parser_version": "demo-0.1.0",
+  "extraction_method": "demo",
+  "extracted_at": "2099-01-01T00:00:00+00:00"
+}

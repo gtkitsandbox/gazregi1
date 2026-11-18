@@ -1,0 +1,416 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gazetteregistry.com/schemas/record.schema.json",
+  "$defs": {
+    "NoticeDetail": {
+      "additionalProperties": false,
+      "properties": {
+        "category": {
+          "enum": [
+            "land",
+            "insolvency",
+            "estate",
+            "court",
+            "licensing",
+            "professional",
+            "other"
+          ],
+          "title": "Category",
+          "type": "string"
+        }
+      },
+      "required": [
+        "category"
+      ],
+      "title": "NoticeDetail",
+      "type": "object"
+    },
+    "PersonReference": {
+      "additionalProperties": false,
+      "properties": {
+        "person_id": {
+          "pattern": "^person:[a-z]{2}:[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "title": "Person Id",
+          "type": "string"
+        },
+        "published_name": {
+          "minLength": 1,
+          "title": "Published Name",
+          "type": "string"
+        },
+        "position": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Position"
+        },
+        "position_kind": {
+          "anyOf": [
+            {
+              "enum": [
+                "appointment",
+                "commissioning",
+                "promotion",
+                "professional",
+                "organisational",
+                "acting",
+                "other"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Position Kind"
+        },
+        "organisation_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Organisation Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "person_id",
+        "published_name"
+      ],
+      "title": "PersonReference",
+      "type": "object"
+    },
+    "RecordSource": {
+      "additionalProperties": false,
+      "properties": {
+        "pdf_page": {
+          "exclusiveMinimum": 0,
+          "title": "Pdf Page",
+          "type": "integer"
+        },
+        "printed_page": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Printed Page"
+        },
+        "excerpt": {
+          "minLength": 20,
+          "title": "Excerpt",
+          "type": "string"
+        },
+        "official_url": {
+          "anyOf": [
+            {
+              "format": "uri",
+              "maxLength": 2083,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Official Url"
+        }
+      },
+      "required": [
+        "pdf_page",
+        "excerpt"
+      ],
+      "title": "RecordSource",
+      "type": "object"
+    },
+    "RegulationDetail": {
+      "additionalProperties": false,
+      "properties": {
+        "instrument_type": {
+          "enum": [
+            "act",
+            "regulation",
+            "order",
+            "rule",
+            "notification",
+            "by_law",
+            "other"
+          ],
+          "title": "Instrument Type",
+          "type": "string"
+        },
+        "instrument_number": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Instrument Number"
+        },
+        "effective_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Effective Date"
+        }
+      },
+      "required": [
+        "instrument_type"
+      ],
+      "title": "RegulationDetail",
+      "type": "object"
+    },
+    "TenderDetail": {
+      "additionalProperties": false,
+      "properties": {
+        "reference": {
+          "minLength": 1,
+          "title": "Reference",
+          "type": "string"
+        },
+        "issuer_organisation_id": {
+          "anyOf": [
+            {
+              "pattern": "^org:[a-z]{2}:[a-z0-9]+(?:-[a-z0-9]+)*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Issuer Organisation Id"
+        },
+        "sector": {
+          "enum": [
+            "civil_works",
+            "goods",
+            "consultancy",
+            "services",
+            "it",
+            "maintenance",
+            "auction",
+            "other"
+          ],
+          "title": "Sector",
+          "type": "string"
+        },
+        "location": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Location"
+        },
+        "closing_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Closing Date"
+        },
+        "closing_time": {
+          "anyOf": [
+            {
+              "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Closing Time"
+        },
+        "document_deadline": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Document Deadline"
+        },
+        "bid_security_lkr": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Bid Security Lkr"
+        }
+      },
+      "required": [
+        "reference",
+        "sector"
+      ],
+      "title": "TenderDetail",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "uid": {
+      "pattern": "^[A-Z]{2}-\\d{4}-\\d+-(?:APPT|TEND|NOTC|REGL)-\\d{3,}$",
+      "title": "Uid",
+      "type": "string"
+    },
+    "record_type": {
+      "enum": [
+        "appointment",
+        "commissioning",
+        "promotion",
+        "professional_position",
+        "organisational_appointment",
+        "tender",
+        "public_notice",
+        "regulation"
+      ],
+      "title": "Record Type",
+      "type": "string"
+    },
+    "title": {
+      "minLength": 1,
+      "title": "Title",
+      "type": "string"
+    },
+    "summary": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Summary"
+    },
+    "issue_id": {
+      "pattern": "^[A-Z]{2}-\\d{4}-\\d+$",
+      "title": "Issue Id",
+      "type": "string"
+    },
+    "people": {
+      "items": {
+        "$ref": "#/$defs/PersonReference"
+      },
+      "title": "People",
+      "type": "array"
+    },
+    "organisation_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Organisation Ids",
+      "type": "array"
+    },
+    "location": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Location"
+    },
+    "keywords": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Keywords",
+      "type": "array"
+    },
+    "tender": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/TenderDetail"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "regulation": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/RegulationDetail"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "notice": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/NoticeDetail"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "source": {
+      "$ref": "#/$defs/RecordSource"
+    }
+  },
+  "required": [
+    "uid",
+    "record_type",
+    "title",
+    "issue_id",
+    "source"
+  ],
+  "title": "CuratedRecord",
+  "type": "object"
+}

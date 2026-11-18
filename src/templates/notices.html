@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% from "_macros.html" import breadcrumbs, empty_state, record_card %}
+{% block body_class %}page-notices{% endblock %}
+{% block content %}
+<div class="shell">
+  {{ breadcrumbs(crumbs) }}
+  <header class="page-heading">
+    <p class="eyebrow">PUBLIC NOTICES</p>
+    <h1>Public notices</h1>
+    <p class="page-heading__lede">Land, insolvency, estate, court and licensing notices extracted from indexed Gazettes, with the exact source page preserved.</p>
+  </header>
+
+  {% if notices %}
+  <div class="section-heading">
+    <h2>All notices</h2>
+    <span class="section-count">{{ notices|length }} record{% if notices|length != 1 %}s{% endif %}</span>
+  </div>
+  <div class="record-list">{% for record in notices %}{{ record_card(record) }}{% endfor %}</div>
+  {% else %}
+    {{ empty_state("No public notices published yet", "Public-notice records appear only after an operator verifies the source excerpt. The full Gazette page index is available now.", "/gazettes/", "Browse Gazettes") }}
+  {% endif %}
+</div>
+{% endblock %}

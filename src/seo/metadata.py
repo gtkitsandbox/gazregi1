@@ -1,4 +1,4 @@
-"""Unique per-page SEO titles and descriptions."""
+"""Per-page SEO titles, descriptions and robots directives."""
 
 from __future__ import annotations
 
@@ -9,35 +9,29 @@ from dataclasses import dataclass
 class PageMetadata:
     title: str
     description: str
+    robots: str = "index,follow"
+    og_type: str = "website"
 
 
-def _excerpt(text: str, limit: int = 155) -> str:
+def excerpt(text: str, limit: int = 155) -> str:
     flat = " ".join(text.split())
     if len(flat) <= limit:
         return flat
-    return flat[:limit].rsplit(" ", 1)[0] + "..."
+    return flat[:limit].rsplit(" ", 1)[0].rstrip(",.;:") + "..."
 
 
-def record_metadata(gazette_no: str, printed_page: int | None, physical_page: int, text: str) -> PageMetadata:
-    page_label = f"printed page {printed_page}" if printed_page else f"PDF page {physical_page}"
-    title = f"Sri Lanka Gazette No. {gazette_no} - {page_label}"
-    description = f"Official Sri Lanka Government Gazette No. {gazette_no}, {page_label}: {_excerpt(text)}"
-    return PageMetadata(title=title, description=description)
-
-
-def issue_metadata(gazette_no: str, publication_date: str, page_count: int) -> PageMetadata:
-    title = f"Sri Lanka Gazette No. {gazette_no} ({publication_date}) - {page_count} pages"
-    description = (
-        f"Browse every searchable page of Sri Lanka Government Gazette No. {gazette_no}, "
-        f"published {publication_date}, with links to the official source."
+def page_metadata(
+    *,
+    site_name: str,
+    title: str,
+    description: str,
+    robots: str = "index,follow",
+    og_type: str = "website",
+) -> PageMetadata:
+    full_title = title if site_name in title else f"{title} | {site_name}"
+    return PageMetadata(
+        title=full_title,
+        description=excerpt(description),
+        robots=robots,
+        og_type=og_type,
     )
-    return PageMetadata(title=title, description=description)
-
-
-def home_metadata(issue_count: int, page_count: int) -> PageMetadata:
-    title = "GazetteRegistry - Search Sri Lanka Government Gazette records"
-    description = (
-        f"Search {page_count} indexed pages across {issue_count} official Sri Lanka Government Gazette issues "
-        "by name, company, tender reference, or topic."
-    )
-    return PageMetadata(title=title, description=description)

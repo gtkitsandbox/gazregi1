@@ -1,31 +1,58 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{{PAGE_TITLE}}</title>
-  <meta name="description" content="{{PAGE_DESCRIPTION}}">
-  <link rel="canonical" href="{{CANONICAL_URL}}">
-  <link rel="stylesheet" href="/assets/styles.css">
-  <script type="application/ld+json">{{STRUCTURED_DATA}}</script>
-</head>
-<body>
-  <header class="masthead" data-pagefind-ignore>
-    <a class="wordmark" href="/" aria-label="GazetteRegistry home">Gazette<span>Registry</span></a>
-    <a class="back-link" href="/">Back to search <span aria-hidden="true">↗</span></a>
+{% extends "base.html" %}
+{% from "_macros.html" import badge, breadcrumbs, empty_state, record_card, source_note %}
+{% block body_class %}page-issue{% endblock %}
+{% block content %}
+<div class="shell">
+  {{ breadcrumbs(crumbs) }}
+  <header class="page-heading page-heading--record">
+    <p class="eyebrow">{{ issue.country.name|upper }} GAZETTE <span aria-hidden="true">/</span> NO. {{ issue.issue.gazette_no }}</p>
+    <h1>{{ issue.country.name }} Gazette No. {{ issue.issue.gazette_no }}</h1>
+    <p class="meta-line">Published {{ issue.issue.publication_date|date_long }} <span aria-hidden="true">·</span> {{ issue.pages|length }} searchable pages <span aria-hidden="true">·</span> {{ issue.issue.edition }} edition</p>
   </header>
-  <main class="record-workspace">
-    <nav class="breadcrumbs" aria-label="Breadcrumb" data-pagefind-ignore>{{BREADCRUMBS}}</nav>
-    <div class="record-kicker">SRI LANKA GAZETTE <span>·</span> NO. {{GAZETTE_NUMBER}}</div>
-    <h1>{{ISSUE_HEADING}}</h1>
-    <p class="issue-date">Published {{PUBLICATION_DATE}} <span class="issue-separator">·</span> {{PAGE_COUNT}} searchable pages</p>
-    <section class="result-list">
-      {{PAGE_LIST}}
+
+  <div class="two-column">
+    <section class="panel" aria-labelledby="records-title">
+      <div class="section-heading">
+        <h2 id="records-title">Curated records in this issue</h2>
+        <span class="section-count">{{ records|length }}</span>
+      </div>
+      {% if records %}
+        <div class="record-list">{% for record in records %}{{ record_card(record) }}{% endfor %}</div>
+      {% else %}
+        {{ empty_state("No curated records for this issue", "The page-level index below is complete for the extracted text. Structured records are added only after source-excerpt validation.") }}
+      {% endif %}
     </section>
-  </main>
-  <footer class="site-footer" data-pagefind-ignore>
-    <span>GazetteRegistry is an independent search and information service, not affiliated with the Government of Sri Lanka.</span>
-    <span>Issue {{ISSUE_ID}}</span>
-  </footer>
-</body>
-</html>
+
+    <aside class="panel panel--muted" aria-labelledby="source-title">
+      <h2 id="source-title">Source and provenance</h2>
+      {{ source_note(issue) }}
+      <dl class="detail-list detail-list--compact">
+        <div><dt>Source file</dt><dd><code>{{ issue.source.source_file }}</code></dd></div>
+        <div><dt>SHA-256</dt><dd><code class="checksum">{{ issue.source.sha256 or "Not recorded" }}</code></dd></div>
+        <div><dt>Checksum checked</dt><dd>{{ issue.source.checked_at|date_long }}</dd></div>
+        <div><dt>Extraction</dt><dd>{{ issue.issue.extraction_method }}, parser {{ issue.issue.parser_version }}</dd></div>
+        <div><dt>Extracted</dt><dd>{{ issue.issue.extracted_at }}</dd></div>
+      </dl>
+      <p class="panel__note">Raw PDFs remain local extraction inputs and are not deployed. The official source link is preserved when a verified URL is recorded.</p>
+    </aside>
+  </div>
+
+  <section class="panel" aria-labelledby="pages-title">
+    <div class="section-heading">
+      <h2 id="pages-title">Searchable pages</h2>
+      <span class="section-count">{{ issue.pages|length }} pages</span>
+    </div>
+    <div class="page-list">
+      {% for item in page_items %}
+      <article class="page-row">
+        <div class="page-row__index">
+          <a href="{{ page_path(item.page) }}">{{ page_label(issue, item.page) }}</a>
+          <span>PDF page {{ item.page.physical_pdf_page }}</span>
+        </div>
+        <p class="page-row__excerpt">{{ item.excerpt }}</p>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+</div>
+{% endblock %}

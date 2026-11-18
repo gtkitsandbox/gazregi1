@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% from "_macros.html" import badge, breadcrumbs, record_source_link %}
+{% block body_class %}page-regulation{% endblock %}
+{% block content %}
+<div class="shell shell--narrow">
+  {{ breadcrumbs(crumbs) }}
+  <header class="page-heading page-heading--record">
+    <p class="eyebrow">REGULATION <span aria-hidden="true">/</span> {{ instrument_type_label(record.regulation.instrument_type)|upper }}</p>
+    <h1>{{ record.title }}</h1>
+    <p class="meta-line">{{ badge(instrument_type_label(record.regulation.instrument_type), "regulation") }} <span aria-hidden="true">·</span> Published {{ issue.issue.publication_date|date_long }} <span aria-hidden="true">·</span> Gazette No. {{ issue.issue.gazette_no }}, PDF page {{ record.source.pdf_page }}</p>
+  </header>
+
+  {% if record.summary %}<p class="lede">{{ record.summary }}</p>{% endif %}
+
+  <section class="detail-panel" aria-labelledby="regulation-title">
+    <div class="section-heading"><h2 id="regulation-title">Instrument details</h2></div>
+    <dl class="detail-list detail-list--two">
+      <div><dt>Instrument type</dt><dd>{{ instrument_type_label(record.regulation.instrument_type) }}</dd></div>
+      <div><dt>Instrument number</dt><dd>{{ record.regulation.instrument_number or "Not stated" }}</dd></div>
+      <div><dt>Effective date</dt><dd>{{ record.regulation.effective_date|date_long_or_missing }}</dd></div>
+      <div><dt>Gazette</dt><dd><a href="{{ issue.path }}">No. {{ issue.issue.gazette_no }}</a>, {{ issue.issue.publication_date|date_long }}</dd></div>
+    </dl>
+  </section>
+
+  <section class="source-excerpt" aria-labelledby="excerpt-title">
+    <div class="section-heading"><h2 id="excerpt-title">Source excerpt</h2>{{ record_source_link(record) }}</div>
+    <blockquote>{{ record.source.excerpt }}</blockquote>
+    <p class="provenance">Verified against the extracted text of {{ issue.source.source_file }}, PDF page {{ record.source.pdf_page }}. SHA-256 <code class="checksum">{{ issue.source.sha256 or "Not recorded" }}</code>.</p>
+  </section>
+
+  {% if related_orgs %}
+  <section class="detail-panel" aria-labelledby="related-title">
+    <div class="section-heading"><h2 id="related-title">Referenced organisations</h2></div>
+    <div class="chip-row">{% for org in related_orgs %}<a class="chip" href="{{ org_path(org) }}">{{ org.name }}</a>{% endfor %}</div>
+  </section>
+  {% endif %}
+
+  <p class="inline-note"><a href="/corrections/">Request a correction</a> <span aria-hidden="true">·</span> <a href="/regulations/">Back to regulations</a></p>
+</div>
+{% endblock %}

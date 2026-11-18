@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gazetteregistry.com/schemas/person.schema.json",
+  "additionalProperties": false,
+  "properties": {
+    "person_id": {
+      "pattern": "^person:[a-z]{2}:[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "title": "Person Id",
+      "type": "string"
+    },
+    "country_code": {
+      "pattern": "^[A-Z]{2}$",
+      "title": "Country Code",
+      "type": "string"
+    },
+    "canonical_name": {
+      "minLength": 1,
+      "title": "Canonical Name",
+      "type": "string"
+    },
+    "identity_status": {
+      "enum": [
+        "operator_verified",
+        "unverified"
+      ],
+      "title": "Identity Status",
+      "type": "string"
+    },
+    "verified_at": {
+      "anyOf": [
+        {
+          "format": "date",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Verified At"
+    },
+    "basis": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Basis"
+    }
+  },
+  "required": [
+    "person_id",
+    "country_code",
+    "canonical_name",
+    "identity_status"
+  ],
+  "title": "PersonEntity",
+  "type": "object"
+}

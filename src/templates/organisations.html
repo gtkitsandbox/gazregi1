@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% from "_macros.html" import breadcrumbs, empty_state, verification %}
+{% block body_class %}page-organisations{% endblock %}
+{% block content %}
+<div class="shell">
+  {{ breadcrumbs(crumbs) }}
+  <header class="page-heading">
+    <p class="eyebrow">PEOPLE &amp; ORGANISATIONS</p>
+    <h1>Organisations</h1>
+    <p class="page-heading__lede">Public bodies, companies and professional organisations named in indexed Gazette records. Organisation pages link to the appointments and tenders that reference them.</p>
+    <p class="page-heading__actions"><a class="button button--secondary" href="/people/">Browse people</a></p>
+  </header>
+
+  {% if org_cards %}
+  <div class="entity-list">
+    {% for card in org_cards %}
+    <article class="entity-card">
+      <div class="entity-card__heading">
+        <div>
+          <h2><a href="{{ card.path }}">{{ card.org.name }}</a></h2>
+          {{ verification(card.org.identity_status) }}
+        </div>
+        <span class="section-count">{{ card.record_count }} record{% if card.record_count != 1 %}s{% endif %}</span>
+      </div>
+      <p class="entity-card__meta">{{ org_type_label(card.org.type) }}{% if card.org.aliases %} <span aria-hidden="true">·</span> Also published as {{ card.org.aliases|join(", ") }}{% endif %}</p>
+      {% if card.latest %}
+      <dl class="record-card__meta">
+        <div><dt>Most recent</dt><dd><a href="{{ card.latest.path }}">{{ card.latest.record.title }}</a></dd></div>
+        <div><dt>Gazette</dt><dd>No. {{ card.latest.issue.issue.gazette_no }}, {{ card.latest.issue.issue.publication_date|date_long }}</dd></div>
+      </dl>
+      {% endif %}
+    </article>
+    {% endfor %}
+  </div>
+  {% else %}
+    {{ empty_state("No organisations published yet", "Organisation pages appear when operator-curated records reference a verified organisation. The Gazette page index remains searchable.", "/gazettes/", "Browse Gazettes") }}
+  {% endif %}
+</div>
+{% endblock %}

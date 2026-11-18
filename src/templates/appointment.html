@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% from "_macros.html" import badge, breadcrumbs, record_source_link %}
+{% block body_class %}page-appointment{% endblock %}
+{% block content %}
+<div class="shell shell--narrow">
+  {{ breadcrumbs(crumbs) }}
+  <header class="page-heading page-heading--record">
+    <p class="eyebrow">{{ record_type_label(record.record_type)|upper }} <span aria-hidden="true">/</span> {{ issue.country.name|upper }}</p>
+    <h1>{{ record.title }}</h1>
+    <p class="meta-line">{{ badge(record_type_label(record.record_type), "appointment") }} <span aria-hidden="true">·</span> Published {{ issue.issue.publication_date|date_long }} <span aria-hidden="true">·</span> Gazette No. {{ issue.issue.gazette_no }}, PDF page {{ record.source.pdf_page }}</p>
+  </header>
+
+  {% if record.summary %}<p class="lede">{{ record.summary }}</p>{% endif %}
+
+  <section class="detail-panel" aria-labelledby="positions-title">
+    <div class="section-heading"><h2 id="positions-title">Published position{% if people_items|length != 1 %}s{% endif %}</h2></div>
+    <div class="position-list">
+      {% for item in people_items %}
+      <article class="position-item">
+        <div>
+          <h3>{% if item.person_path %}<a href="{{ item.person_path }}">{{ item.ref.published_name }}</a>{% else %}{{ item.ref.published_name }}{% endif %}</h3>
+          <p class="position-item__role">{{ item.ref.position or "Position not stated" }}{% if item.organisations %} at {% for org in item.organisations %}<a href="{{ org_path(org) }}">{{ org.name }}</a>{% if not loop.last %}, {% endif %}{% endfor %}{% endif %}</p>
+          {% if item.ref.position_kind %}<p class="position-item__kind">Character: {{ item.ref.position_kind|replace("_", " ") }}</p>{% endif %}
+          {% if item.person and item.ref.published_name != item.person.canonical_name %}<p class="position-item__kind">Published in this notice as “{{ item.ref.published_name }}”. Linked identity: {{ item.person.canonical_name }}.</p>{% endif %}
+        </div>
+        {% if item.person_path %}
+        <a class="button button--secondary button--small" href="{{ item.person_path }}">Person reference</a>
+        {% else %}
+        <span class="badge badge--warning">Identity not published</span>
+        {% endif %}
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="source-excerpt" aria-labelledby="excerpt-title">
+    <div class="section-heading"><h2 id="excerpt-title">Source excerpt</h2>{{ record_source_link(record) }}</div>
+    <blockquote>{{ record.source.excerpt }}</blockquote>
+    <p class="provenance">Verified against the extracted text of {{ issue.source.source_file }}, PDF page {{ record.source.pdf_page }}. SHA-256 <code class="checksum">{{ issue.source.sha256 or "Not recorded" }}</code>.</p>
+  </section>
+
+  {% if related_orgs %}
+  <section class="detail-panel" aria-labelledby="related-title">
+    <div class="section-heading"><h2 id="related-title">Referenced organisations</h2></div>
+    <div class="chip-row">{% for org in related_orgs %}<a class="chip" href="{{ org_path(org) }}">{{ org.name }}</a>{% endfor %}</div>
+  </section>
+  {% endif %}
+
+  <p class="inline-note"><a href="/corrections/">Request a correction or identity review</a> <span aria-hidden="true">·</span> <a href="/people/">Back to people</a></p>
+</div>
+{% endblock %}
