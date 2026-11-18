@@ -40,6 +40,7 @@ npm ci
 | `npm run validate` | Validate the existing `dist/` build and deployment limits. |
 | `npm run validate:preview` | Validate the existing `dist-preview/` build. |
 | `npm run validate:search` | Exercise the generated Pagefind index; add `--preview` for demo data. |
+| `npm run package` | Rebuild production and preview, then write deterministic deployment ZIPs under `release/`. |
 | `npm run ingest -- --country gb --all` | Run the registered source adapters for one country. |
 | `npm run ingest -- --sync-registry` | Rewrite each country's source registry from `config/sources-intl.json`. |
 | `npm run schemas` | Regenerate JSON Schema files from the Python models. |
@@ -124,6 +125,7 @@ Tenders are opportunities published by official sources. The site provides struc
 - GitHub Pages workflow (`.github/workflows/deploy.yml`) remains active until an authorised cutover.
 - Cloudflare deployment is static-only and configured in `wrangler.jsonc` from `dist/`. Wrangler is pinned to an exact version.
 - `npm run preview` runs Wrangler locally; no remote authentication or deployment is performed by the build or validation scripts.
+- `npm run package` writes `release/gazetteregistry-production.zip` and `release/gazetteregistry-preview.zip` for manual static upload. `release/` is ignored by Git. The production archive currently exceeds Cloudflare Pages direct-upload limits; it is compatible with Workers static assets and must not be trimmed to fit Pages.
 - See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
 ## Coverage and limitations

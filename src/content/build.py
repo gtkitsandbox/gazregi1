@@ -41,13 +41,14 @@ ASSETS = Path(__file__).resolve().parents[1] / "assets"
 
 NAV = [
     {"label": "Home", "path": "/", "section": "home"},
-    {"label": "Gazettes", "path": "/gazettes/", "section": "gazettes"},
-    {"label": "Countries", "path": "/countries/", "section": "countries"},
-    {"label": "People & Organisations", "path": "/people/", "section": "people"},
-    {"label": "Tenders", "path": "/tenders/", "section": "tenders"},
-    {"label": "Public Notices", "path": "/notices/", "section": "notices"},
+    {"label": "Tenders", "path": "/tenders/", "section": "tenders", "header": True},
+    {"label": "Gazettes", "path": "/gazettes/", "section": "gazettes", "header": True},
+    {"label": "People", "path": "/people/", "section": "people", "header": True},
+    {"label": "Organisations", "path": "/organisations/", "section": "organisations", "header": True},
+    {"label": "Countries", "path": "/countries/", "section": "countries", "header": True},
+    {"label": "Public notices", "path": "/notices/", "section": "notices"},
     {"label": "Regulations", "path": "/regulations/", "section": "regulations"},
-    {"label": "Sources", "path": "/sources/", "section": "sources"},
+    {"label": "Sources", "path": "/sources/", "section": "sources", "header": True},
     {"label": "About", "path": "/about/", "section": "about"},
 ]
 
@@ -201,6 +202,44 @@ def _effective_status(status: str, closing_date: date | None) -> str:
 
 def _opportunity_kind_label(value: str) -> str:
     return OPPORTUNITY_KIND_LABELS.get(value, value.replace("_", " ").title())
+
+
+TENDER_STATUS_LABELS = {
+    "open": "Open",
+    "closed": "Closed",
+    "awarded": "Awarded",
+    "cancelled": "Cancelled",
+    "unknown": "Status not stated",
+}
+
+
+def _tender_status_label(value: str) -> str:
+    return TENDER_STATUS_LABELS.get(value, value.replace("_", " ").title())
+
+
+def _tender_status_tone(value: str) -> str:
+    if value == "open":
+        return "verified"
+    if value in {"closed", "cancelled"}:
+        return "warning"
+    return "neutral"
+
+
+def _closing_note(closing_date: date | None) -> str:
+    """Human closing-date label that never presents an expired date as current."""
+    if closing_date is None:
+        return "Date not stated"
+    days = (closing_date - date.today()).days
+    label = _date_long(closing_date)
+    if days < 0:
+        return f"Closed {label}"
+    if days == 0:
+        return f"{label} (today)"
+    if days == 1:
+        return f"{label} (tomorrow)"
+    if days <= 30:
+        return f"{label} (in {days} days)"
+    return label
 
 
 def _money(value: int) -> str:
@@ -488,6 +527,77 @@ def _home_context(site: SiteData) -> dict[str, Any]:
                     "excerpt": excerpt(issue.texts[page.uid], 220),
                 }
             )
+
+    tender_records = [
+        record
+        for record in site.records
+        if record.record_type == "tender" and record.tender is not None
+    ]
+    open_tenders = [
+        record
+        for record in tender_records
+        if _effective_status(record.tender.status, record.tender.closing_date) == "open"
+    ]
+    open_tenders.sort(
+        key=lambda record: (
+            record.tender.closing_date or date.max,
+            -(site.record_date(record) or date.min).toordinal(),
+            record.uid,
+        )
+    )
+    spotlight_records = open_tenders[:4]
+    if len(spotlight_records) < 4:
+        remaining = sorted(
+            (record for record in tender_records if record not in spotlight_records),
+            key=lambda record: (
+                site.record_date(record) or date.min,
+                record.uid,
+            ),
+            reverse=True,
+        )
+        spotlight_records.extend(remaining[: 4 - len(spotlight_records)])
+
+    latest_tenders = []
+    for record in spotlight_records:
+        issuer = _record_issuer(site, record)
+        effective = _effective_status(record.tender.status, record.tender.closing_date)
+        latest_tenders.append(
+            {
+                "record": record,
+                "path": _record_path(record),
+                "country_name": site.country_of_record(record).config.name,
+                "issuer_name": issuer.name
+                if issuer
+                else (record.issuing_organisation_name or "Issuer not recorded"),
+                "issuer_path": _org_path(issuer) if issuer else None,
+                "status_label": _tender_status_label(effective),
+                "status_tone": _tender_status_tone(effective),
+                "closing_note": _closing_note(record.tender.closing_date),
+                "reference": record.tender.reference,
+            }
+        )
+
+    region_stats_by_name: dict[str, dict[str, Any]] = {}
+    for row in country_stats:
+        region = region_stats_by_name.setdefault(
+            row["region"],
+            {
+                "name": row["region"],
+                "countries": 0,
+                "with_records": 0,
+                "records": 0,
+                "tenders": 0,
+            },
+        )
+        region["countries"] += 1
+        if row["records"]:
+            region["with_records"] += 1
+        region["records"] += row["records"]
+        region["tenders"] += row["tenders"]
+    region_stats = sorted(region_stats_by_name.values(), key=lambda row: row["name"].casefold())
+
+    registry = site.source_registry
+    registry_statuses = [entry.access_status for entry in registry]
     dates = [row["latest_date"] for row in country_stats if row["latest_date"]]
     return {
         "stats": {
@@ -497,6 +607,7 @@ def _home_context(site: SiteData) -> dict[str, Any]:
             "people": len(site.published_people),
             "organisations": len(site.organisations),
             "tenders": counts.get("tender", 0),
+            "open_tenders": len(open_tenders),
             "notices": counts.get("public_notice", 0),
             "regulations": counts.get("regulation", 0),
             "countries": len(site.countries),
@@ -504,15 +615,21 @@ def _home_context(site: SiteData) -> dict[str, Any]:
             "verified": sum(1 for row in country_stats if row["coverage"] == "verified"),
             "partial": sum(1 for row in country_stats if row["coverage"] == "partial"),
             "planned": sum(1 for row in country_stats if row["coverage"] == "planned"),
-            "sources": len(site.source_registry),
+            "sources": len(registry),
+            "sources_accessible": registry_statuses.count("verified"),
+            "sources_restricted": registry_statuses.count("restricted")
+            + registry_statuses.count("unavailable"),
+            "sources_planned": registry_statuses.count("planned"),
         },
         "country_names": ", ".join(row["name"] for row in sorted(country_stats, key=lambda row: row["name"].casefold())),
         "country_stats": country_stats,
         "regions": sorted({row["region"] for row in country_stats}),
+        "region_stats": region_stats,
         "latest_issue": site.issues[0] if site.issues else None,
         "latest_record_date": max(dates) if dates else None,
         "latest_records": latest_records,
         "latest_pages": latest_pages,
+        "latest_tenders": latest_tenders,
     }
 
 
@@ -563,11 +680,12 @@ def build_site(
     latest_iso = latest_date.isoformat() if latest_date else None
 
     # Home
-    home_title = "Search official Gazette records"
+    home_title = "Official Gazette, tender and public-record search"
     home_description = (
         f"Search official gazette, tender and appointment records from {home['stats']['with_records']} "
-        f"countries: {home['stats']['records']} source-validated records and {home['stats']['issues']} "
-        f"verified Gazette issues with {home['stats']['pages']} searchable pages. Coverage is incomplete."
+        f"countries: {home['stats']['records']} source-validated records, including "
+        f"{home['stats']['tenders']} procurement records, with {home['stats']['issues']} indexed "
+        f"Gazette issues and {home['stats']['pages']} searchable pages. Coverage is incomplete."
     )
     _write_page(
         env,
@@ -1047,13 +1165,16 @@ def build_site(
             sitemap.add(path, _latest_record_date(site, records) or org.verified_at.isoformat() if org.verified_at else None)
 
     # Tenders index
+    def _tender_sort(record: CuratedRecord) -> tuple[int, date, str]:
+        status = _effective_status(record.tender.status, record.tender.closing_date)
+        # Open opportunities first (soonest closing), then undated status,
+        # then closed/awarded/cancelled records.
+        priority = 0 if status == "open" else 1 if status == "unknown" else 2
+        return (priority, record.tender.closing_date or date.max, record.uid)
+
     tender_records = sorted(
         [record for record in site.records if record.record_type == "tender"],
-        key=lambda record: (
-            record.tender.closing_date is None,
-            record.tender.closing_date or date.max,
-            record.uid,
-        ),
+        key=_tender_sort,
     )
     tender_items = [
         {
@@ -1389,7 +1510,11 @@ def build_site(
             items=[(row["name"], row["path"]) for row in sorted(country_stats, key=lambda row: row["name"].casefold())],
         ),
         section="countries",
-        context={"country_stats": country_stats, "regions": home["regions"]},
+        context={
+            "country_stats": country_stats,
+            "regions": home["regions"],
+            "stats": home["stats"],
+        },
         site=site,
     )
     sitemap.add("/countries/", latest_iso)
@@ -1471,7 +1596,11 @@ def build_site(
             items=[(item["source"].title, f"/sources/#source-{item['source'].source_id}") for item in source_items],
         ),
         section="sources",
-        context={"sources": source_items, "country_stats": country_stats},
+        context={
+            "sources": source_items,
+            "country_stats": country_stats,
+            "stats": home["stats"],
+        },
         site=site,
     )
     sitemap.add("/sources/", latest_iso)

@@ -2,15 +2,53 @@ const pagefindImport = "/pagefind/pagefind.js";
 let pagefind;
 let latestSearch = 0;
 
+const SEARCH_SCOPES = {
+  all: { label: "", paths: null, landing: "/" },
+  people: { label: "people", paths: ["/people/"], landing: "/people/" },
+  organisations: { label: "organisations", paths: ["/organisations/"], landing: "/organisations/" },
+  gazettes: { label: "gazettes", paths: ["/gazettes/", "/records/"], landing: "/gazettes/" },
+  tenders: { label: "tenders", paths: ["/tenders/"], landing: "/tenders/" },
+};
+
 function initSiteSearch() {
   const form = document.querySelector("#search-form");
   const input = document.querySelector("#search-query");
   const results = document.querySelector("#search-results");
   const count = document.querySelector("#result-count");
+  const panel = document.querySelector("#search-results-panel");
   if (!form || !input || !results || !count) return;
 
   const initialResults = results.innerHTML;
   const initialCount = count.textContent;
+  const scopeButtons = Array.from(document.querySelectorAll(".search-scope"));
+  let scope = "all";
+
+  function setScope(nextScope) {
+    scope = SEARCH_SCOPES[nextScope] ? nextScope : "all";
+    for (const button of scopeButtons) {
+      const active = button.dataset.scope === scope;
+      button.classList.toggle("is-active", active);
+      button.setAttribute("aria-selected", active ? "true" : "false");
+    }
+  }
+
+  function matchesScope(url) {
+    const paths = SEARCH_SCOPES[scope].paths;
+    if (!paths) return true;
+    let pathname = url;
+    try {
+      pathname = new URL(url, window.location.origin).pathname;
+    } catch {
+      pathname = url;
+    }
+    return paths.some((path) => pathname.startsWith(path));
+  }
+
+  function resultLabel(amount) {
+    const category = SEARCH_SCOPES[scope].label;
+    const noun = amount === 1 ? "result" : "results";
+    return category ? `${amount} ${noun} in ${category}` : `${amount} ${noun}`;
+  }
 
   async function runSearch(query) {
     const requestId = ++latestSearch;
@@ -18,32 +56,61 @@ function initSiteSearch() {
     if (!trimmed) {
       results.innerHTML = initialResults;
       count.textContent = initialCount;
+      if (panel) panel.hidden = true;
       return;
     }
 
+    if (panel) panel.hidden = false;
     count.textContent = "Searching...";
+    results.setAttribute("aria-busy", "true");
     try {
       if (!pagefind) pagefind = await import(pagefindImport);
       const response = await pagefind.search(trimmed);
-      const matches = await Promise.all(response.results.map((result) => result.data()));
+      const matches = (await Promise.all(response.results.map((result) => result.data())))
+        .filter((result) => matchesScope(result.url))
+        .slice(0, 30);
       if (requestId !== latestSearch) return;
 
       results.replaceChildren(...matches.map(renderResult));
-      count.textContent = `${matches.length} ${matches.length === 1 ? "result" : "results"} for “${trimmed}”`;
+      count.textContent = `${resultLabel(matches.length)} for “${trimmed}”`;
       if (matches.length === 0) {
         const empty = document.createElement("p");
         empty.className = "empty-state";
-        empty.textContent = "No indexed pages match this search.";
+        empty.textContent = "No indexed pages match this search in the selected category.";
         results.append(empty);
       }
     } catch {
       count.textContent = "Search index could not be loaded. Try refreshing the page.";
+    } finally {
+      results.removeAttribute("aria-busy");
     }
+  }
+
+  for (const button of scopeButtons) {
+    button.addEventListener("click", () => {
+      setScope(button.dataset.scope);
+      if (input.value.trim()) {
+        runSearch(input.value);
+      } else {
+        count.textContent = scope === "all"
+          ? initialCount
+          : `Searching ${SEARCH_SCOPES[scope].label}. Enter a term, or submit to browse that category.`;
+      }
+    });
   }
 
   form.addEventListener("submit", (event) => {
     event.preventDefault();
-    runSearch(input.value);
+    const trimmed = input.value.trim();
+    if (!trimmed) {
+      if (scope !== "all") window.location.href = SEARCH_SCOPES[scope].landing;
+      return;
+    }
+    runSearch(trimmed);
+    if (panel) {
+      const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      panel.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" });
+    }
   });
 
   input.addEventListener("input", () => {

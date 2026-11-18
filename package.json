@@ -6,6 +6,7 @@
     "build": "python scripts/build_site.py && pagefind --site dist && python scripts/validate_site.py && node scripts/validate_search.mjs",
     "build:site": "python scripts/build_site.py",
     "build:preview": "python scripts/build_site.py --preview && pagefind --site dist-preview && python scripts/validate_site.py --preview && node scripts/validate_search.mjs --preview",
+    "package": "npm run build && npm run build:preview && python scripts/package_release.py",
     "preview": "wrangler dev",
     "preview:designer": "wrangler dev --config wrangler.preview.jsonc",
     "preview:serve": "python -m http.server 4174 --directory dist-preview",

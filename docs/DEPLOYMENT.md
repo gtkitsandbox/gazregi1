@@ -50,6 +50,32 @@ The default is `https://gazetteregistry.com`, read from `config/site.json`.
 
 `dist/` is ignored by Git. It is reproducible from tracked sources.
 
+### Manual static ZIP packages
+
+```bash
+npm run package
+```
+
+This rebuilds production and preview, then runs `scripts/package_release.py`. It writes:
+
+| Archive | Source | Contents |
+| --- | --- | --- |
+| `release/gazetteregistry-production.zip` | `dist/` | Complete production site, including sitemap and CNAME |
+| `release/gazetteregistry-preview.zip` | `dist-preview/` | Fictional designer preview only; no production data |
+
+`index.html` is at the ZIP root — there is no enclosing `dist` directory. HTML, CSS, JavaScript, the self-hosted font, `_headers`, `robots.txt`, `404.html`, favicon, Pagefind index and public deployment files are included. PDFs, Python source, NDJSON/compressed data, Git metadata, internal documentation, CTO handovers, credentials, private verification material, `node_modules` and development configuration are excluded; packaging fails if any are found.
+
+Archives use sorted entries, a fixed `1980-01-01` timestamp and fixed file modes, so repeated packaging of an unchanged build is byte-identical. Each run verifies ZIP integrity, required files, root `index.html`, unsafe paths, file count, largest asset, SHA-256 archive and manifest checksums. It then extracts each archive into a temporary directory and serves it independently over HTTP to confirm key pages and assets return 200.
+
+Phase 1F measurements:
+
+| Package | ZIP size | Files | Largest asset | Pages upload | Workers assets |
+| --- | --- | --- | --- | --- | --- |
+| Production | 4.173 MiB | 1,306 | 344.0 KiB | Not compatible (306 over 1,000) | Compatible |
+| Preview | 0.751 MiB | 90 | 344.0 KiB | Compatible | Compatible |
+
+Cloudflare Pages direct upload, including Cloudflare Drop, currently caps a deployment at **1,000 files**. The complete production archive exceeds that by 306 files. Do not remove records, permanent pages or Pagefind shards to fit: preserve the complete archive and deploy it through a path that supports the full file count (Workers static assets, or a Pages Git integration if its current limits allow). `release/` is not tracked by Git.
+
 ## 4. Validation only
 
 ```bash
@@ -121,7 +147,7 @@ Preview content is fictional, excluded from the production sitemap and search in
 
 Do not place internal project information, credentials or production corrections data in `demo/`. The validator rejects preview data in the production build and production markers in the preview build.
 
-## 7. Deploying (operator action, not performed in Phase 1E)
+## 7. Deploying (operator action, not performed in Phase 1F)
 
 Run these commands from the repository root. The dry run does not authenticate or upload:
 
@@ -182,7 +208,7 @@ Until configured, the page truthfully states that no public submission channel h
 
 Wrangler static assets have hard limits: **20,000 files** and **25 MiB per file**. The project targets **fewer than 15,000 files**. `scripts/validate_site.py` fails above 20,000, warns above 15,000 and reports the largest file.
 
-For reference, the Phase 1E production build produced 1,304 files and 7.82 MiB total. Growth is dominated by HTML pages and the search index, not PDFs; no PDFs are copied into `dist/`.
+For reference, the Phase 1F production build produced 1,306 files and 10.15 MiB total; the Pagefind index is 666 files and 1.84 MiB. Growth is dominated by HTML pages and the search index, not PDFs; no PDFs are copied into `dist/`.
 
 If a future dataset approaches the limit, split by country into separate deployments or move non-page assets to object storage. Neither is implemented; both require CTO authorisation.
 

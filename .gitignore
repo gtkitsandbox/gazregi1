@@ -5,6 +5,7 @@ dist/
 dist-preview/
 .wrangler/
 reports/
+release/
 
 # New extraction inputs stay local. Existing tracked PDFs are preserved.
 raw/*.pdf

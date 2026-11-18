@@ -16,6 +16,7 @@
   <meta name="twitter:title" content="{{ meta.title }}">
   <meta name="twitter:description" content="{{ meta.description }}">
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="/assets/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/styles.css">
   <script type="application/ld+json">{{ structured_data|safe }}</script>
 </head>
@@ -28,17 +29,46 @@
   {% endif %}
   <header class="site-header" data-pagefind-ignore>
     <div class="site-header__inner">
-      <a class="wordmark" href="/" aria-label="{{ site.site_name }} home">{{ site.site_name }}</a>
+      <a class="wordmark" href="/" aria-label="{{ site.site_name }} home">
+        <svg class="wordmark__mark" viewBox="0 0 36 36" aria-hidden="true" focusable="false">
+          <rect width="36" height="36" rx="7" fill="#0a1f38"/>
+          <path d="M11 7.5h9.5L26 13v15.5H11z" fill="#ffffff"/>
+          <path d="M20.5 7.5V13H26" fill="#c4d9f6"/>
+          <path d="M14.5 16.5h8M14.5 20.5h8M14.5 24.5h5" stroke="#0a1f38" stroke-width="1.5" stroke-linecap="round"/>
+          <rect x="22.5" y="23.5" width="6" height="6" rx="1.5" fill="#2f7df0"/>
+        </svg>
+        <span class="wordmark__text">Gazette<span>Registry</span></span>
+      </a>
+
       <nav class="primary-nav" aria-label="Primary">
-        {% for item in nav %}
+        {% for item in nav if item.header %}
         <a href="{{ item.path }}"{% if item.section == current_section %} aria-current="page"{% endif %}>{{ item.label }}</a>
         {% endfor %}
       </nav>
+
       <form class="header-search" action="/" method="get" role="search">
         <label class="visually-hidden" for="global-search">Search indexed records</label>
         <input id="global-search" name="q" type="search" placeholder="Search records" autocomplete="off">
-        <button type="submit">Search</button>
+        <button type="submit" aria-label="Search">
+          <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m13 13 4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
       </form>
+
+      <details class="mobile-nav">
+        <summary><span class="mobile-nav__bars" aria-hidden="true"></span><span>Menu</span></summary>
+        <div class="mobile-nav__panel">
+          <nav aria-label="Primary mobile">
+            {% for item in nav if item.header %}
+            <a href="{{ item.path }}"{% if item.section == current_section %} aria-current="page"{% endif %}>{{ item.label }}</a>
+            {% endfor %}
+          </nav>
+          <form class="mobile-nav__search" action="/" method="get" role="search">
+            <label class="visually-hidden" for="mobile-global-search">Search indexed records</label>
+            <input id="mobile-global-search" name="q" type="search" placeholder="Search records" autocomplete="off">
+            <button type="submit">Search</button>
+          </form>
+        </div>
+      </details>
     </div>
   </header>
 
@@ -48,18 +78,46 @@
 
   <footer class="site-footer" data-pagefind-ignore>
     <div class="site-footer__inner">
-      <div>
-        <p class="site-footer__brand">{{ site.site_name }}</p>
-        <p>An independent public-record and procurement discovery service. Not affiliated with any government. Source documents remain with their official publisher.</p>
+      <div class="site-footer__brand-block">
+        <a class="site-footer__brand" href="/" aria-label="{{ site.site_name }} home">
+          <svg viewBox="0 0 36 36" aria-hidden="true" focusable="false">
+            <rect width="36" height="36" rx="7" fill="#ffffff"/>
+            <path d="M11 7.5h9.5L26 13v15.5H11z" fill="#0a1f38"/>
+            <path d="M20.5 7.5V13H26" fill="#8fb9ee"/>
+            <path d="M14.5 16.5h8M14.5 20.5h8M14.5 24.5h5" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round"/>
+            <rect x="22.5" y="23.5" width="6" height="6" rx="1.5" fill="#2f7df0"/>
+          </svg>
+          <span>Gazette<span class="site-footer__brand-accent">Registry</span></span>
+        </a>
+        <p class="site-footer__tagline">Official records. One search. Source attached.</p>
+        <p class="site-footer__disclaimer">GazetteRegistry is an independent public-record and procurement discovery service. It is not affiliated with, endorsed by or operated by any government. Source documents remain with their official publisher.</p>
       </div>
-      <nav aria-label="Footer">
-        <a href="/gazettes/">Gazettes</a>
-        <a href="/about/">About</a>
-        <a href="/corrections/">Corrections</a>
+      <nav class="site-footer__links" aria-label="Footer">
+        <div>
+          <h2>Browse</h2>
+          <a href="/tenders/">Tenders</a>
+          <a href="/gazettes/">Gazettes</a>
+          <a href="/notices/">Public notices</a>
+          <a href="/regulations/">Regulations</a>
+        </div>
+        <div>
+          <h2>Reference</h2>
+          <a href="/people/">People</a>
+          <a href="/organisations/">Organisations</a>
+          <a href="/countries/">Country coverage</a>
+          <a href="/sources/">Source registry</a>
+        </div>
+        <div>
+          <h2>Registry</h2>
+          <a href="/about/">About the index</a>
+          <a href="/corrections/">Corrections</a>
+          <a href="/#search-form">Search</a>
+        </div>
       </nav>
-      <p class="site-footer__note">
-        {% if preview %}Fictional demonstration build. Not indexed.{% else %}Indexed from official Gazette publications with page-level source references.{% endif %}
-      </p>
+      <div class="site-footer__bottom">
+        <p>{% if preview %}Fictional demonstration build. Not indexed.{% else %}An independent index of official Gazette publications, with page-level source references. Coverage is incomplete.{% endif %}</p>
+        <p>No accounts. No tracking scripts. No tender submissions.</p>
+      </div>
     </div>
   </footer>
   <script type="module" src="/assets/app.js"></script>

@@ -10,6 +10,17 @@
     <p class="page-heading__lede">Coverage is listed alphabetically by country and grouped by region. A verified flag means records have been retrieved from an official source and passed provenance checks; planned countries have no published records yet.</p>
   </header>
 
+  <div class="stat-grid" aria-label="Coverage overview">
+    <div class="stat"><span class="stat__value">{{ stats.countries }}</span><span class="stat__label">Countries configured</span></div>
+    <div class="stat"><span class="stat__value">{{ stats.with_records }}</span><span class="stat__label">With published records</span></div>
+    <div class="stat"><span class="stat__value">{{ stats.planned }}</span><span class="stat__label">Planned, no records</span></div>
+    <div class="stat"><span class="stat__value">{{ stats.tenders }}</span><span class="stat__label">Procurement records</span></div>
+  </div>
+
+  <aside class="callout">
+    <strong>Coverage limitation.</strong> {{ stats.with_records }} of {{ stats.countries }} configured countries have published records. {{ stats.planned }} countries are tracked as planned coverage and are shown without placeholder records. A country's inclusion does not imply complete or current national coverage.
+  </aside>
+
   <form class="filter-bar" data-country-filters aria-label="Filter countries">
     <div class="filter-field filter-field--search">
       <label for="country-query">Search countries</label>
