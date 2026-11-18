@@ -8,6 +8,7 @@ import json
 import sys
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass, field
+from datetime import date
 from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
@@ -15,7 +16,7 @@ from urllib.parse import unquote, urlsplit
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from content.build import _record_path  # noqa: E402
+from content.build import _person_path, _record_path  # noqa: E402
 from content.loader import ContentValidationError, load_site  # noqa: E402
 from content.models import CuratedRecord  # noqa: E402
 
@@ -239,9 +240,27 @@ def build_validation_report(
             page_text = html.unescape(path.read_text(encoding="utf-8"))
             if person.canonical_name not in page_text:
                 errors.append(f"{person.person_id}: canonical name missing from generated HTML")
-            for record in site.records_for_person(person.person_id):
+            if "not statements of current employment" not in page_text:
+                errors.append(
+                    f"{person.person_id}: historical/current position distinction missing"
+                )
+            for variant in site.verified_variants_for(person.person_id):
+                if variant.name not in page_text:
+                    errors.append(
+                        f"{person.person_id}: verified name variant missing: {variant.name}"
+                    )
+            person_records = sorted(
+                site.records_for_person(person.person_id),
+                key=lambda record: (site.record_date(record) or date.min, record.uid),
+            )
+            positions = []
+            for record in person_records:
                 if record.title not in page_text:
                     errors.append(f"{person.person_id}: record {record.uid} missing from person page")
+                else:
+                    positions.append(page_text.index(record.title))
+            if positions != sorted(positions):
+                errors.append(f"{person.person_id}: record history is not chronological")
         for person in site.held_people:
             parts = person.person_id.split(":")
             if (output_dir / "people" / parts[1] / parts[2] / "index.html").exists():
@@ -332,6 +351,13 @@ def build_validation_report(
                     namespace = {"s": "http://www.sitemaps.org/schemas/sitemap/0.9"}
                     urls = [node.text or "" for node in tree.findall(".//s:loc", namespace)]
                     report["sitemap_urls"] = len(urls)
+                    sitemap_url_set = set(urls)
+                    for person in site.published_people:
+                        person_url = site_url.rstrip("/") + _person_path(person)
+                        if person_url not in sitemap_url_set:
+                            errors.append(
+                                f"{person.person_id}: verified person page missing from sitemap"
+                            )
                     for url in urls:
                         if not url.startswith(site_url):
                             errors.append(f"Sitemap URL outside site origin: {url}")

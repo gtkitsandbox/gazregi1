@@ -121,38 +121,87 @@ Preview content is fictional, excluded from the production sitemap and search in
 
 Do not place internal project information, credentials or production corrections data in `demo/`. The validator rejects preview data in the production build and production markers in the preview build.
 
-## 7. Deploying (operator action, not performed in Phase 1D)
+## 7. Deploying (operator action, not performed in Phase 1E)
+
+Run these commands from the repository root. The dry run does not authenticate or upload:
 
 ```bash
+npm ci
+npm test
 npm run build
-npm run validate
-npx wrangler deploy
+npm run build:preview
+npx wrangler deploy --dry-run
+npx wrangler deploy --dry-run --config wrangler.preview.jsonc
 ```
 
-`npm run deploy` is a convenience wrapper for `wrangler deploy`. The operator must authenticate first (`npx wrangler login` or a scoped `CLOUDFLARE_API_TOKEN`). Do not commit credentials or `.env` files.
+After reviewing the dry run, authenticate and deploy production only:
+
+```bash
+npx wrangler login          # or set a scoped CLOUDFLARE_API_TOKEN
+npx wrangler deploy         # serves ./dist via wrangler.jsonc
+```
+
+`npm run deploy` is a convenience wrapper for the last command. Do not commit credentials, `.env` files or `wrangler` authentication state.
+
+### Custom-domain verification
+
+Configure the production custom domain in the Cloudflare dashboard under Workers & Pages → the production project → Custom domains. Do not change DNS until that step is authorised. Verify after propagation:
+
+```bash
+dig +short gazetteregistry.com
+dig +short www.gazetteregistry.com
+curl -sSI https://gazetteregistry.com/ | head -n 5
+curl -sS https://gazetteregistry.com/robots.txt
+curl -sS https://gazetteregistry.com/sitemap.xml | head -n 5
+curl -sS -o /dev/null -w '%{http_code}\n' https://gazetteregistry.com/does-not-exist/
+```
+
+`nslookup` is an acceptable substitute if `dig` is unavailable. Confirm the canonical host in the generated HTML matches the verified domain.
+
+### Corrections configuration
+
+The corrections page is built and ready. To enable the operator's submission route, set the public values in `config/site.json` and rebuild:
+
+```json
+"corrections_email": "operator-configured-public-address",
+"corrections_note": "Optional public handling note"
+```
+
+Until configured, the page truthfully states that no public submission channel has been enabled. Do not put private verification evidence or operator identity in these fields.
 
 ### Cutover checklist
 
-1. Confirm `npm run build` and `npm run validate` pass.
-2. Confirm the generated canonical host matches the intended production host.
-3. Confirm `sitemap.xml` URLs resolve.
-4. Configure the custom domain in Cloudflare.
-5. Verify `/` and a deliberately missing path in production.
-6. Keep the GitHub Pages workflow active until the Cloudflare deployment is verified, then disable it with explicit authorisation.
-7. Submit the sitemap to search engines only after cutover is confirmed.
+1. Confirm `npm test`, `npm run build` and `npm run build:preview` pass.
+2. Confirm both Wrangler dry runs succeed and `dist/` contains no PDFs, credentials or internal documentation.
+3. Enable the corrections contact route and rebuild production.
+4. Configure the custom domain in Cloudflare and verify DNS, `/`, `/robots.txt`, `/sitemap.xml` and a missing path.
+5. Keep the GitHub Pages workflow active until the Cloudflare deployment is verified, then disable it with explicit authorisation.
+6. Submit the sitemap to search engines only after cutover is confirmed.
 
 ## 8. Cloudflare static limits
 
 Wrangler static assets have hard limits: **20,000 files** and **25 MiB per file**. The project targets **fewer than 15,000 files**. `scripts/validate_site.py` fails above 20,000, warns above 15,000 and reports the largest file.
 
-For reference, the Phase 1D production build produced 1,234 files and 7.39 MiB total. Growth is dominated by HTML pages and the search index, not PDFs; no PDFs are copied into `dist/`.
+For reference, the Phase 1E production build produced 1,304 files and 7.82 MiB total. Growth is dominated by HTML pages and the search index, not PDFs; no PDFs are copied into `dist/`.
 
 If a future dataset approaches the limit, split by country into separate deployments or move non-page assets to object storage. Neither is implemented; both require CTO authorisation.
 
 ## 9. GitHub Pages
 
-`.github/workflows/deploy.yml` builds and deploys production on pushes to `main`. A separate `preview` job builds and validates `dist-preview/` without deploying it. Phase 1D made a local commit only; nothing was pushed, so the workflow has not run.
+`.github/workflows/deploy.yml` builds and deploys production on pushes to `main`. A separate `preview` job builds and validates `dist-preview/` without deploying it. Phase 1E made a local commit only; nothing was pushed, so the workflow has not run.
 
 ## 10. Rollback
 
 Because `dist/` is generated, rollback is a rebuild of the previous commit followed by redeployment. Source PDFs and curated NDJSON are tracked, so every published page can be regenerated from the repository plus the local `raw/` inputs.
+
+Preferred rollback is the Cloudflare dashboard's deployment history: select the last known-good deployment and roll back. Rebuild-based rollback:
+
+```bash
+git log --oneline -n 5
+git switch --detach <last-known-good-commit>
+npm ci
+npm run build
+npx wrangler deploy
+```
+
+Return to the release branch afterwards with `git switch main`. Keep the previous deployment available until the replacement is verified.

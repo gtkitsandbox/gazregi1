@@ -19,9 +19,9 @@
       "reuse_restrictions": "Crown copyright. The Gazette is reused by attribution with links to the official notice.",
       "access_status": "verified",
       "adapter": "uk_gazette_notices",
-      "records_ingested": 0,
+      "records_ingested": 14,
       "last_checked": "2026-11-18",
-      "notes": "Personal insolvency and deceased-estate categories are excluded from ingestion."
+      "notes": "Historical London Gazette supplements are curated from official PDFs with page-level provenance; OCR is not used."
     },
     {
       "source_id": "gb-find-a-tender",

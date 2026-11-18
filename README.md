@@ -130,6 +130,7 @@ Tenders are opportunities published by official sources. The site provides struc
 
 - Fifteen of the 21 configured countries have published records: Australia, Bangladesh, Canada, Germany, Ireland, Japan, Kenya, Maldives, the Netherlands, New Zealand, Singapore, Sri Lanka, South Africa, the United Kingdom and the United States. India, Indonesia, South Korea, Malaysia, the Philippines and Thailand are configured but have no verified records; their pages show a truthful empty-coverage state.
 - Coverage per country is uneven. Maldives meets the Phase 1D target of at least 10 notices and 10 procurement records; Japan and Sri Lanka have partial coverage. Exact counts are on `/countries/`.
+- United Kingdom historical coverage includes verified 1914 and 1915 London Gazette issues with appointment and promotion records. Person pages label positions as historical records, not current employment.
 - Some official sources are restricted, unavailable or not machine-readable. They remain visible on `/sources/` with notes; no records are fabricated for them.
 - Extracted page and snapshot text can contain OCR/layout artefacts; the official source remains authoritative.
 - Official URLs are shown only when recorded; they are never guessed.

@@ -774,7 +774,10 @@ def build_site(
     sitemap.add("/people/", latest_iso)
 
     for person in site.published_people:
-        records = site.records_for_person(person.person_id)
+        records = sorted(
+            site.records_for_person(person.person_id),
+            key=lambda record: (site.record_date(record) or date.min, record.uid),
+        )
         history = []
         published_names: set[str] = set()
         for record in records:
@@ -793,12 +796,14 @@ def build_site(
         path = _person_path(person)
         role_label = "appointments and positions"
         if history:
-            latest = history[0]
+            latest = history[-1]
             bits = []
             if latest["ref"].position:
                 bits.append(latest["ref"].position)
             if latest["organisations"]:
-                bits.append(f"at {latest['organisations'][0].name}")
+                organisation_name = latest["organisations"][0].name
+                if organisation_name.casefold() not in (latest["ref"].position or "").casefold():
+                    bits.append(f"at {organisation_name}")
             if bits:
                 role_label = " ".join(bits)
         title = f"{person.canonical_name} — {role_label}"

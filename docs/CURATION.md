@@ -46,12 +46,24 @@ Whitespace is normalised before either excerpt check, but the words and order mu
 
 For a batch of historical gazettes supplied out of band:
 
-1. Place each original PDF in a staging directory outside `data/` and record its filename, publisher, issue number, publication date and acquisition note.
-2. For each PDF, run `scripts/extract_pdf.py` with an explicit `--source-url` only if the official URL was independently verified; otherwise leave it unset and set the issue's coverage to `partial`.
-3. Check the extracted page count and printed page labels against the PDF before adding records.
-4. Add one record per notice with a verbatim excerpt, the exact `pdf_page` and a stable `<issue_id>-<CATEGORY>-<NNN>` UID.
-5. Run `npm run build`. Provenance failures name the record and page; fix the extraction or excerpt, never the source text.
-6. Keep the original PDFs out of `dist/` and out of Git unless redistribution rights are confirmed.
+1. Place each original PDF in `raw/` (Git-ignored) and record its filename, publisher, issue number, publication date and acquisition note outside the public build.
+2. Extract with explicit metadata when the filename does not follow `Gazette-YYYY-MM-DD-edition.pdf`:
+
+   ```bash
+   python scripts/extract_pdf.py raw/<file>.pdf --country <cc> \
+     --gazette-number <number> --publication-date YYYY-MM-DD \
+     --edition <code> --gazette-type regular|extraordinary|supplement \
+     --language <code> [--source-url <verified-url>]
+   ```
+
+   Only pass `--source-url` when the official URL was independently verified. `--gazette-number` and dates must be copied from the document or an authoritative publisher listing.
+3. Check the extracted page count and printed page labels against the PDF. A warning lists pages without a text layer. Scanned-only documents fail with `OCR is not enabled`; supply a text-layer PDF, OCR the file outside this repository, or transcribe the relevant notice manually. No OCR engine is bundled.
+4. Run `npm run sources` to record the PDF checksum and issue mapping in tracked `sources/sources.ndjson`. The PDF itself remains untracked.
+5. Add one record per notice with a verbatim excerpt, the exact `pdf_page` and a stable `<issue_id>-<CATEGORY>-<NNN>` UID. Use `appointment`, `commissioning`, `promotion`, `professional_position` or `organisational_appointment` according to the printed notice, not a generic label.
+6. Run `npm test` and `npm run build`. Provenance failures name the record and page; fix the extraction or excerpt, never the source text.
+7. Keep original PDFs out of `dist/` and out of Git unless redistribution rights are confirmed.
+
+For a reusable batch, adapt `scripts/import_historical_records.py`: it asserts each excerpt against the extracted page before writing records, people, organisations and verified name variants. It never guesses a person's identity from a name alone.
 
 No automated importer guesses issue numbers, dates or official URLs. Those values must come from the document itself or an authoritative publisher listing.
 
@@ -210,6 +222,17 @@ python scripts/report_name_candidates.py
 ```
 
 The report is written to `reports/name-candidates.ndjson` (ignored by Git). It is advisory only and never edits data.
+
+### 3.4 Operator-supplied identity mappings
+
+Private verification evidence stays outside tracked data:
+
+1. The operator records candidate mappings and the evidence location in a local file under `reports/` or outside the repository. `reports/` is ignored by Git.
+2. The reviewer confirms or rejects each mapping and supplies the public `basis` wording.
+3. Only the approved `person_id`, name variant, `verification`, `reviewed_at`, `basis` and public record UIDs are written to `entities/people.ndjson` or `entities/name-variants.ndjson`.
+4. Never commit private documents, identity numbers, contact details, reviewer names or the operator's identity. `basis` must contain only the public-source justification.
+
+An unconfirmed mapping remains unpublished. A name match alone is never sufficient.
 
 ## 4. Organisations
 

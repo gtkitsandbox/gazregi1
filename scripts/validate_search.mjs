@@ -70,6 +70,12 @@ try {
         { term: "NETWORK EQUIPMENT AND SMART BOARDROOMS", includes: "/tenders/ZA-2026-TEND-001/" },
         { term: "United Kingdom", includes: "/countries/gb/" },
         { term: "1374249", includes: "/tenders/BD-2026-TEND-001/" },
+        { term: "Havelock Hudson", includes: "/people/gb/havelock-hudson/" },
+        { term: "Havelock Hudson, C.B., C.I.E.", includes: "/people/gb/havelock-hudson/" },
+        { term: "Ian M. Smith", includes: "/people/gb/ian-m-smith/" },
+        { term: "Indian Army", includes: "/people/gb/havelock-hudson/" },
+        { term: "29131", includes: "/gazettes/GB-1915-29131/" },
+        { term: "Home Office", includes: "/people/gb/gareth-davies/" },
       ];
 
   const failures = [];

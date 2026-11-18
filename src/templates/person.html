@@ -14,7 +14,7 @@
   </header>
 
   <aside class="callout">
-    <strong>Reference page.</strong> This page lists source-backed Gazette notices linked to one verified identity. It contains no biography, contact details, family relationships or inferred personal information.
+    <strong>Reference page.</strong> This page lists source-backed Gazette notices linked to one verified identity. It contains no biography, contact details, family relationships or inferred personal information. Positions are historical records as published on the date shown; they are not statements of current employment.
   </aside>
 
   {% if same_name %}
@@ -28,7 +28,7 @@
   <div class="two-column">
     <section class="panel" aria-labelledby="history-title">
       <div class="section-heading">
-        <h2 id="history-title">Record history</h2>
+        <h2 id="history-title">Record history <span class="muted">(oldest first)</span></h2>
         <span class="section-count">{{ history|length }} record{% if history|length != 1 %}s{% endif %}</span>
       </div>
       {% if history %}

@@ -1,0 +1,14 @@
+{
+  "issue_id": "GB-1914-29002",
+  "country": "GB",
+  "gazette_no": "29002",
+  "gazette_type": "supplement",
+  "edition": "S",
+  "publication_date": "1914-12-08",
+  "source_url": "https://www.thegazette.co.uk/London/issue/29002/data.pdf",
+  "source_file": "Gazette-1914-12-08-S.pdf",
+  "page_count": 10,
+  "parser_version": "0.1.0",
+  "extraction_method": "pymupdf",
+  "extracted_at": "2026-11-18T20:21:48+00:00"
+}

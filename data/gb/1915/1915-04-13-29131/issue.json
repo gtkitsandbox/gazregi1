@@ -1,0 +1,14 @@
+{
+  "issue_id": "GB-1915-29131",
+  "country": "GB",
+  "gazette_no": "29131",
+  "gazette_type": "supplement",
+  "edition": "S",
+  "publication_date": "1915-04-13",
+  "source_url": "https://www.thegazette.co.uk/London/issue/29131/data.pdf",
+  "source_file": "Gazette-1915-04-13-S.pdf",
+  "page_count": 16,
+  "parser_version": "0.1.0",
+  "extraction_method": "pymupdf",
+  "extracted_at": "2026-11-18T20:17:41+00:00"
+}
