@@ -1,0 +1,13 @@
+{
+  "country_code": "MV",
+  "name": "Maldives",
+  "region": "Asia",
+  "languages": [
+    "dv",
+    "en"
+  ],
+  "gazette_name": "Government Gazette of the Maldives",
+  "publisher_name": "Government of the Maldives",
+  "default_language": "dv",
+  "coverage_status": "partial"
+}

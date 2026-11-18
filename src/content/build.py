@@ -88,7 +88,20 @@ NOTICE_LABELS = {
     "court": "Court",
     "licensing": "Licensing",
     "professional": "Professional",
+    "construction": "Construction",
+    "infrastructure": "Infrastructure",
+    "procurement": "Procurement notice",
+    "technology": "Technology",
+    "general": "General notice",
     "other": "Other",
+}
+OPPORTUNITY_KIND_LABELS = {
+    "tender": "Tender",
+    "grant": "Grant opportunity",
+    "procurement_award": "Procurement award",
+    "request_for_information": "Request for information",
+    "market_consultation": "Market consultation",
+    "other": "Other opportunity",
 }
 INSTRUMENT_LABELS = {
     "act": "Act",
@@ -167,6 +180,27 @@ def _date_long(value: date | str | None) -> str:
 
 def _date_long_or_missing(value: date | None) -> str:
     return _date_long(value) if value else "Not stated"
+
+
+def _closing_state(closing_date: date | None) -> str:
+    """Calculate the date-derived state independently of source-reported status."""
+    if closing_date is None:
+        return "unknown"
+    return "closed" if closing_date < date.today() else "open"
+
+
+def _effective_status(status: str, closing_date: date | None) -> str:
+    """Presentation status that can never call an expired opportunity open.
+
+    The stored source-reported status remains available separately.
+    """
+    if status in {"awarded", "cancelled", "closed"}:
+        return status
+    return _closing_state(closing_date)
+
+
+def _opportunity_kind_label(value: str) -> str:
+    return OPPORTUNITY_KIND_LABELS.get(value, value.replace("_", " ").title())
 
 
 def _money(value: int) -> str:
@@ -325,6 +359,9 @@ def _build_env(site: SiteData) -> Environment:
         record_type_label=_record_type_label,
         record_type_tone=lambda value: RECORD_TYPE_TONES.get(value, "neutral"),
         sector_label=_sector_label,
+        opportunity_kind_label=_opportunity_kind_label,
+        closing_state=_closing_state,
+        effective_status=_effective_status,
         notice_category_label=lambda value: NOTICE_LABELS.get(value, value.title()),
         instrument_type_label=lambda value: INSTRUMENT_LABELS.get(value, value.title()),
         org_type_label=lambda value: ORG_TYPE_LABELS.get(value, value.title()),
@@ -528,8 +565,9 @@ def build_site(
     # Home
     home_title = "Search official Gazette records"
     home_description = (
-        f"Search {home['stats']['pages']} indexed pages across {home['stats']['issues']} official "
-        f"Gazette issues in {home['country_names']}. Appointments, tenders, public notices and regulations."
+        f"Search official gazette, tender and appointment records from {home['stats']['with_records']} "
+        f"countries: {home['stats']['records']} source-validated records and {home['stats']['issues']} "
+        f"verified Gazette issues with {home['stats']['pages']} searchable pages. Coverage is incomplete."
     )
     _write_page(
         env,
@@ -1018,9 +1056,17 @@ def build_site(
             "origin": _origin(site, record),
             "org": _record_issuer(site, record),
             "country": site.country_of_record(record).config,
+            "closing_state": _closing_state(record.tender.closing_date),
+            "effective_status": _effective_status(
+                record.tender.status, record.tender.closing_date
+            ),
         }
         for record in tender_records
     ]
+    kind_values = sorted(
+        {record.tender.opportunity_kind for record in tender_records},
+        key=lambda value: _opportunity_kind_label(value),
+    )
     sector_values = sorted(
         {record.tender.sector for record in tender_records},
         key=lambda value: SECTOR_LABELS.get(value, value),
@@ -1069,6 +1115,7 @@ def build_site(
         section="tenders",
         context={
             "tenders": tender_items,
+            "kind_options": [(value, _opportunity_kind_label(value)) for value in kind_values],
             "sector_options": [(value, _sector_label(value)) for value in sector_values],
             "location_options": location_values,
             "organisation_options": organisation_values,
@@ -1123,7 +1170,16 @@ def build_site(
                 date_published=origin.issue.publication_date.isoformat(),
             ),
             section="tenders",
-            context={"record": record, "origin": origin, "issuer": issuer, "related_orgs": related_orgs},
+            context={
+                "record": record,
+                "origin": origin,
+                "issuer": issuer,
+                "related_orgs": related_orgs,
+                "closing_state": _closing_state(record.tender.closing_date),
+                "effective_status": _effective_status(
+                    record.tender.status, record.tender.closing_date
+                ),
+            },
             site=site,
         )
         sitemap.add(path, origin.issue.publication_date.isoformat() if origin.issue.publication_date else "")

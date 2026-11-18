@@ -20,7 +20,7 @@ A PDF record requires:
 - `source.pdf_page` that exists in `pages.ndjson`;
 - `source.printed_page` matching the extracted page if supplied;
 - `source.excerpt` copied verbatim from that page's extracted text;
-- a stable UID in the form `<COUNTRY>-<YEAR>-<CATEGORY>-<SEQUENCE>`, where category is `APPT`, `TEND`, `NOTC` or `REGL`.
+- a stable UID beginning `<issue_id>-<CATEGORY>-`, where category is `APPT`, `TEND`, `NOTC` or `REGL` (for example `LK-2026-2502-NOTC-001`).
 
 ### HTML, XML, JSON, CSV or text sources
 
@@ -41,6 +41,19 @@ A non-PDF record requires:
 PDF page numbers are forbidden on non-PDF records, and `issue_id` is forbidden. This keeps the permanent URL and provenance rules intact without forcing every country through PDF extraction.
 
 Whitespace is normalised before either excerpt check, but the words and order must match. If a PDF has a malformed text layer, correct the extraction or choose a shorter verbatim excerpt; do not paraphrase the excerpt.
+
+### Importing operator-supplied historical PDFs
+
+For a batch of historical gazettes supplied out of band:
+
+1. Place each original PDF in a staging directory outside `data/` and record its filename, publisher, issue number, publication date and acquisition note.
+2. For each PDF, run `scripts/extract_pdf.py` with an explicit `--source-url` only if the official URL was independently verified; otherwise leave it unset and set the issue's coverage to `partial`.
+3. Check the extracted page count and printed page labels against the PDF before adding records.
+4. Add one record per notice with a verbatim excerpt, the exact `pdf_page` and a stable `<issue_id>-<CATEGORY>-<NNN>` UID.
+5. Run `npm run build`. Provenance failures name the record and page; fix the extraction or excerpt, never the source text.
+6. Keep the original PDFs out of `dist/` and out of Git unless redistribution rights are confirmed.
+
+No automated importer guesses issue numbers, dates or official URLs. Those values must come from the document itself or an authoritative publisher listing.
 
 ## 2. Record types
 

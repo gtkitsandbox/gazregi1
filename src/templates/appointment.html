@@ -36,7 +36,7 @@
   <section class="source-excerpt" aria-labelledby="excerpt-title">
     <div class="section-heading"><h2 id="excerpt-title">Source excerpt</h2>{{ record_source_link(record) }}</div>
     <blockquote>{{ record.source.excerpt }}</blockquote>
-    <p class="provenance">Verified against the {% if origin.is_pdf %}extracted text of {{ origin.source.source_file }}, PDF page {{ origin.pdf_page }}{% else %}retrieved official source recorded as {{ origin.source.source_file }}{% endif %}. SHA-256 <code class="checksum">{{ origin.source.sha256 or "Not recorded" }}</code>.</p>
+    <p class="provenance">Verified against the {% if origin.is_pdf %}extracted text of {{ origin.source.source_file }}, PDF page {{ origin.pdf_page }}{% else %}retrieved official source recorded as {{ origin.source.source_file }}{% endif %}. SHA-256 <code class="checksum">{{ origin.source.sha256 or "Not recorded" }}</code>{% if origin.document %} (checksum scope: {{ origin.document.checksum_scope|replace("_", " ") }}){% endif %}.</p>
   </section>
 
   {% if related_orgs %}

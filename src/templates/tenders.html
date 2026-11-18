@@ -24,6 +24,13 @@
       </select>
     </div>
     <div class="filter-field">
+      <label for="tender-kind">Type</label>
+      <select id="tender-kind" data-filter="kind">
+        <option value="">All opportunity types</option>
+        {% for value, label in kind_options %}<option value="{{ value }}">{{ label }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="filter-field">
       <label for="tender-sector">Industry</label>
       <select id="tender-sector" data-filter="sector">
         <option value="">All industries</option>
@@ -58,14 +65,14 @@
   </form>
   <div class="filter-summary">
     <p id="tender-count" aria-live="polite">{{ tenders|length }} tender{% if tenders|length != 1 %}s{% endif %}</p>
-    <p class="filter-hint">Closing status is calculated in your browser from the published date.</p>
+    <p class="filter-hint">Source-reported status and closing-date status are kept separate. Expired opportunities are never shown as open.</p>
   </div>
 
   <div class="tender-list" data-tender-list>
     {% for item in tenders %}
-    <article class="tender-card" data-tender data-sector="{{ item.record.tender.sector }}" data-location="{{ item.record.tender.location or '' }}" data-organisation="{{ item.record.tender.issuer_organisation_id or '' }}" data-country="{{ item.country.country_code|lower }}" data-closing="{{ item.record.tender.closing_date or '' }}" data-closing-time="{{ item.record.tender.closing_time or '' }}">
+    <article class="tender-card" data-tender data-kind="{{ item.record.tender.opportunity_kind }}" data-sector="{{ item.record.tender.sector }}" data-location="{{ item.record.tender.location or '' }}" data-organisation="{{ item.record.tender.issuer_organisation_id or '' }}" data-country="{{ item.country.country_code|lower }}" data-closing="{{ item.record.tender.closing_date or '' }}" data-closing-time="{{ item.record.tender.closing_time or '' }}">
       <div class="tender-card__top">
-        <span>{{ badge(sector_label(item.record.tender.sector), "sector") }} {{ badge(item.record.tender.status|title, "verified" if item.record.tender.status == "open" else ("warning" if item.record.tender.status in ["closed", "cancelled"] else "neutral")) }}</span>
+        <span>{{ badge(opportunity_kind_label(item.record.tender.opportunity_kind), "sector") }} {{ badge(sector_label(item.record.tender.sector), "sector") }} {{ badge(item.effective_status|title, "verified" if item.effective_status == "open" else ("warning" if item.effective_status in ["closed", "cancelled"] else "neutral")) }}</span>
         <span class="tender-card__reference">{{ item.record.tender.reference }}</span>
       </div>
       <h2><a href="{{ record_path(item.record) }}">{{ item.record.title }}</a></h2>

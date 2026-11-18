@@ -12,7 +12,7 @@
 
   <section class="prose" aria-labelledby="what-title">
     <h2 id="what-title">What the index contains</h2>
-    <p>The current build covers {{ country_names }}: {{ stats.issues }} Gazette issues and {{ stats.pages }} searchable pages. {{ stats.records }} structured records have passed source-excerpt validation. {{ stats.people }} person identities are operator-verified and published.</p>
+    <p>This build is configured for {{ stats.countries }} countries; {{ stats.with_records }} currently have published records. It holds {{ stats.issues }} verified Gazette issues and {{ stats.pages }} searchable pages, plus {{ stats.records }} structured records that have passed source-excerpt validation. {{ stats.people }} person identities are operator-verified and published. Coverage is incomplete and is not a complete record of any country's gazette.</p>
     <p>Every indexed page preserves the Gazette number, publication date, physical PDF page, printed page where available, source filename, source checksum and official document URL where recorded. Original PDFs are not hosted here; links point to the official publisher when a verified URL is available.</p>
   </section>
 
@@ -53,7 +53,7 @@
 
   <section class="prose" aria-labelledby="coverage-title">
     <h2 id="coverage-title">Country coverage</h2>
-    <p>The architecture is country-independent. {{ country_names }} is the initial country; additional countries can be added under <code>data/&lt;country-code&gt;/</code> without changing the templates or URL structure for existing records.</p>
+    <p>The architecture is country-independent. {{ stats.countries }} countries are configured under <code>data/&lt;country-code&gt;/</code>; {{ stats.with_records }} have published records and the remainder show a truthful empty-coverage state. Configured countries are {{ country_names }}. Adding a country does not change the templates or URL structure for existing records.</p>
   </section>
 </div>
 {% endblock %}

@@ -117,6 +117,7 @@ function initTenderFilters() {
     for (const card of cards) {
       const haystack = card.textContent.toLowerCase();
       const matchesQuery = !query || haystack.includes(query);
+      const matchesKind = !values.kind || card.dataset.kind === values.kind;
       const matchesSector = !values.sector || card.dataset.sector === values.sector;
       const matchesLocation = !values.location || card.dataset.location === values.location;
       const matchesOrganisation =
@@ -128,7 +129,7 @@ function initTenderFilters() {
         values.closing === state ||
         (values.closing === "open" && (state === "open" || state === "soon"));
       const show =
-        matchesQuery && matchesSector && matchesLocation && matchesOrganisation && matchesCountry && matchesClosing;
+        matchesQuery && matchesKind && matchesSector && matchesLocation && matchesOrganisation && matchesCountry && matchesClosing;
       card.hidden = !show;
       if (show) visible += 1;
     }

@@ -7,14 +7,17 @@
     "build:site": "python scripts/build_site.py",
     "build:preview": "python scripts/build_site.py --preview && pagefind --site dist-preview && python scripts/validate_site.py --preview && node scripts/validate_search.mjs --preview",
     "preview": "wrangler dev",
+    "preview:designer": "wrangler dev --config wrangler.preview.jsonc",
     "preview:serve": "python -m http.server 4174 --directory dist-preview",
     "validate": "python scripts/validate_site.py",
     "validate:preview": "python scripts/validate_site.py --preview",
     "validate:search": "node scripts/validate_search.mjs",
     "validate:search:preview": "node scripts/validate_search.mjs --preview",
+    "test": "python -m unittest discover -s tests",
     "schemas": "python scripts/export_schemas.py",
     "sources": "python scripts/record_sources.py",
     "deploy": "wrangler deploy",
+    "deploy:preview": "npm run build:preview && wrangler deploy --config wrangler.preview.jsonc",
     "ingest": "python scripts/ingest.py"
   },
   "devDependencies": {

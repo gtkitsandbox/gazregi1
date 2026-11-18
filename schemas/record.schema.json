@@ -13,6 +13,11 @@
             "court",
             "licensing",
             "professional",
+            "construction",
+            "infrastructure",
+            "procurement",
+            "technology",
+            "general",
             "other"
           ],
           "title": "Category",
@@ -174,6 +179,24 @@
           "default": null,
           "title": "Sha256"
         },
+        "checksum_scope": {
+          "anyOf": [
+            {
+              "enum": [
+                "original_source",
+                "source_response",
+                "transformed_snapshot",
+                "unknown"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Checksum Scope"
+        },
         "retrieved_at": {
           "anyOf": [
             {
@@ -277,6 +300,19 @@
           "title": "Sector",
           "type": "string"
         },
+        "opportunity_kind": {
+          "default": "tender",
+          "enum": [
+            "tender",
+            "grant",
+            "procurement_award",
+            "request_for_information",
+            "market_consultation",
+            "other"
+          ],
+          "title": "Opportunity Kind",
+          "type": "string"
+        },
         "status": {
           "default": "unknown",
           "enum": [
@@ -288,6 +324,31 @@
           ],
           "title": "Status",
           "type": "string"
+        },
+        "source_status": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Status"
+        },
+        "status_as_of": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Status As Of"
         },
         "location": {
           "anyOf": [

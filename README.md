@@ -1,6 +1,6 @@
 # GazetteRegistry
 
-GazetteRegistry is an independent, file-first public-record and procurement discovery platform over official government gazettes and public-notice publications. Coverage is country-independent: Sri Lanka (`lk`) is one of 20 configured countries, not the site's organising principle.
+GazetteRegistry is an independent, file-first public-record and procurement discovery platform over official government gazettes and public-notice publications. Coverage is country-independent: Sri Lanka (`lk`) is one of 21 configured countries, not the site's organising principle.
 
 The source of truth is local Python extraction output plus operator-curated NDJSON. Pagefind provides the prebuilt static search index. There is no database, runtime worker, account system or payment flow.
 
@@ -128,8 +128,8 @@ Tenders are opportunities published by official sources. The site provides struc
 
 ## Coverage and limitations
 
-- Twelve countries have verified records in this phase: Australia, Bangladesh, Canada, Germany, Ireland, Kenya, the Netherlands, New Zealand, Singapore, South Africa, the United Kingdom and the United States. Eight countries (India, Indonesia, Japan, South Korea, Malaysia, Philippines, Sri Lanka records, Thailand) are configured but have no curated international records in this phase.
-- Coverage per country is uneven and below the Phase 1C target of approximately 10 notices and 10 procurement records per country. Exact counts are on `/countries/` and in the Phase 1C handover.
+- Fifteen of the 21 configured countries have published records: Australia, Bangladesh, Canada, Germany, Ireland, Japan, Kenya, Maldives, the Netherlands, New Zealand, Singapore, Sri Lanka, South Africa, the United Kingdom and the United States. India, Indonesia, South Korea, Malaysia, the Philippines and Thailand are configured but have no verified records; their pages show a truthful empty-coverage state.
+- Coverage per country is uneven. Maldives meets the Phase 1D target of at least 10 notices and 10 procurement records; Japan and Sri Lanka have partial coverage. Exact counts are on `/countries/`.
 - Some official sources are restricted, unavailable or not machine-readable. They remain visible on `/sources/` with notes; no records are fabricated for them.
 - Extracted page and snapshot text can contain OCR/layout artefacts; the official source remains authoritative.
 - Official URLs are shown only when recorded; they are never guessed.

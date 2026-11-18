@@ -52,6 +52,14 @@ TenderSector = Literal[
     "auction",
     "other",
 ]
+OpportunityKind = Literal[
+    "tender",
+    "grant",
+    "procurement_award",
+    "request_for_information",
+    "market_consultation",
+    "other",
+]
 NoticeCategory = Literal[
     "land",
     "insolvency",
@@ -59,6 +67,11 @@ NoticeCategory = Literal[
     "court",
     "licensing",
     "professional",
+    "construction",
+    "infrastructure",
+    "procurement",
+    "technology",
+    "general",
     "other",
 ]
 InstrumentType = Literal[
@@ -178,7 +191,15 @@ class TenderDetail(FrozenModel):
     reference: str = Field(min_length=1)
     issuer_organisation_id: str | None = Field(default=None, pattern=ORG_ID_RE)
     sector: TenderSector
+    opportunity_kind: OpportunityKind = "tender"
     status: Literal["open", "closed", "awarded", "cancelled", "unknown"] = "unknown"
+    # Exact status wording used by the publisher (for example "Clarification"
+    # or "Forecasted").  `status` is the normalised, source-reported state; it
+    # is never recalculated from the closing date.
+    source_status: str | None = None
+    # The date on which `status` was reported.  Used to detect an expired
+    # opportunity that was recorded as open at the time of retrieval.
+    status_as_of: date | None = None
     location: str | None = None
     closing_date: date | None = None
     closing_time: str | None = Field(default=None, pattern=r"^([01]\d|2[0-3]):[0-5]\d$")
@@ -202,6 +223,12 @@ class NoticeDetail(FrozenModel):
 
 
 SourceFormat = Literal["pdf", "html", "xml", "json", "csv", "text"]
+ChecksumScope = Literal[
+    "original_source",
+    "source_response",
+    "transformed_snapshot",
+    "unknown",
+]
 
 
 class RecordSource(FrozenModel):
@@ -212,6 +239,10 @@ class RecordSource(FrozenModel):
     excerpt: str = Field(min_length=20)
     official_url: HttpUrl | None = None
     sha256: str | None = Field(default=None, pattern=r"^[a-f0-9]{64}$")
+    # What `sha256` covers.  `original_source` means the bytes of the cited
+    # document; `source_response` means a listing/API response; and
+    # `transformed_snapshot` means the readable text stored after redaction.
+    checksum_scope: ChecksumScope | None = None
     retrieved_at: date | None = None
 
     @model_validator(mode="after")
@@ -303,6 +334,8 @@ class PersonEntity(FrozenModel):
     def _verification(self) -> "PersonEntity":
         if self.identity_status == "operator_verified" and self.verified_at is None:
             raise ValueError("operator_verified people require verified_at")
+        if self.identity_status == "operator_verified" and not self.basis:
+            raise ValueError("operator_verified people require a publication basis")
         if self.person_id.split(":")[1].upper() != self.country_code:
             raise ValueError("person_id country prefix must match country_code")
         return self
@@ -324,6 +357,8 @@ class OrganisationEntity(FrozenModel):
             raise ValueError("organisation_id country prefix must match country_code")
         if self.identity_status == "operator_verified" and self.verified_at is None:
             raise ValueError("operator_verified organisations require verified_at")
+        if self.identity_status == "operator_verified" and not self.basis:
+            raise ValueError("operator_verified organisations require a publication basis")
         return self
 
 
@@ -379,6 +414,11 @@ class SourceDocumentSnapshot(FrozenModel):
     publication_date: date | None = None
     source_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
     source_bytes: int = Field(ge=0)
+    # Scope of source_sha256.  text_sha256 is a separately verifiable digest
+    # of the stored, redacted text so transformed snapshots are distinguishable
+    # from original-source checksums.
+    checksum_scope: ChecksumScope = "unknown"
+    text_sha256: str | None = Field(default=None, pattern=r"^[a-f0-9]{64}$")
     text: str = Field(min_length=1)
 
 

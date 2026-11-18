@@ -1,0 +1,9 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "gazetteregistry-designer-preview",
+  "compatibility_date": "2026-11-18",
+  "assets": {
+    "directory": "./dist-preview",
+    "not_found_handling": "404-page"
+  }
+}

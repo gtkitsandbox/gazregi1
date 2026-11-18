@@ -101,7 +101,27 @@ npm run preview:serve
 
 No Cloudflare account, token, DNS record or remote resource is used by any build or validation command.
 
-## 6. Deploying (operator action, not performed in Phase 1B)
+## 6. Designer preview deployment
+
+The preview is a separate static output and a separate Wrangler project. It is built from `demo/` and `config/preview.json`, never from production `data/`:
+
+```bash
+npm run build:preview          # dist-preview/, noindex, no sitemap, no CNAME
+npm run preview:designer       # wrangler dev --config wrangler.preview.jsonc
+npm run deploy:preview         # operator-only; requires Cloudflare authentication
+```
+
+`wrangler.preview.jsonc` uses the project name `gazetteregistry-designer-preview` and serves `./dist-preview`. Production `wrangler.jsonc` is unchanged and serves `./dist`.
+
+Preview content is fictional, excluded from the production sitemap and search index, and carries `noindex` plus a visible preview banner. **`noindex` is not access control.** Before sharing a deployed preview, restrict access with one of:
+
+- Cloudflare Access in front of the preview host (email allow-list or one-time PIN);
+- a separate `*.pages.dev`/preview host that is not linked or submitted for indexing;
+- HTTP Basic authentication at the edge.
+
+Do not place internal project information, credentials or production corrections data in `demo/`. The validator rejects preview data in the production build and production markers in the preview build.
+
+## 7. Deploying (operator action, not performed in Phase 1D)
 
 ```bash
 npm run build
@@ -121,18 +141,18 @@ npx wrangler deploy
 6. Keep the GitHub Pages workflow active until the Cloudflare deployment is verified, then disable it with explicit authorisation.
 7. Submit the sitemap to search engines only after cutover is confirmed.
 
-## 7. Cloudflare static limits
+## 8. Cloudflare static limits
 
-Wrangler static assets have hard limits: **20,000 files** and **25 MiB per file**. Phase 1B targets **fewer than 15,000 files**. `scripts/validate_site.py` fails above 20,000, warns above 15,000 and reports the largest file.
+Wrangler static assets have hard limits: **20,000 files** and **25 MiB per file**. The project targets **fewer than 15,000 files**. `scripts/validate_site.py` fails above 20,000, warns above 15,000 and reports the largest file.
 
-For reference, the Phase 1B production build produced roughly 444 files and 3.1 MiB total. Growth is dominated by HTML pages, not PDFs; no PDFs are copied into `dist/`.
+For reference, the Phase 1D production build produced 1,234 files and 7.39 MiB total. Growth is dominated by HTML pages and the search index, not PDFs; no PDFs are copied into `dist/`.
 
-If a future dataset approaches the limit, split by country into separate deployments or move non-page assets to R2. Neither is implemented in Phase 1B.
+If a future dataset approaches the limit, split by country into separate deployments or move non-page assets to object storage. Neither is implemented; both require CTO authorisation.
 
-## 8. GitHub Pages
+## 9. GitHub Pages
 
-`.github/workflows/deploy.yml` is unchanged and still builds/deploys the site on pushes to `main`. Phase 1B made a local commit only; nothing was pushed, so the workflow has not run.
+`.github/workflows/deploy.yml` builds and deploys production on pushes to `main`. A separate `preview` job builds and validates `dist-preview/` without deploying it. Phase 1D made a local commit only; nothing was pushed, so the workflow has not run.
 
-## 9. Rollback
+## 10. Rollback
 
 Because `dist/` is generated, rollback is a rebuild of the previous commit followed by redeployment. Source PDFs and curated NDJSON are tracked, so every published page can be regenerated from the repository plus the local `raw/` inputs.

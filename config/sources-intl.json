@@ -555,9 +555,9 @@
       "reuse_restrictions": "Official publication. Reuse is subject to the publisher's terms; records here paraphrase or quote briefly with attribution and link to the official source.",
       "access_status": "verified",
       "adapter": null,
-      "records_ingested": 0,
+      "records_ingested": 1,
       "last_checked": "2026-11-18",
-      "notes": "Daily index and article links are reachable; article pages are JavaScript PDF viewers, so HTML text extraction is not enabled in this phase."
+      "notes": "Daily index and PDF editions are reachable. One procurement notice was extracted from the official PDF in Phase 1D; Japanese text is preserved and unreadable closing dates are recorded as unknown."
     },
     {
       "source_id": "jp-p-portal",
@@ -956,6 +956,93 @@
       "records_ingested": 0,
       "last_checked": "2026-11-18",
       "notes": "Personal disqualification and estate notices are excluded."
+    },
+    {
+      "source_id": "mv-gazette",
+      "country_code": "MV",
+      "organisation": "Government of the Maldives",
+      "publication_type": "gazette",
+      "title": "Government Gazette — Public Notices (Iulaan)",
+      "official_url": "https://www.gazette.gov.mv/iulaan",
+      "formats": [
+        "html",
+        "pdf"
+      ],
+      "languages": [
+        "dv"
+      ],
+      "access_method": "Official public notice listing and detail pages",
+      "reuse_restrictions": "Official government publication. Records here quote short excerpts with attribution and link to the official notice; the linked PDF attachments remain subject to the publisher's terms.",
+      "access_status": "verified",
+      "adapter": null,
+      "records_ingested": 10,
+      "last_checked": "2026-11-18",
+      "notes": "Dhivehi content is retained verbatim. English keywords are editorial classification only."
+    },
+    {
+      "source_id": "mv-finance-tenders",
+      "country_code": "MV",
+      "organisation": "Ministry of Finance and Public Enterprises",
+      "publication_type": "procurement",
+      "title": "Recent Tenders",
+      "official_url": "https://www.finance.gov.mv/tenders",
+      "formats": [
+        "html",
+        "pdf"
+      ],
+      "languages": [
+        "en"
+      ],
+      "access_method": "Official tender listing and detail pages",
+      "reuse_restrictions": "Official government tender publication. Records here quote the published metadata with attribution and link to the official notice.",
+      "access_status": "verified",
+      "adapter": null,
+      "records_ingested": 10,
+      "last_checked": "2026-11-18",
+      "notes": "Deadlines are as published; status is calculated from the deadline date."
+    },
+    {
+      "source_id": "mv-presidency",
+      "country_code": "MV",
+      "organisation": "The President's Office, Maldives",
+      "publication_type": "public_notice",
+      "title": "The President's Office — Press Releases",
+      "official_url": "https://presidency.gov.mv/Press",
+      "formats": [
+        "html"
+      ],
+      "languages": [
+        "en",
+        "dv"
+      ],
+      "access_method": "Official press release pages",
+      "reuse_restrictions": "Official government publication. Appointment records quote a short excerpt and link to the release; personal data beyond the published appointment is excluded.",
+      "access_status": "verified",
+      "adapter": null,
+      "records_ingested": 4,
+      "last_checked": "2026-11-18",
+      "notes": "Verified appointment announcements only; no inference of current office beyond the release date."
+    },
+    {
+      "source_id": "gb-govuk-news",
+      "country_code": "GB",
+      "organisation": "UK Government",
+      "publication_type": "public_notice",
+      "title": "GOV.UK — Government news and communications",
+      "official_url": "https://www.gov.uk/government/news",
+      "formats": [
+        "html"
+      ],
+      "languages": [
+        "en"
+      ],
+      "access_method": "Official GOV.UK announcement pages",
+      "reuse_restrictions": "Crown copyright. Records quote a short excerpt under the Open Government Licence and link to the official announcement.",
+      "access_status": "verified",
+      "adapter": null,
+      "records_ingested": 3,
+      "last_checked": "2026-11-18",
+      "notes": "Senior public appointments announced by the Cabinet Secretary; historical role only."
     }
   ]
 }

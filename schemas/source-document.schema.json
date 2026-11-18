@@ -81,6 +81,30 @@
       "title": "Source Bytes",
       "type": "integer"
     },
+    "checksum_scope": {
+      "default": "unknown",
+      "enum": [
+        "original_source",
+        "source_response",
+        "transformed_snapshot",
+        "unknown"
+      ],
+      "title": "Checksum Scope",
+      "type": "string"
+    },
+    "text_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Text Sha256"
+    },
     "text": {
       "minLength": 1,
       "title": "Text",

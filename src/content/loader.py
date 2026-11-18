@@ -438,6 +438,17 @@ def load_site(
         for document in country.documents:
             if document.country_code != country_config.country_code:
                 errors.append(f"{country_dir}: document {document.document_id} country mismatch")
+            if document.text_sha256:
+                actual_text_sha256 = hashlib.sha256(document.text.encode("utf-8")).hexdigest()
+                if actual_text_sha256 != document.text_sha256:
+                    errors.append(
+                        f"{country_dir}: document {document.document_id} text_sha256 does not "
+                        "match the stored snapshot text"
+                    )
+            if document.checksum_scope == "unknown":
+                warnings.append(
+                    f"{country_dir}: document {document.document_id} has unknown checksum scope"
+                )
         for registry_entry in country.sources:
             if registry_entry.country_code != country_config.country_code:
                 errors.append(f"{country_dir}: source {registry_entry.source_id} country mismatch")
@@ -471,6 +482,8 @@ def load_site(
                 if uid not in {record.uid for record in country.records}:
                     errors.append(f"{country_dir}: name variant {variant.variant_id} references unknown record {uid}")
 
+        record_signatures: dict[tuple[str, ...], str] = {}
+        used_document_ids: set[str] = set()
         for record in country.records:
             if record.uid in seen_record_uids:
                 errors.append(f"{country_dir}: duplicate record uid {record.uid}")
@@ -512,6 +525,14 @@ def load_site(
                     errors.append(f"{record.uid}: source sha256 does not match document {document.document_id}")
                 if record.source.official_url and str(record.source.official_url) != str(document.official_url):
                     errors.append(f"{record.uid}: source URL does not match document {document.document_id}")
+                if (
+                    record.source.checksum_scope
+                    and record.source.checksum_scope != document.checksum_scope
+                ):
+                    errors.append(
+                        f"{record.uid}: record checksum scope does not match document "
+                        f"{document.document_id}"
+                    )
                 if record.publication_date is None:
                     errors.append(f"{record.uid}: non-PDF records require publication_date")
                 for registry_entry in country.sources:
@@ -519,6 +540,33 @@ def load_site(
                         break
                 else:
                     errors.append(f"{record.uid}: document source {document.source_id} missing from registry")
+                used_document_ids.add(document.document_id)
+                title_key = normalise_text(record.title).casefold()
+                # Two people appointed by one instrument are distinct records
+                # even though they share the release title.
+                people_key = ",".join(sorted(ref.person_id for ref in record.people))
+                signature = ("document_title", document.document_id, title_key, people_key)
+                previous = record_signatures.get(signature)
+                if previous is not None:
+                    errors.append(
+                        f"{record.uid}: duplicate of {previous} (same source document and title)"
+                    )
+                else:
+                    record_signatures[signature] = record.uid
+                if record.tender is not None:
+                    reference_signature = (
+                        "document_reference",
+                        document.document_id,
+                        record.tender.reference.casefold(),
+                    )
+                    previous = record_signatures.get(reference_signature)
+                    if previous is not None:
+                        errors.append(
+                            f"{record.uid}: duplicate of {previous} (same source document and "
+                            "tender reference)"
+                        )
+                    else:
+                        record_signatures[reference_signature] = record.uid
             for person_ref in record.people:
                 _validate_person_reference(
                     record, person_ref, people_by_id, orgs_by_id, country_config, errors
@@ -537,6 +585,23 @@ def load_site(
                     )
                 elif issuer.country_code != country_config.country_code:
                     errors.append(f"{record.uid}: tender issuer country mismatch")
+            if record.tender is not None:
+                if record.tender.status_as_of is None:
+                    warnings.append(f"{record.uid}: tender has no status_as_of date")
+                elif (
+                    record.tender.status == "open"
+                    and record.tender.closing_date is not None
+                    and record.tender.closing_date < record.tender.status_as_of
+                ):
+                    errors.append(
+                        f"{record.uid}: recorded open after its closing date "
+                        f"({record.tender.closing_date} < {record.tender.status_as_of})"
+                    )
+        for document in country.documents:
+            if document.document_id not in used_document_ids:
+                warnings.append(
+                    f"{country_dir}: document {document.document_id} has no published record"
+                )
         countries.append(country)
 
     if not preview:
