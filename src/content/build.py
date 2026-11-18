@@ -545,8 +545,8 @@ def _home_context(site: SiteData) -> dict[str, Any]:
             record.uid,
         )
     )
-    spotlight_records = open_tenders[:4]
-    if len(spotlight_records) < 4:
+    spotlight_records = open_tenders[:5]
+    if len(spotlight_records) < 5:
         remaining = sorted(
             (record for record in tender_records if record not in spotlight_records),
             key=lambda record: (
@@ -555,12 +555,13 @@ def _home_context(site: SiteData) -> dict[str, Any]:
             ),
             reverse=True,
         )
-        spotlight_records.extend(remaining[: 4 - len(spotlight_records)])
+        spotlight_records.extend(remaining[: 5 - len(spotlight_records)])
 
     latest_tenders = []
     for record in spotlight_records:
         issuer = _record_issuer(site, record)
-        effective = _effective_status(record.tender.status, record.tender.closing_date)
+        closing = record.tender.closing_date
+        effective = _effective_status(record.tender.status, closing)
         latest_tenders.append(
             {
                 "record": record,
@@ -572,7 +573,10 @@ def _home_context(site: SiteData) -> dict[str, Any]:
                 "issuer_path": _org_path(issuer) if issuer else None,
                 "status_label": _tender_status_label(effective),
                 "status_tone": _tender_status_tone(effective),
-                "closing_note": _closing_note(record.tender.closing_date),
+                "closing_note": _closing_note(closing),
+                "closing_day": closing.strftime("%d") if closing else "—",
+                "closing_month": closing.strftime("%b") if closing else "No date",
+                "closing_year": closing.year if closing else "",
                 "reference": record.tender.reference,
             }
         )

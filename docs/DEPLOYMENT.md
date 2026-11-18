@@ -71,8 +71,8 @@ Phase 1F measurements:
 
 | Package | ZIP size | Files | Largest asset | Pages upload | Workers assets |
 | --- | --- | --- | --- | --- | --- |
-| Production | 4.173 MiB | 1,306 | 344.0 KiB | Not compatible (306 over 1,000) | Compatible |
-| Preview | 0.751 MiB | 90 | 344.0 KiB | Compatible | Compatible |
+| Production | 4.197 MiB | 1,306 | 344.0 KiB | Not compatible (306 over 1,000) | Compatible |
+| Preview | 0.752 MiB | 90 | 344.0 KiB | Compatible | Compatible |
 
 Cloudflare Pages direct upload, including Cloudflare Drop, currently caps a deployment at **1,000 files**. The complete production archive exceeds that by 306 files. Do not remove records, permanent pages or Pagefind shards to fit: preserve the complete archive and deploy it through a path that supports the full file count (Workers static assets, or a Pages Git integration if its current limits allow). `release/` is not tracked by Git.
 
@@ -208,7 +208,7 @@ Until configured, the page truthfully states that no public submission channel h
 
 Wrangler static assets have hard limits: **20,000 files** and **25 MiB per file**. The project targets **fewer than 15,000 files**. `scripts/validate_site.py` fails above 20,000, warns above 15,000 and reports the largest file.
 
-For reference, the Phase 1F production build produced 1,306 files and 10.15 MiB total; the Pagefind index is 666 files and 1.84 MiB. Growth is dominated by HTML pages and the search index, not PDFs; no PDFs are copied into `dist/`.
+For reference, the Phase 1F production build produced 1,306 files and 10.36 MiB total; the Pagefind index is 666 files and 1.84 MiB. Growth is dominated by HTML pages and the search index, not PDFs; no PDFs are copied into `dist/`.
 
 If a future dataset approaches the limit, split by country into separate deployments or move non-page assets to object storage. Neither is implemented; both require CTO authorisation.
 

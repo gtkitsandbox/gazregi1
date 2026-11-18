@@ -4,32 +4,32 @@
 {% block content %}
 <section class="hero" aria-labelledby="page-title">
   <div class="hero__inner">
-    <p class="eyebrow">Independent public-record index</p>
-    <h1 id="page-title">Your next contract is already published.<span class="hero__question">Can you find it?</span></h1>
+    <p class="hero__pill">Tenders · Gazettes · Public notices</p>
+    <h1 id="page-title">Your next contract is already published.<span class="hero__kicker">Find it in seconds.</span></h1>
     <p class="hero__lede">Official gazettes publish tenders, notices and appointments first — inside long PDFs, local languages and references scattered across {{ stats.with_records }} countries. GazetteRegistry brings those records into one search, with every result linked to the page it came from.</p>
 
     <form id="search-form" class="search-form" role="search">
       <div class="search-panel">
-        <div class="search-scopes" role="tablist" aria-label="Search category">
-          <button type="button" class="search-scope is-active" data-scope="all" role="tab" aria-selected="true">All records</button>
-          <button type="button" class="search-scope" data-scope="people" role="tab" aria-selected="false">People</button>
-          <button type="button" class="search-scope" data-scope="organisations" role="tab" aria-selected="false">Organisations</button>
-          <button type="button" class="search-scope" data-scope="gazettes" role="tab" aria-selected="false">Gazettes</button>
-          <button type="button" class="search-scope" data-scope="tenders" role="tab" aria-selected="false">Tenders</button>
-        </div>
         <div class="search-control">
           <svg class="search-control__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m15.5 15.5 5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
           <label class="visually-hidden" for="search-query">Search indexed records</label>
-          <input id="search-query" name="q" type="search" placeholder="Search records or references" autocomplete="off">
-          <button type="submit">Search</button>
+          <input id="search-query" name="q" type="search" placeholder="Search tenders, people, gazettes" autocomplete="off">
+          <button type="submit">Search records</button>
+        </div>
+        <div class="search-scopes" role="tablist" aria-label="Search category">
+          <button type="button" class="search-scope is-active" data-scope="all" role="tab" aria-selected="true">All records</button>
+          <button type="button" class="search-scope" data-scope="tenders" role="tab" aria-selected="false">Tenders</button>
+          <button type="button" class="search-scope" data-scope="gazettes" role="tab" aria-selected="false">Gazettes</button>
+          <button type="button" class="search-scope" data-scope="people" role="tab" aria-selected="false">People</button>
+          <button type="button" class="search-scope" data-scope="organisations" role="tab" aria-selected="false">Organisations</button>
         </div>
       </div>
     </form>
     <p class="search-note" id="result-count" aria-live="polite">Search {{ stats.countries }} configured countries. Coverage is incomplete; every result links to its source page.</p>
 
     <dl class="hero-stats" aria-label="Index coverage">
-      <div class="hero-stat"><dt class="hero-stat__label">Countries configured</dt><dd class="hero-stat__value">{{ stats.countries }}</dd></div>
       <div class="hero-stat"><dt class="hero-stat__label">Procurement records</dt><dd class="hero-stat__value">{{ stats.tenders }}</dd></div>
+      <div class="hero-stat"><dt class="hero-stat__label">Countries with records</dt><dd class="hero-stat__value">{{ stats.with_records }}</dd></div>
       <div class="hero-stat"><dt class="hero-stat__label">Curated records</dt><dd class="hero-stat__value">{{ stats.records }}</dd></div>
       <div class="hero-stat"><dt class="hero-stat__label">Registered sources</dt><dd class="hero-stat__value">{{ stats.sources }}</dd></div>
     </dl>
@@ -43,17 +43,53 @@
         <p class="eyebrow">Search results</p>
         <h2 id="search-results-title">Matching records</h2>
       </div>
-      <a class="text-link" href="/tenders/">Browse all tenders <span aria-hidden="true">→</span></a>
+      <a class="text-link" href="/#browse-title">Browse the registry <span aria-hidden="true">→</span></a>
     </div>
     <div id="search-results" class="record-list" aria-live="polite"></div>
   </div>
 </section>
 
+{% if latest_tenders %}
+<section class="section opportunities" aria-labelledby="tenders-title">
+  <div class="section-inner">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Procurement</p>
+        <h2 id="tenders-title">Latest procurement opportunities</h2>
+        <p class="section-head__note">Open opportunities first, ordered by closing date. Always confirm the details in the official notice before acting.</p>
+      </div>
+      <a class="text-link" href="/tenders/">All {{ stats.tenders }} tenders <span aria-hidden="true">→</span></a>
+    </div>
+    <div class="opportunity-list">
+      {% for item in latest_tenders %}
+      <article class="opportunity">
+        <div class="opportunity__body">
+          <div class="opportunity__top">
+            <span class="opportunity__country">{{ item.country_name }}</span>
+            {{ badge(item.status_label, item.status_tone) }}
+          </div>
+          <h3><a href="{{ item.path }}">{{ item.record.title }}</a></h3>
+          <p class="opportunity__meta">
+            <span>{% if item.issuer_path %}<a href="{{ item.issuer_path }}">{{ item.issuer_name }}</a>{% else %}{{ item.issuer_name }}{% endif %}</span>
+            <span class="opportunity__reference">{{ item.reference }}</span>
+          </p>
+        </div>
+        <div class="opportunity__side">
+          <p class="opportunity__closing"><span>Closes</span><strong>{{ item.closing_note }}</strong></p>
+          <a class="button button--small" href="{{ item.path }}">View tender</a>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
 <section class="section" aria-labelledby="problem-title">
   <div class="section-inner">
     <div class="section-head">
       <div>
-        <p class="eyebrow">The problem</p>
+        <p class="eyebrow">Why this exists</p>
         <h2 id="problem-title">Public records are not the same as findable records.</h2>
       </div>
       <p class="section-head__note">The information exists. The access is what is broken.</p>
@@ -75,41 +111,8 @@
         <p>A notice forwarded late is a contract already lost. Publication dates, closing dates and source-reported status stay next to every record.</p>
       </article>
     </div>
-    <p class="section-cta"><a class="button button--secondary" href="/about/">How the index works</a></p>
   </div>
 </section>
-
-{% if latest_tenders %}
-<section class="section section--muted" aria-labelledby="tenders-title">
-  <div class="section-inner">
-    <div class="section-head">
-      <div>
-        <p class="eyebrow">Procurement</p>
-        <h2 id="tenders-title">Latest procurement opportunities</h2>
-        <p class="section-head__note">Open opportunities first, ordered by closing date. Always confirm the details in the official notice before acting.</p>
-      </div>
-      <a class="text-link" href="/tenders/">All {{ stats.tenders }} tenders <span aria-hidden="true">→</span></a>
-    </div>
-    <div class="tender-grid">
-      {% for item in latest_tenders %}
-      <article class="tender-spotlight">
-        <div class="tender-spotlight__top">
-          <span class="tender-spotlight__country">{{ item.country_name }}</span>
-          {{ badge(item.status_label, item.status_tone) }}
-        </div>
-        <h3><a href="{{ item.path }}">{{ item.record.title }}</a></h3>
-        {% if item.record.summary %}<p class="tender-spotlight__summary">{{ item.record.summary }}</p>{% endif %}
-        <dl class="tender-spotlight__facts">
-          <div><dt>Issuer</dt><dd>{% if item.issuer_path %}<a href="{{ item.issuer_path }}">{{ item.issuer_name }}</a>{% else %}{{ item.issuer_name }}{% endif %}</dd></div>
-          <div><dt>Closing</dt><dd>{{ item.closing_note }}</dd></div>
-          <div><dt>Reference</dt><dd class="tender-spotlight__reference">{{ item.reference }}</dd></div>
-        </dl>
-      </article>
-      {% endfor %}
-    </div>
-  </div>
-</section>
-{% endif %}
 
 <section class="section" aria-labelledby="browse-title">
   <div class="section-inner">
@@ -126,36 +129,42 @@
         <span class="entry-card__title">Tenders</span>
         <span class="entry-card__meta">{{ stats.tenders }} procurement records</span>
         <span class="entry-card__desc">Open and closed opportunities with issuer, location and closing date.</span>
+        <span class="entry-card__more">Browse tenders →</span>
       </a>
       <a class="entry-card" href="/gazettes/">
         <span class="entry-card__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6zM14 3v4h4M9 11h6M9 15h6M9 19h3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
         <span class="entry-card__title">Gazettes</span>
         <span class="entry-card__meta">{{ stats.issues }} issues · {{ stats.pages }} pages</span>
         <span class="entry-card__desc">Page-level archive with publication date and official source links.</span>
+        <span class="entry-card__more">Browse gazettes →</span>
       </a>
       <a class="entry-card" href="/people/">
         <span class="entry-card__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M5 20c0-3.5 3.1-5.5 7-5.5s7 2 7 5.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span>
         <span class="entry-card__title">People</span>
         <span class="entry-card__meta">{{ stats.people }} verified people</span>
         <span class="entry-card__desc">Appointments and professional positions linked to Gazette records.</span>
+        <span class="entry-card__more">Browse people →</span>
       </a>
       <a class="entry-card" href="/organisations/">
         <span class="entry-card__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 21V6l8-3 8 3v15M9 21v-5h6v5M8 9h2M14 9h2M8 12.5h2M14 12.5h2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
         <span class="entry-card__title">Organisations</span>
         <span class="entry-card__meta">{{ stats.organisations }} organisations</span>
         <span class="entry-card__desc">Public bodies and companies named in indexed notices.</span>
+        <span class="entry-card__more">Browse organisations →</span>
       </a>
       <a class="entry-card" href="/notices/">
         <span class="entry-card__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5h16v12H8l-4 4zM8 9h8M8 13h5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
         <span class="entry-card__title">Public notices</span>
         <span class="entry-card__meta">{{ stats.notices }} records</span>
         <span class="entry-card__desc">Licensing, land, estate, court and corporate announcements.</span>
+        <span class="entry-card__more">Browse notices →</span>
       </a>
       <a class="entry-card" href="/regulations/">
         <span class="entry-card__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 4h9l5 5v11H5zM14 4v5h5M8 13h8M8 17h5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
         <span class="entry-card__title">Regulations</span>
         <span class="entry-card__meta">{{ stats.regulations }} records</span>
         <span class="entry-card__desc">Acts, instruments, orders and notifications from official sources.</span>
+        <span class="entry-card__more">Browse regulations →</span>
       </a>
     </div>
   </div>
@@ -169,22 +178,24 @@
         <h2 id="coverage-title">One index. {{ stats.countries }} configured countries.</h2>
         <p class="coverage-band__lede">{{ stats.with_records }} countries have published records. {{ stats.planned }} are planned and have no records yet. Coverage is deliberately incremental; planned countries are never padded with placeholder entries.</p>
       </div>
-      <a class="button button--on-dark" href="/countries/">View country coverage</a>
+      <a class="button button--secondary" href="/countries/">View country coverage</a>
     </div>
     <div class="region-grid">
       {% for region in region_stats %}
       <a class="region-card" href="/countries/">
-        <span class="region-card__name">{{ region.name }}</span>
+        <span>
+          <span class="region-card__name">{{ region.name }}</span>
+          <span class="region-card__meta">{{ region.countries }} countr{{ "y" if region.countries == 1 else "ies" }} · {{ region.with_records }} with records</span>
+        </span>
         <span class="region-card__count">{{ region.records }}</span>
-        <span class="region-card__meta">{{ region.countries }} countr{{ "y" if region.countries == 1 else "ies" }} · {{ region.with_records }} with records</span>
       </a>
       {% endfor %}
     </div>
-    <p class="coverage-band__note">Detailed record, source and empty-coverage status is published on the <a href="/countries/">country coverage</a> and <a href="/sources/">source registry</a> pages.</p>
+    <p class="coverage-band__note">Record and source status is published in full on the <a href="/countries/">country coverage</a> and <a href="/sources/">source registry</a> pages.</p>
   </div>
 </section>
 
-<section class="section section--trust" aria-labelledby="trust-title">
+<section class="section" aria-labelledby="trust-title">
   <div class="section-inner">
     <div class="section-head">
       <div>
