@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "_macros.html" import breadcrumbs, empty_state, verification %}
+{% from "_macros.html" import breadcrumbs, empty_state, page_banner, verification %}
 {% block body_class %}page-organisations{% endblock %}
 {% block content %}
 <div class="shell">
@@ -10,6 +10,7 @@
     <p class="page-heading__lede">Public bodies, companies and professional organisations named in indexed Gazette records. Organisation pages link to the appointments and tenders that reference them.</p>
     <p class="page-heading__actions"><a class="button button--secondary" href="/people/">Browse people</a></p>
   </header>
+  {{ page_banner("organisations") }}
 
   {% if org_cards %}
   <div class="entity-list">

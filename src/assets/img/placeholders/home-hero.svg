@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="960" viewBox="0 0 1200 960" role="img" aria-label="Placeholder: home-hero.svg">
+  <rect x="1" y="1" width="1198" height="958" fill="#e9edf2" stroke="#c3ccd7" stroke-width="2"/>
+  <line x1="2" y1="2" x2="1198" y2="958" stroke="#d3dae3" stroke-width="1.5"/>
+  <line x1="1198" y1="2" x2="2" y2="958" stroke="#d3dae3" stroke-width="1.5"/>
+  <rect x="280.0" y="392.0" width="640.0" height="176.0" rx="12" fill="#ffffff" stroke="#c3ccd7" stroke-width="1.5"/>
+  <g font-family="Inter, Arial, sans-serif" text-anchor="middle">
+    <text x="600.0" y="450.1" font-size="29.0" font-weight="700" fill="#0b2440">home-hero.svg</text>
+    <text x="600.0" y="490.6" font-size="20.3" font-weight="600" fill="#3b526b">1200 × 960</text>
+    <text x="600.0" y="527.5" font-size="18.8" font-weight="500" fill="#5b6d82">Hero visual: product UI or illustration</text>
+  </g>
+</svg>

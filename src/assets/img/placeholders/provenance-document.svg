@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="760" viewBox="0 0 960 760" role="img" aria-label="Placeholder: provenance-document.svg">
+  <rect x="1" y="1" width="958" height="758" fill="#e9edf2" stroke="#c3ccd7" stroke-width="2"/>
+  <line x1="2" y1="2" x2="958" y2="758" stroke="#d3dae3" stroke-width="1.5"/>
+  <line x1="958" y1="2" x2="2" y2="758" stroke="#d3dae3" stroke-width="1.5"/>
+  <rect x="211.5" y="292.0" width="537.0" height="176.0" rx="12" fill="#ffffff" stroke="#c3ccd7" stroke-width="1.5"/>
+  <g font-family="Inter, Arial, sans-serif" text-anchor="middle">
+    <text x="480.0" y="350.1" font-size="29.0" font-weight="700" fill="#0b2440">provenance-document.svg</text>
+    <text x="480.0" y="390.6" font-size="20.3" font-weight="600" fill="#3b526b">960 × 760</text>
+    <text x="480.0" y="427.5" font-size="18.8" font-weight="500" fill="#5b6d82">Annotated gazette page with provenance callouts</text>
+  </g>
+</svg>

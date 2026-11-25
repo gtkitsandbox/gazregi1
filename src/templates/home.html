@@ -4,35 +4,63 @@
 {% block content %}
 <section class="hero" aria-labelledby="page-title">
   <div class="hero__inner">
-    <p class="hero__pill">Tenders · Gazettes · Public notices</p>
-    <h1 id="page-title">Your next contract is already published.<span class="hero__kicker">Find it in seconds.</span></h1>
-    <p class="hero__lede">Official gazettes publish tenders, notices and appointments first — inside long PDFs, local languages and references scattered across {{ stats.with_records }} countries. GazetteRegistry brings those records into one search, with every result linked to the page it came from.</p>
+    <div class="hero__content">
+      <p class="hero__pill">Tenders · Gazettes · Public notices</p>
+      <h1 id="page-title">Your next contract is already published.<span class="hero__kicker">Find it in seconds.</span></h1>
+      <p class="hero__lede">Official gazettes publish tenders, notices and appointments first — inside long PDFs, local languages and references scattered across {{ stats.with_records }} countries. GazetteRegistry brings those records into one search, with every result linked to the page it came from.</p>
 
-    <form id="search-form" class="search-form" role="search">
-      <div class="search-panel">
-        <div class="search-control">
-          <svg class="search-control__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m15.5 15.5 5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-          <label class="visually-hidden" for="search-query">Search indexed records</label>
-          <input id="search-query" name="q" type="search" placeholder="Search tenders, people, gazettes" autocomplete="off">
-          <button type="submit">Search records</button>
+      <form id="search-form" class="search-form" role="search">
+        <div class="search-panel">
+          <div class="search-control">
+            <svg class="search-control__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m15.5 15.5 5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <label class="visually-hidden" for="search-query">Search indexed records</label>
+            <input id="search-query" name="q" type="search" placeholder="Search tenders, people, gazettes" autocomplete="off">
+            <button type="submit">Search records</button>
+          </div>
+          <div class="search-scopes" role="tablist" aria-label="Search category">
+            <button type="button" class="search-scope is-active" data-scope="all" role="tab" aria-selected="true">All records</button>
+            <button type="button" class="search-scope" data-scope="tenders" role="tab" aria-selected="false">Tenders</button>
+            <button type="button" class="search-scope" data-scope="gazettes" role="tab" aria-selected="false">Gazettes</button>
+            <button type="button" class="search-scope" data-scope="people" role="tab" aria-selected="false">People</button>
+            <button type="button" class="search-scope" data-scope="organisations" role="tab" aria-selected="false">Organisations</button>
+          </div>
         </div>
-        <div class="search-scopes" role="tablist" aria-label="Search category">
-          <button type="button" class="search-scope is-active" data-scope="all" role="tab" aria-selected="true">All records</button>
-          <button type="button" class="search-scope" data-scope="tenders" role="tab" aria-selected="false">Tenders</button>
-          <button type="button" class="search-scope" data-scope="gazettes" role="tab" aria-selected="false">Gazettes</button>
-          <button type="button" class="search-scope" data-scope="people" role="tab" aria-selected="false">People</button>
-          <button type="button" class="search-scope" data-scope="organisations" role="tab" aria-selected="false">Organisations</button>
-        </div>
+      </form>
+      <p class="search-note" id="result-count" aria-live="polite">Search {{ stats.countries }} configured countries. Coverage is incomplete; every result links to its source page.</p>
+
+      <dl class="hero-stats" aria-label="Index coverage">
+        <div class="hero-stat"><dt class="hero-stat__label">Procurement records</dt><dd class="hero-stat__value">{{ stats.tenders }}</dd></div>
+        <div class="hero-stat"><dt class="hero-stat__label">Countries with records</dt><dd class="hero-stat__value">{{ stats.with_records }}</dd></div>
+        <div class="hero-stat"><dt class="hero-stat__label">Curated records</dt><dd class="hero-stat__value">{{ stats.records }}</dd></div>
+        <div class="hero-stat"><dt class="hero-stat__label">Registered sources</dt><dd class="hero-stat__value">{{ stats.sources }}</dd></div>
+      </dl>
+    </div>
+
+    <div class="hero__visual">
+      <div class="hero__frame">
+        <img class="hero__img" src="/assets/img/placeholders/home-hero.svg" alt="Placeholder: home-hero" width="1200" height="960" fetchpriority="high">
       </div>
-    </form>
-    <p class="search-note" id="result-count" aria-live="polite">Search {{ stats.countries }} configured countries. Coverage is incomplete; every result links to its source page.</p>
+      <img class="float-card float-card--a" src="/assets/img/placeholders/home-hero-float-1.svg" alt="Placeholder: home-hero-float-1" width="480" height="300" loading="lazy">
+      <img class="float-card float-card--b" src="/assets/img/placeholders/home-hero-float-2.svg" alt="Placeholder: home-hero-float-2" width="420" height="260" loading="lazy">
+    </div>
+  </div>
+</section>
 
-    <dl class="hero-stats" aria-label="Index coverage">
-      <div class="hero-stat"><dt class="hero-stat__label">Procurement records</dt><dd class="hero-stat__value">{{ stats.tenders }}</dd></div>
-      <div class="hero-stat"><dt class="hero-stat__label">Countries with records</dt><dd class="hero-stat__value">{{ stats.with_records }}</dd></div>
-      <div class="hero-stat"><dt class="hero-stat__label">Curated records</dt><dd class="hero-stat__value">{{ stats.records }}</dd></div>
-      <div class="hero-stat"><dt class="hero-stat__label">Registered sources</dt><dd class="hero-stat__value">{{ stats.sources }}</dd></div>
-    </dl>
+<section class="marquee-band" aria-label="Coverage across regions">
+  <div class="marquee-band__inner">
+    <span class="marquee-band__label">Coverage across regions</span>
+    <div class="marquee">
+      <div class="marquee__track">
+        {% for region in region_stats %}
+        <span class="marquee__item">{{ region.name }}</span>
+        {% endfor %}
+        <span class="marquee__items-dup" aria-hidden="true">
+          {% for region in region_stats %}
+          <span class="marquee__item">{{ region.name }}</span>
+          {% endfor %}
+        </span>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -52,7 +80,7 @@
 {% if latest_tenders %}
 <section class="section opportunities" aria-labelledby="tenders-title">
   <div class="section-inner">
-    <div class="section-head">
+    <div class="section-head" data-reveal>
       <div>
         <p class="eyebrow">Procurement</p>
         <h2 id="tenders-title">Latest procurement opportunities</h2>
@@ -62,7 +90,7 @@
     </div>
     <div class="opportunity-list">
       {% for item in latest_tenders %}
-      <article class="opportunity">
+      <article class="opportunity" data-reveal style="--d: {{ loop.index0 * 60 }}ms">
         <div class="opportunity__body">
           <div class="opportunity__top">
             <span class="opportunity__country">{{ item.country_name }}</span>
@@ -85,9 +113,28 @@
 </section>
 {% endif %}
 
+<section class="section product-showcase" aria-labelledby="product-title">
+  <div class="section-inner">
+    <div class="section-head" data-reveal>
+      <div>
+        <p class="eyebrow">The product</p>
+        <h2 id="product-title">Search once. Land on the exact page.</h2>
+      </div>
+      <p class="section-head__note">Every search hit leads directly to the indexed record, gazette issue, page number and official source URL.</p>
+    </div>
+    <figure class="browser-frame" data-reveal>
+      <div class="browser-frame__bar" aria-hidden="true">
+        <span class="browser-frame__dots"><span></span><span></span><span></span></span>
+        <span class="browser-frame__url">gazetteregistry.org / search</span>
+      </div>
+      <img src="/assets/img/placeholders/home-search-demo.svg" alt="Placeholder: home-search-demo" width="1400" height="860" loading="lazy">
+    </figure>
+  </div>
+</section>
+
 <section class="section" aria-labelledby="problem-title">
   <div class="section-inner">
-    <div class="section-head">
+    <div class="section-head" data-reveal>
       <div>
         <p class="eyebrow">Why this exists</p>
         <h2 id="problem-title">Public records are not the same as findable records.</h2>
@@ -95,20 +142,82 @@
       <p class="section-head__note">The information exists. The access is what is broken.</p>
     </div>
     <div class="problem-grid">
-      <article class="problem-card">
-        <span class="problem-card__num" aria-hidden="true">01</span>
-        <h3>Published once, inside a PDF</h3>
-        <p>Official notices appear in gazettes, supplements and agency portals. There is no single feed across countries, languages or publishers.</p>
+      <article class="problem-card" data-reveal style="--d: 0ms">
+        <div class="problem-card__media">
+          <img src="/assets/img/placeholders/problem-pdf.svg" alt="Placeholder: problem-pdf" width="640" height="420" loading="lazy">
+        </div>
+        <div class="problem-card__body">
+          <span class="problem-card__num" aria-hidden="true">01</span>
+          <h3>Published once, inside a PDF</h3>
+          <p>Official notices appear in gazettes, supplements and agency portals. There is no single feed across countries, languages or publishers.</p>
+        </div>
       </article>
-      <article class="problem-card">
-        <span class="problem-card__num" aria-hidden="true">02</span>
-        <h3>The reference you would never guess</h3>
-        <p>Tender numbers, ministry names and legal titles vary by publisher. A keyword that works in one country can return nothing in another.</p>
+      <article class="problem-card" data-reveal style="--d: 80ms">
+        <div class="problem-card__media">
+          <img src="/assets/img/placeholders/problem-reference.svg" alt="Placeholder: problem-reference" width="640" height="420" loading="lazy">
+        </div>
+        <div class="problem-card__body">
+          <span class="problem-card__num" aria-hidden="true">02</span>
+          <h3>The reference you would never guess</h3>
+          <p>Tender numbers, ministry names and legal titles vary by publisher. A keyword that works in one country can return nothing in another.</p>
+        </div>
       </article>
-      <article class="problem-card">
-        <span class="problem-card__num" aria-hidden="true">03</span>
-        <h3>A deadline does not wait</h3>
-        <p>A notice forwarded late is a contract already lost. Publication dates, closing dates and source-reported status stay next to every record.</p>
+      <article class="problem-card" data-reveal style="--d: 160ms">
+        <div class="problem-card__media">
+          <img src="/assets/img/placeholders/problem-deadline.svg" alt="Placeholder: problem-deadline" width="640" height="420" loading="lazy">
+        </div>
+        <div class="problem-card__body">
+          <span class="problem-card__num" aria-hidden="true">03</span>
+          <h3>A deadline does not wait</h3>
+          <p>A notice forwarded late is a contract already lost. Publication dates, closing dates and source-reported status stay next to every record.</p>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="section section--muted" aria-labelledby="how-title">
+  <div class="section-inner">
+    <div class="section-head" data-reveal>
+      <div>
+        <p class="eyebrow">How it works</p>
+        <h2 id="how-title">Three steps from query to official notice</h2>
+      </div>
+      <p class="section-head__note">No accounts, no login wall and no invented summaries.</p>
+    </div>
+    <div class="feature-rows">
+      <article class="feature-row" data-reveal>
+        <div class="feature-row__media">
+          <img src="/assets/img/placeholders/how-1-search.svg" alt="Placeholder: how-1-search" width="800" height="600" loading="lazy">
+        </div>
+        <div class="feature-row__body">
+          <span class="feature-row__step">Step 01</span>
+          <h3>Search across gazettes, tenders and people</h3>
+          <p>Filter by record type, country, issuing organisation or keyword in one static search index instead of guessing publisher-specific reference formats.</p>
+          <a class="text-link" href="/#search-form">Try the search bar <span aria-hidden="true">→</span></a>
+        </div>
+      </article>
+      <article class="feature-row feature-row--reverse" data-reveal>
+        <div class="feature-row__media">
+          <img src="/assets/img/placeholders/how-2-verify.svg" alt="Placeholder: how-2-verify" width="800" height="600" loading="lazy">
+        </div>
+        <div class="feature-row__body">
+          <span class="feature-row__step">Step 02</span>
+          <h3>Open the record and verify the source page</h3>
+          <p>Every record retains its Gazette number, publication date, PDF page number and verbatim source excerpt, alongside a link to the official document where recorded.</p>
+          <a class="text-link" href="/gazettes/">Browse gazette issues <span aria-hidden="true">→</span></a>
+        </div>
+      </article>
+      <article class="feature-row" data-reveal>
+        <div class="feature-row__media">
+          <img src="/assets/img/placeholders/how-3-act.svg" alt="Placeholder: how-3-act" width="800" height="600" loading="lazy">
+        </div>
+        <div class="feature-row__body">
+          <span class="feature-row__step">Step 03</span>
+          <h3>Act on the closing date shown with the record</h3>
+          <p>Review open and closing procurement deadlines directly on each tender page and confirm final submission terms in the publisher's official notice.</p>
+          <a class="text-link" href="/tenders/">Explore open tenders <span aria-hidden="true">→</span></a>
+        </div>
       </article>
     </div>
   </div>
@@ -116,55 +225,85 @@
 
 <section class="section" aria-labelledby="browse-title">
   <div class="section-inner">
-    <div class="section-head">
+    <div class="section-head" data-reveal>
       <div>
         <p class="eyebrow">Browse the registry</p>
         <h2 id="browse-title">Start with the record you need</h2>
       </div>
       <p class="section-head__note">Six entry points, one source-backed index.</p>
     </div>
-    <div class="entry-grid">
-      <a class="entry-card" href="/tenders/">
-        <span class="entry-card__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 8h16v11H4zM9 8V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M4 12h16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-        <span class="entry-card__title">Tenders</span>
-        <span class="entry-card__meta">{{ stats.tenders }} procurement records</span>
-        <span class="entry-card__desc">Open and closed opportunities with issuer, location and closing date.</span>
-        <span class="entry-card__more">Browse tenders →</span>
+    <div class="entry-grid bento">
+      <a class="entry-card entry-card--featured" href="/tenders/" data-reveal style="--d: 0ms">
+        <div class="entry-card__media">
+          <img src="/assets/img/placeholders/browse-tenders.svg" alt="Placeholder: browse-tenders" width="640" height="400" loading="lazy">
+          <span class="entry-card__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 8h16v11H4zM9 8V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M4 12h16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </div>
+        <div class="entry-card__body">
+          <span class="entry-card__title">Tenders</span>
+          <span class="entry-card__meta">{{ stats.tenders }} procurement records</span>
+          <span class="entry-card__desc">Open and closed opportunities with issuer, location and closing date.</span>
+          <span class="entry-card__more">Browse tenders →</span>
+        </div>
       </a>
-      <a class="entry-card" href="/gazettes/">
-        <span class="entry-card__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6zM14 3v4h4M9 11h6M9 15h6M9 19h3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-        <span class="entry-card__title">Gazettes</span>
-        <span class="entry-card__meta">{{ stats.issues }} issues · {{ stats.pages }} pages</span>
-        <span class="entry-card__desc">Page-level archive with publication date and official source links.</span>
-        <span class="entry-card__more">Browse gazettes →</span>
+      <a class="entry-card" href="/gazettes/" data-reveal style="--d: 60ms">
+        <div class="entry-card__media">
+          <img src="/assets/img/placeholders/browse-gazettes.svg" alt="Placeholder: browse-gazettes" width="640" height="400" loading="lazy">
+          <span class="entry-card__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6zM14 3v4h4M9 11h6M9 15h6M9 19h3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </div>
+        <div class="entry-card__body">
+          <span class="entry-card__title">Gazettes</span>
+          <span class="entry-card__meta">{{ stats.issues }} issues · {{ stats.pages }} pages</span>
+          <span class="entry-card__desc">Page-level archive with publication date and official source links.</span>
+          <span class="entry-card__more">Browse gazettes →</span>
+        </div>
       </a>
-      <a class="entry-card" href="/people/">
-        <span class="entry-card__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M5 20c0-3.5 3.1-5.5 7-5.5s7 2 7 5.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span>
-        <span class="entry-card__title">People</span>
-        <span class="entry-card__meta">{{ stats.people }} verified people</span>
-        <span class="entry-card__desc">Appointments and professional positions linked to Gazette records.</span>
-        <span class="entry-card__more">Browse people →</span>
+      <a class="entry-card" href="/people/" data-reveal style="--d: 120ms">
+        <div class="entry-card__media">
+          <img src="/assets/img/placeholders/browse-people.svg" alt="Placeholder: browse-people" width="640" height="400" loading="lazy">
+          <span class="entry-card__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M5 20c0-3.5 3.1-5.5 7-5.5s7 2 7 5.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span>
+        </div>
+        <div class="entry-card__body">
+          <span class="entry-card__title">People</span>
+          <span class="entry-card__meta">{{ stats.people }} verified people</span>
+          <span class="entry-card__desc">Appointments and professional positions linked to Gazette records.</span>
+          <span class="entry-card__more">Browse people →</span>
+        </div>
       </a>
-      <a class="entry-card" href="/organisations/">
-        <span class="entry-card__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 21V6l8-3 8 3v15M9 21v-5h6v5M8 9h2M14 9h2M8 12.5h2M14 12.5h2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-        <span class="entry-card__title">Organisations</span>
-        <span class="entry-card__meta">{{ stats.organisations }} organisations</span>
-        <span class="entry-card__desc">Public bodies and companies named in indexed notices.</span>
-        <span class="entry-card__more">Browse organisations →</span>
+      <a class="entry-card" href="/organisations/" data-reveal style="--d: 180ms">
+        <div class="entry-card__media">
+          <img src="/assets/img/placeholders/browse-organisations.svg" alt="Placeholder: browse-organisations" width="640" height="400" loading="lazy">
+          <span class="entry-card__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 21V6l8-3 8 3v15M9 21v-5h6v5M8 9h2M14 9h2M8 12.5h2M14 12.5h2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </div>
+        <div class="entry-card__body">
+          <span class="entry-card__title">Organisations</span>
+          <span class="entry-card__meta">{{ stats.organisations }} organisations</span>
+          <span class="entry-card__desc">Public bodies and companies named in indexed notices.</span>
+          <span class="entry-card__more">Browse organisations →</span>
+        </div>
       </a>
-      <a class="entry-card" href="/notices/">
-        <span class="entry-card__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5h16v12H8l-4 4zM8 9h8M8 13h5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-        <span class="entry-card__title">Public notices</span>
-        <span class="entry-card__meta">{{ stats.notices }} records</span>
-        <span class="entry-card__desc">Licensing, land, estate, court and corporate announcements.</span>
-        <span class="entry-card__more">Browse notices →</span>
+      <a class="entry-card" href="/notices/" data-reveal style="--d: 240ms">
+        <div class="entry-card__media">
+          <img src="/assets/img/placeholders/browse-notices.svg" alt="Placeholder: browse-notices" width="640" height="400" loading="lazy">
+          <span class="entry-card__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5h16v12H8l-4 4zM8 9h8M8 13h5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </div>
+        <div class="entry-card__body">
+          <span class="entry-card__title">Public notices</span>
+          <span class="entry-card__meta">{{ stats.notices }} records</span>
+          <span class="entry-card__desc">Licensing, land, estate, court and corporate announcements.</span>
+          <span class="entry-card__more">Browse notices →</span>
+        </div>
       </a>
-      <a class="entry-card" href="/regulations/">
-        <span class="entry-card__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 4h9l5 5v11H5zM14 4v5h5M8 13h8M8 17h5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-        <span class="entry-card__title">Regulations</span>
-        <span class="entry-card__meta">{{ stats.regulations }} records</span>
-        <span class="entry-card__desc">Acts, instruments, orders and notifications from official sources.</span>
-        <span class="entry-card__more">Browse regulations →</span>
+      <a class="entry-card" href="/regulations/" data-reveal style="--d: 300ms">
+        <div class="entry-card__media">
+          <img src="/assets/img/placeholders/browse-regulations.svg" alt="Placeholder: browse-regulations" width="640" height="400" loading="lazy">
+          <span class="entry-card__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 4h9l5 5v11H5zM14 4v5h5M8 13h8M8 17h5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </div>
+        <div class="entry-card__body">
+          <span class="entry-card__title">Regulations</span>
+          <span class="entry-card__meta">{{ stats.regulations }} records</span>
+          <span class="entry-card__desc">Acts, instruments, orders and notifications from official sources.</span>
+          <span class="entry-card__more">Browse regulations →</span>
+        </div>
       </a>
     </div>
   </div>
@@ -172,7 +311,7 @@
 
 <section class="coverage-band" aria-labelledby="coverage-title">
   <div class="section-inner">
-    <div class="coverage-band__head">
+    <div class="coverage-band__head" data-reveal>
       <div>
         <p class="eyebrow">International coverage</p>
         <h2 id="coverage-title">One index. {{ stats.countries }} configured countries.</h2>
@@ -180,9 +319,12 @@
       </div>
       <a class="button button--secondary" href="/countries/">View country coverage</a>
     </div>
+    <figure class="coverage-band__map" data-reveal>
+      <img src="/assets/img/placeholders/coverage-world-map.svg" alt="Placeholder: coverage-world-map" width="1600" height="760" loading="lazy">
+    </figure>
     <div class="region-grid">
       {% for region in region_stats %}
-      <a class="region-card" href="/countries/">
+      <a class="region-card" href="/countries/" data-reveal style="--d: {{ loop.index0 * 40 }}ms">
         <span>
           <span class="region-card__name">{{ region.name }}</span>
           <span class="region-card__meta">{{ region.countries }} countr{{ "y" if region.countries == 1 else "ies" }} · {{ region.with_records }} with records</span>
@@ -197,26 +339,44 @@
 
 <section class="section" aria-labelledby="trust-title">
   <div class="section-inner">
-    <div class="section-head">
+    <div class="section-head" data-reveal>
       <div>
         <p class="eyebrow">Provenance</p>
         <h2 id="trust-title">Every result says where it came from.</h2>
       </div>
       <a class="text-link" href="/about/">Read the methodology <span aria-hidden="true">→</span></a>
     </div>
-    <div class="trust-grid">
-      <div class="trust-item">
-        <span class="trust-item__check" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="m4 10.5 4 4 8-9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-        <div><h3>Verbatim excerpt check</h3><p>A structured record is rejected unless its source excerpt appears in the extracted text or retrieved official document.</p></div>
+    <div class="provenance-split">
+      <figure class="provenance-split__media" data-reveal>
+        <img src="/assets/img/placeholders/provenance-document.svg" alt="Placeholder: provenance-document" width="960" height="760" loading="lazy">
+      </figure>
+      <div class="trust-list">
+        <div class="trust-item" data-reveal style="--d: 0ms">
+          <span class="trust-item__check" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="m4 10.5 4 4 8-9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <div><h3>Verbatim excerpt check</h3><p>A structured record is rejected unless its source excerpt appears in the extracted text or retrieved official document.</p></div>
+        </div>
+        <div class="trust-item" data-reveal style="--d: 80ms">
+          <span class="trust-item__check" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="m4 10.5 4 4 8-9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <div><h3>Page-level provenance</h3><p>Gazette number, publication date, PDF page and source checksum are retained wherever the publisher provides them.</p></div>
+        </div>
+        <div class="trust-item" data-reveal style="--d: 160ms">
+          <span class="trust-item__check" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="m4 10.5 4 4 8-9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <div><h3>No invented records</h3><p>Empty coverage stays empty. Unverified identities are held back, and no name, deadline or source URL is guessed.</p></div>
+        </div>
       </div>
-      <div class="trust-item">
-        <span class="trust-item__check" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="m4 10.5 4 4 8-9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-        <div><h3>Page-level provenance</h3><p>Gazette number, publication date, PDF page and source checksum are retained wherever the publisher provides them.</p></div>
-      </div>
-      <div class="trust-item">
-        <span class="trust-item__check" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="m4 10.5 4 4 8-9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-        <div><h3>No invented records</h3><p>Empty coverage stays empty. Unverified identities are held back, and no name, deadline or source URL is guessed.</p></div>
-      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-band" aria-labelledby="cta-title">
+  <img class="cta-band__bg" src="/assets/img/placeholders/cta-band.svg" alt="Placeholder: cta-band" width="1600" height="520" loading="lazy">
+  <div class="cta-band__overlay" aria-hidden="true"></div>
+  <div class="section-inner cta-band__inner" data-reveal>
+    <p class="eyebrow eyebrow--on-dark">Start searching</p>
+    <h2 id="cta-title">Find the notice before the deadline does.</h2>
+    <div class="cta-band__actions">
+      <a class="button" href="/tenders/">Browse tenders</a>
+      <a class="button button--on-dark" href="/countries/">View coverage</a>
     </div>
   </div>
 </section>

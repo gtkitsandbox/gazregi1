@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600" role="img" aria-label="Placeholder: how-1-search.svg">
+  <rect x="1" y="1" width="798" height="598" fill="#e9edf2" stroke="#c3ccd7" stroke-width="2"/>
+  <line x1="2" y1="2" x2="798" y2="598" stroke="#d3dae3" stroke-width="1.5"/>
+  <line x1="798" y1="2" x2="2" y2="598" stroke="#d3dae3" stroke-width="1.5"/>
+  <rect x="176.0" y="212.0" width="448.0" height="176.0" rx="12" fill="#ffffff" stroke="#c3ccd7" stroke-width="1.5"/>
+  <g font-family="Inter, Arial, sans-serif" text-anchor="middle">
+    <text x="400.0" y="270.1" font-size="24.9" font-weight="700" fill="#0b2440">how-1-search.svg</text>
+    <text x="400.0" y="310.6" font-size="17.4" font-weight="600" fill="#3b526b">800 × 600</text>
+    <text x="400.0" y="347.5" font-size="16.2" font-weight="500" fill="#5b6d82">Step 1: search</text>
+  </g>
+</svg>
