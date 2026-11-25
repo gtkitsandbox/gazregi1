@@ -4,60 +4,117 @@
 {% block content %}
 {% set top_countries = (country_stats|selectattr("records")|sort(attribute="records", reverse=True)|list) %}
 
-{# ── HERO: SHARP HOOK + IMMEDIATE SEARCH ── #}
+{# ── HERO: SHARP HOOK + IMMEDIATE SEARCH + LIVE CLOSING BOARD ── #}
 <section class="hero" aria-labelledby="page-title">
-  <div class="hero__inner">
-    <p class="hero__pill">Tenders · Gazettes · Public notices</p>
-    <h1 id="page-title">Your next contract is already published. <span class="hero__kicker">Find it in seconds.</span></h1>
-    <p class="hero__lede">Official gazettes publish tenders, notices and appointments first — inside long PDFs, local languages and references scattered across {{ stats.with_records }} countries. GazetteRegistry brings those records into one search, with every result linked to the page it came from.</p>
+  <div class="hero__inner hero__grid">
+    <div class="hero__primary">
+      <p class="hero__pill">Tenders · Gazettes · Public notices</p>
+      <h1 id="page-title">Your next contract is already published. <span class="hero__kicker">Find it in seconds.</span></h1>
+      <p class="hero__lede">Official gazettes publish tenders, notices and appointments first — inside long PDFs, local languages and references scattered across {{ stats.with_records }} countries. GazetteRegistry brings those records into one search, with every result linked to the page it came from.</p>
 
-    <form id="search-form" class="hero-search" role="search">
-      <div class="hero-search__field hero-search__field--keywords">
-        <label for="search-query">Keywords</label>
-        <input id="search-query" name="q" type="search" placeholder="Search tenders, people, gazettes…" autocomplete="off">
-      </div>
-      <div class="hero-search__field">
-        <label for="hero-scope-select">Category</label>
-        <select id="hero-scope-select">
-          <option value="all">All records</option>
-          <option value="tenders">Tenders</option>
-          <option value="gazettes">Gazettes</option>
-          <option value="people">People</option>
-          <option value="organisations">Organisations</option>
-        </select>
-      </div>
-      <div class="hero-search__field">
-        <label for="hero-country-select">Country</label>
-        <select id="hero-country-select">
-          <option value="">All countries</option>
-          {% for row in country_stats if row.records %}
-          <option value="{{ row.code|lower }}" data-country-name="{{ row.name }}">{{ row.name }}</option>
-          {% endfor %}
-        </select>
-      </div>
-      <button class="button button--accent hero-search__submit" type="submit">Search</button>
-    </form>
+      <form id="search-form" class="hero-search" role="search">
+        <div class="hero-search__field hero-search__field--keywords">
+          <label for="search-query">Keywords</label>
+          <input id="search-query" name="q" type="search" placeholder="Keywords, ref ID or name…" autocomplete="off">
+        </div>
+        <div class="hero-search__field">
+          <label for="hero-scope-select">Category</label>
+          <select id="hero-scope-select">
+            <option value="all">All records</option>
+            <option value="tenders">Tenders</option>
+            <option value="gazettes">Gazettes</option>
+            <option value="people">People</option>
+            <option value="organisations">Organisations</option>
+          </select>
+        </div>
+        <div class="hero-search__field">
+          <label for="hero-country-select">Country</label>
+          <select id="hero-country-select">
+            <option value="">All countries</option>
+            {% for row in country_stats if row.records %}
+            <option value="{{ row.code|lower }}" data-country-name="{{ row.name }}">{{ row.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <button class="button button--accent hero-search__submit" type="submit">Search</button>
+      </form>
 
-    <div class="hero__popular" aria-label="Example searches">
-      <span>Try:</span>
-      {% if preview %}
-      <button type="button" data-quick-query="drainage">drainage</button>
-      <button type="button" data-quick-query="stationery">stationery</button>
-      <button type="button" data-quick-query="Nordmark">Nordmark</button>
-      {% else %}
-      <button type="button" data-quick-query="construction">construction</button>
-      <button type="button" data-quick-query="network equipment">network equipment</button>
-      <button type="button" data-quick-query="Home Office">Home Office</button>
-      {% endif %}
+      <div class="hero__popular" aria-label="Example searches">
+        <span>Try:</span>
+        {% if preview %}
+        <button type="button" data-quick-query="drainage">drainage</button>
+        <button type="button" data-quick-query="stationery">stationery</button>
+        <button type="button" data-quick-query="Nordmark">Nordmark</button>
+        {% else %}
+        <button type="button" data-quick-query="construction">construction</button>
+        <button type="button" data-quick-query="network equipment">network equipment</button>
+        <button type="button" data-quick-query="Home Office">Home Office</button>
+        {% endif %}
+      </div>
+      <p class="hero__note" id="result-count" aria-live="polite">Search {{ stats.records }} verified records across {{ stats.sources }} official sources. Coverage is incomplete; every result links to its source page.</p>
+
+      <dl class="hero-stats">
+        <div><dt>Portals &amp; gazettes tracked</dt><dd>{{ stats.sources }}</dd></div>
+        <div><dt>Gazette PDF pages indexed</dt><dd>{{ stats.pages }}</dd></div>
+        <div><dt>Open tenders live now</dt><dd>{{ stats.open_tenders }}</dd></div>
+        <div><dt>Active jurisdictions</dt><dd>{{ stats.with_records }}</dd></div>
+      </dl>
     </div>
-    <p class="hero__note" id="result-count" aria-live="polite">Search {{ stats.records }} verified records across {{ stats.sources }} official sources. Coverage is incomplete; every result links to its source page.</p>
 
-    <dl class="hero-stats">
-      <div><dt>Portals &amp; gazettes tracked</dt><dd>{{ stats.sources }}</dd></div>
-      <div><dt>Gazette PDF pages indexed</dt><dd>{{ stats.pages }}</dd></div>
-      <div><dt>Open tenders live now</dt><dd>{{ stats.open_tenders }}</dd></div>
-      <div><dt>Active jurisdictions</dt><dd>{{ stats.with_records }}</dd></div>
-    </dl>
+    {% if latest_tenders %}
+    <aside class="hero-board" aria-label="Tenders closing next">
+      <div class="hero-board__head">
+        <span class="hero-board__title"><span class="hero-board__dot" aria-hidden="true"></span>Closing soonest · Live feed</span>
+        <a href="/tenders/">All {{ stats.open_tenders }} open →</a>
+      </div>
+      <div class="hero-board__viewport">
+        <div class="hero-board__track{% if latest_tenders|length > 1 %} is-auto{% endif %}">
+          <div class="hero-board__group">
+            {% for item in latest_tenders %}
+            <a class="hero-board__item{% if loop.first %} is-spotlight{% endif %}" href="{{ item.path }}">
+              <div class="hero-board__meta">
+                <span class="hero-board__sender">
+                  <span class="hero-board__avatar" aria-hidden="true">{{ item.record.uid.split('-')[0] }}</span>
+                  <span class="hero-board__country">{{ item.country_name }}</span>
+                </span>
+                <span class="hero-board__due">{{ item.closing_note }}</span>
+              </div>
+              <strong class="hero-board__name">{{ item.record.title }}</strong>
+              <div class="hero-board__foot">
+                <code>{{ item.reference }}</code>
+                <span>{{ item.issuer_name }}</span>
+              </div>
+            </a>
+            {% endfor %}
+          </div>
+          {% if latest_tenders|length > 1 %}
+          <div class="hero-board__group" aria-hidden="true" data-pagefind-ignore>
+            {% for item in latest_tenders %}
+            <a class="hero-board__item{% if loop.first %} is-spotlight{% endif %}" href="{{ item.path }}" tabindex="-1">
+              <div class="hero-board__meta">
+                <span class="hero-board__sender">
+                  <span class="hero-board__avatar">{{ item.record.uid.split('-')[0] }}</span>
+                  <span class="hero-board__country">{{ item.country_name }}</span>
+                </span>
+                <span class="hero-board__due">{{ item.closing_note }}</span>
+              </div>
+              <strong class="hero-board__name">{{ item.record.title }}</strong>
+              <div class="hero-board__foot">
+                <code>{{ item.reference }}</code>
+                <span>{{ item.issuer_name }}</span>
+              </div>
+            </a>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      <div class="hero-board__footer">
+        <span>{{ icon("shield-check", 14) }} Verbatim source &amp; page linked</span>
+        <a href="/sources/">{{ stats.sources }} sources →</a>
+      </div>
+    </aside>
+    {% endif %}
   </div>
   {% if top_countries %}
   <div class="hero__tab">
