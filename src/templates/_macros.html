@@ -74,20 +74,72 @@
 {%- endmacro %}
 
 {% macro page_visual(name) -%}
-{% set visuals = {
-  "tenders": ("bento-procurement.svg", "Infrastructure and public procurement"),
-  "gazettes": ("bento-archive.svg", "Official gazette archive volumes"),
-  "people": ("workflow-index.svg", "Structured appointment and position index"),
-  "organisations": ("bento-procurement.svg", "Public bodies and issuing organisations"),
-  "notices": ("workflow-pdfs.svg", "Official public notices and filings"),
-  "regulations": ("bento-archive.svg", "Acts, instruments and official regulations"),
-  "countries": ("coverage-world.svg", "International jurisdiction coverage"),
-  "sources": ("provenance-verify.jpg", "Official publisher source verification"),
-  "about": ("hero-main.jpg", "Layered official documents converging into a structured index"),
-  "corrections": ("provenance-verify.jpg", "Record verification and corrections")
+{% set panels = {
+  "tenders": ("Procurement Discovery", [
+    ("Verification", "Verbatim source excerpt check"),
+    ("Filters", "Country · Sector · Closing date"),
+    ("Policy", "Discovery index · Official links")
+  ]),
+  "gazettes": ("Page-Level Archive", [
+    ("Structure", "Issue metadata & physical PDF pages"),
+    ("Provenance", "SHA-256 source checksums retained"),
+    ("Sources", "Linked to official publisher URLs")
+  ]),
+  "people": ("Verified Directory", [
+    ("Eligibility", "Operator-verified identities only"),
+    ("Policy", "Never merged solely by name"),
+    ("Records", "Appointments & Gazette positions")
+  ]),
+  "organisations": ("Issuing Bodies", [
+    ("Coverage", "Ministries, councils & public entities"),
+    ("Verification", "Cited against official publications"),
+    ("Links", "Connected tenders & appointments")
+  ]),
+  "notices": ("Official Notices", [
+    ("Categories", "Licensing, land, estate & corporate"),
+    ("Provenance", "Date, jurisdiction & source snapshot"),
+    ("Search", "Indexed across active jurisdictions")
+  ]),
+  "regulations": ("Legal Instruments", [
+    ("Scope", "Acts, orders, rules & notifications"),
+    ("Citations", "Gazette issue & official document links"),
+    ("Integrity", "Unmodified extracted source text")
+  ]),
+  "countries": ("Jurisdiction Matrix", [
+    ("Tracking", "Verified, partial & planned status"),
+    ("Integrity", "Empty coverage stays transparently empty"),
+    ("Languages", "Multi-script official gazette support")
+  ]),
+  "sources": ("Publisher Registry", [
+    ("Audit", "Format, access method & reuse terms"),
+    ("Status", "Accessible, restricted & planned logged"),
+    ("Honesty", "Unavailable sources never omitted")
+  ]),
+  "about": ("Index Methodology", [
+    ("Architecture", "Static-first · Prebuilt Pagefind search"),
+    ("Provenance", "Every record linked to source page"),
+    ("Independence", "Not affiliated with any government")
+  ]),
+  "corrections": ("Corrections & Review", [
+    ("Scope", "Indexing, links & transcription errors"),
+    ("Authority", "Official publisher record remains final"),
+    ("Privacy", "Minimal personal identifiers retained")
+  ])
 } %}
-{% set asset = visuals.get(name, ("bento-archive.svg", "GazetteRegistry")) %}
-<figure class="index-hero__media">
-  <img src="/assets/img/{{ asset[0] }}" alt="{{ asset[1] }}" width="800" height="500" loading="eager">
-</figure>
+{% set spec = panels.get(name, ("Registry Index", [
+  ("Provenance", "Verbatim source excerpt check"),
+  ("Search", "Full-text static Pagefind index"),
+  ("Links", "Direct citations to official sources")
+])) %}
+<aside class="index-hero__panel" aria-hidden="true">
+  <div class="index-hero__panel-head">
+    <span class="index-hero__dot"></span>
+    <span>{{ spec[0] }}</span>
+  </div>
+  <dl class="index-hero__specs">
+    {% for label, value in spec[1] %}
+    <div><dt>{{ label }}</dt><dd>{{ value }}</dd></div>
+    {% endfor %}
+  </dl>
+</aside>
 {%- endmacro %}

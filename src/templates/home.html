@@ -48,7 +48,7 @@
 
     <div class="hero__visual">
       <div class="hero-showcase">
-        <img src="/assets/img/hero-main.jpg" alt="Layered official documents converging into a structured index" width="1200" height="900" fetchpriority="high">
+        <img src="/assets/img/hero-main.jpg" alt="Layered official documents converging into a structured index" width="1200" height="896" fetchpriority="high">
         <div class="hero-showcase__card">
           <span class="hero-showcase__icon" aria-hidden="true">
             <svg viewBox="0 0 20 20"><path d="m4.5 10.5 3.5 3.5 7.5-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -127,52 +127,44 @@
 
     {% set lead = latest_tenders[0] %}
     {% set rest = latest_tenders[1:] %}
-    <div class="opportunities-layout{% if not rest %} opportunities-layout--single{% endif %}">
-      <article class="lead-tender" data-reveal style="--d: 0ms">
-        <div class="lead-tender__media">
-          <img src="/assets/img/bento-procurement.svg" alt="Public infrastructure and procurement" width="800" height="500" loading="lazy">
-          <div class="lead-tender__scrim" aria-hidden="true"></div>
-          <div class="lead-tender__badges">
+    <div class="procurement-grid">
+      <article class="tender-featured" data-reveal style="--d: 0ms">
+        <div class="tender-featured__main">
+          <div class="opportunity__top">
+            <span class="badge badge--featured">Lead opportunity</span>
             <span class="opportunity__country">{{ lead.country_name }}</span>
             {{ badge(lead.status_label, lead.status_tone) }}
           </div>
-        </div>
-        <div class="lead-tender__body">
-          <h3><a href="{{ lead.path }}">{{ lead.record.title }}</a></h3>
-          <p class="lead-tender__issuer">
-            {% if lead.issuer_path %}<a href="{{ lead.issuer_path }}">{{ lead.issuer_name }}</a>{% else %}{{ lead.issuer_name }}{% endif %}
+          <h3><a href="{{ lead.path }}" title="{{ lead.record.title }}">{{ lead.record.title }}</a></h3>
+          <p class="opportunity__meta">
+            <span>{% if lead.issuer_path %}<a href="{{ lead.issuer_path }}">{{ lead.issuer_name }}</a>{% else %}{{ lead.issuer_name }}{% endif %}</span>
             <span class="opportunity__reference">{{ lead.reference }}</span>
           </p>
-          <div class="lead-tender__deadline">
+        </div>
+        <div class="tender-featured__side">
+          <div class="tender-featured__closing">
             <span>Closing date</span>
             <strong>{{ lead.closing_note }}</strong>
           </div>
-          <a class="button lead-tender__cta" href="{{ lead.path }}">View tender notice <span aria-hidden="true">→</span></a>
+          <a class="button" href="{{ lead.path }}">View tender notice <span aria-hidden="true">→</span></a>
         </div>
       </article>
 
       {% if rest %}
-      <div class="tender-stack">
+      <div class="tender-cards-grid">
         {% for item in rest %}
-        <article class="tender-row" data-reveal style="--d: {{ loop.index * 50 }}ms">
-          <div class="opportunity__date" aria-hidden="true">
-            <span class="opportunity__month">{{ item.closing_month }}</span>
-            <strong class="opportunity__day">{{ item.closing_day }}</strong>
-          </div>
-          <div class="tender-row__body">
+        <article class="tender-grid-card" data-reveal style="--d: {{ loop.index * 50 }}ms">
+          <div class="tender-grid-card__top">
             <div class="opportunity__top">
               <span class="opportunity__country">{{ item.country_name }}</span>
               {{ badge(item.status_label, item.status_tone) }}
             </div>
-            <h3><a href="{{ item.path }}">{{ item.record.title }}</a></h3>
-            <p class="opportunity__meta">
-              <span>{% if item.issuer_path %}<a href="{{ item.issuer_path }}">{{ item.issuer_name }}</a>{% else %}{{ item.issuer_name }}{% endif %}</span>
-              <span class="opportunity__reference">{{ item.reference }}</span>
-            </p>
+            <span class="tender-grid-card__date">{{ item.closing_month }} {{ item.closing_day }}</span>
           </div>
-          <div class="tender-row__side">
-            <span class="tender-row__close">{{ item.closing_note }}</span>
-            <a class="tender-row__go" href="{{ item.path }}" aria-label="View {{ item.record.title }}">→</a>
+          <h3><a href="{{ item.path }}" title="{{ item.record.title }}">{{ item.record.title }}</a></h3>
+          <div class="tender-grid-card__foot">
+            <span class="tender-grid-card__issuer">{% if item.issuer_path %}<a href="{{ item.issuer_path }}">{{ item.issuer_name }}</a>{% else %}{{ item.issuer_name }}{% endif %}</span>
+            <a class="tender-grid-card__more" href="{{ item.path }}">{{ item.closing_note }} <span aria-hidden="true">→</span></a>
           </div>
         </article>
         {% endfor %}
@@ -183,40 +175,59 @@
 </section>
 {% endif %}
 
-<section class="section section--dark" aria-labelledby="problem-title">
+<section class="section section--muted" aria-labelledby="problem-title">
   <div class="section-inner">
-    <div class="section-head section-head--dark">
+    <div class="section-head">
       <div>
-        <p class="eyebrow eyebrow--on-dark">Why this exists</p>
+        <p class="eyebrow">Why this exists</p>
         <h2 id="problem-title">Public records are not the same as findable records.</h2>
       </div>
       <p class="section-head__note">The information exists. The access is what is broken.</p>
     </div>
     <div class="problem-grid">
       <article class="problem-card" data-reveal style="--d: 0ms">
-        <figure class="problem-card__media">
-          <img src="/assets/img/workflow-pdfs.svg" alt="Layered official gazette documents" width="800" height="500" loading="lazy">
-        </figure>
+        <div class="ui-preview" aria-hidden="true">
+          <div class="preview-folio preview-folio--back"></div>
+          <div class="preview-folio preview-folio--front">
+            <span class="preview-folio__tag">Official Gazette · PDF</span>
+            <span class="preview-folio__bar preview-folio__bar--lg"></span>
+            <span class="preview-folio__bar preview-folio__bar--sm"></span>
+            <span class="preview-folio__callout">Page 14 · Procurement Notice</span>
+          </div>
+        </div>
         <div class="problem-card__body">
           <span class="problem-card__num" aria-hidden="true">01</span>
           <h3>Published once, inside a PDF</h3>
           <p>Official notices appear in gazettes, supplements and agency portals. There is no single feed across countries, languages or publishers.</p>
         </div>
       </article>
+
       <article class="problem-card" data-reveal style="--d: 70ms">
-        <figure class="problem-card__media">
-          <img src="/assets/img/workflow-index.svg" alt="Optical prism aligning scattered record channels" width="800" height="500" loading="lazy">
-        </figure>
+        <div class="ui-preview" aria-hidden="true">
+          <div class="preview-router">
+            <div class="preview-router__query">q: "equipment"</div>
+            <div class="preview-router__results">
+              <span><b>LK</b> Gazette 2502</span>
+              <span><b>GB</b> Notice</span>
+              <span><b>KE</b> Tender</span>
+            </div>
+          </div>
+        </div>
         <div class="problem-card__body">
           <span class="problem-card__num" aria-hidden="true">02</span>
           <h3>The reference you would never guess</h3>
           <p>Tender numbers, ministry names and legal titles vary by publisher. A keyword that works in one country can return nothing in another.</p>
         </div>
       </article>
+
       <article class="problem-card" data-reveal style="--d: 140ms">
-        <figure class="problem-card__media">
-          <img src="/assets/img/workflow-deadlines.svg" alt="Precision chronometer ring highlighting closing deadlines" width="800" height="500" loading="lazy">
-        </figure>
+        <div class="ui-preview" aria-hidden="true">
+          <div class="preview-timeline">
+            <div class="preview-timeline__row"><span class="dot dot--emerald"></span><span>Closes today</span><strong>Open</strong></div>
+            <div class="preview-timeline__row"><span class="dot dot--blue"></span><span>In 4 days</span><strong>Open</strong></div>
+            <div class="preview-timeline__row"><span class="dot dot--slate"></span><span>Expired</span><strong>Closed</strong></div>
+          </div>
+        </div>
         <div class="problem-card__body">
           <span class="problem-card__num" aria-hidden="true">03</span>
           <h3>A deadline does not wait</h3>
@@ -238,29 +249,37 @@
     </div>
     <div class="bento-grid">
       <a class="bento-card bento-card--wide" href="/tenders/" data-reveal style="--d: 0ms">
-        <div class="bento-card__content">
+        <span class="bento-card__content">
           <span class="bento-card__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 8h16v11H4zM9 8V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M4 12h16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
           <span class="bento-card__meta">{{ stats.tenders }} procurement records</span>
           <span class="bento-card__title">Tenders</span>
           <span class="bento-card__desc">Open and closed opportunities with issuer, location and closing date.</span>
           <span class="bento-card__more">Browse tenders <span aria-hidden="true">→</span></span>
-        </div>
-        <div class="bento-card__media">
-          <img src="/assets/img/bento-procurement.svg" alt="Procurement opportunity pipeline preview" width="800" height="500" loading="lazy">
-        </div>
+        </span>
+        <span class="bento-live-panel" aria-hidden="true">
+          <span class="bento-live-panel__kicker">Live Procurement Index</span>
+          <span class="bento-live-panel__stat"><strong>{{ stats.open_tenders }}</strong> open now · {{ stats.tenders }} total</span>
+          <span class="bento-live-panel__tags">
+            <span>Country</span><span>Sector</span><span>Issuer</span><span>Closing date</span>
+          </span>
+        </span>
       </a>
 
       <a class="bento-card bento-card--wide" href="/gazettes/" data-reveal style="--d: 60ms">
-        <div class="bento-card__content">
+        <span class="bento-card__content">
           <span class="bento-card__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6zM14 3v4h4M9 11h6M9 15h6M9 19h3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
           <span class="bento-card__meta">{{ stats.issues }} issues · {{ stats.pages }} pages</span>
           <span class="bento-card__title">Gazettes</span>
           <span class="bento-card__desc">Page-level archive with publication date and official source links.</span>
           <span class="bento-card__more">Browse gazettes <span aria-hidden="true">→</span></span>
-        </div>
-        <div class="bento-card__media">
-          <img src="/assets/img/bento-archive.svg" alt="Page-level gazette archive spread preview" width="800" height="500" loading="lazy">
-        </div>
+        </span>
+        <span class="bento-live-panel" aria-hidden="true">
+          <span class="bento-live-panel__kicker">Page-Level Archive</span>
+          <span class="bento-live-panel__stat"><strong>{{ stats.pages }}</strong> pages · {{ stats.issues }} issues</span>
+          <span class="bento-live-panel__tags">
+            <span>Issue No.</span><span>PDF Page</span><span>SHA-256</span><span>Official URL</span>
+          </span>
+        </span>
       </a>
 
       <a class="bento-card" href="/people/" data-reveal style="--d: 100ms">
@@ -294,6 +313,51 @@
         <span class="bento-card__desc">Acts, instruments, orders and notifications from official sources.</span>
         <span class="bento-card__more">Browse regulations <span aria-hidden="true">→</span></span>
       </a>
+    </div>
+  </div>
+</section>
+
+<section class="section section--muted" aria-labelledby="trust-title">
+  <div class="section-inner">
+    <div class="provenance-split">
+      <figure class="doc-frame" data-reveal>
+        <div class="doc-frame__bar" aria-hidden="true">
+          <span class="doc-frame__dot"></span>
+          <span>SHA-256 Checksum · Verbatim Source Match</span>
+        </div>
+        <img src="/assets/img/provenance-verify.jpg" alt="Optical verification lens inspecting archival source weave" width="1200" height="896" loading="lazy">
+      </figure>
+
+      <div class="provenance-split__body">
+        <p class="eyebrow">Provenance</p>
+        <h2 id="trust-title">Every result says where it came from.</h2>
+        <div class="trust-list">
+          <article class="trust-card" data-reveal style="--d: 0ms">
+            <span class="trust-item__check" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="m4 10.5 4 4 8-9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <div>
+              <h3>Verbatim excerpt check</h3>
+              <p>A structured record is rejected unless its source excerpt appears in the extracted text or retrieved official document.</p>
+            </div>
+          </article>
+          <article class="trust-card" data-reveal style="--d: 60ms">
+            <span class="trust-item__check" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="m4 10.5 4 4 8-9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <div>
+              <h3>Page-level provenance</h3>
+              <p>Gazette number, publication date, PDF page and source checksum are retained wherever the publisher provides them.</p>
+            </div>
+          </article>
+          <article class="trust-card" data-reveal style="--d: 120ms">
+            <span class="trust-item__check" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="m4 10.5 4 4 8-9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <div>
+              <h3>No invented records</h3>
+              <p>Empty coverage stays empty. Unverified identities are held back, and no name, deadline or source URL is guessed.</p>
+            </div>
+          </article>
+        </div>
+        <div class="section-cta">
+          <a class="button button--secondary" href="/about/">Read the methodology <span aria-hidden="true">→</span></a>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -334,51 +398,6 @@
       {% endfor %}
     </div>
     <p class="coverage-band__note">Record and source status is published in full on the <a href="/countries/">country coverage</a> and <a href="/sources/">source registry</a> pages.</p>
-  </div>
-</section>
-
-<section class="section" aria-labelledby="trust-title">
-  <div class="section-inner">
-    <div class="provenance-split">
-      <figure class="doc-frame" data-reveal>
-        <div class="doc-frame__bar" aria-hidden="true">
-          <span class="doc-frame__dot"></span>
-          <span>SHA-256 Checksum · Verbatim Source Match</span>
-        </div>
-        <img src="/assets/img/provenance-verify.jpg" alt="Optical verification lens inspecting archival source weave" width="960" height="720" loading="lazy">
-      </figure>
-
-      <div class="provenance-split__body">
-        <p class="eyebrow">Provenance</p>
-        <h2 id="trust-title">Every result says where it came from.</h2>
-        <div class="trust-list">
-          <article class="trust-card" data-reveal style="--d: 0ms">
-            <span class="trust-item__check" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="m4 10.5 4 4 8-9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            <div>
-              <h3>Verbatim excerpt check</h3>
-              <p>A structured record is rejected unless its source excerpt appears in the extracted text or retrieved official document.</p>
-            </div>
-          </article>
-          <article class="trust-card" data-reveal style="--d: 60ms">
-            <span class="trust-item__check" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="m4 10.5 4 4 8-9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            <div>
-              <h3>Page-level provenance</h3>
-              <p>Gazette number, publication date, PDF page and source checksum are retained wherever the publisher provides them.</p>
-            </div>
-          </article>
-          <article class="trust-card" data-reveal style="--d: 120ms">
-            <span class="trust-item__check" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="m4 10.5 4 4 8-9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            <div>
-              <h3>No invented records</h3>
-              <p>Empty coverage stays empty. Unverified identities are held back, and no name, deadline or source URL is guessed.</p>
-            </div>
-          </article>
-        </div>
-        <div class="section-cta">
-          <a class="button button--secondary" href="/about/">Read the methodology <span aria-hidden="true">→</span></a>
-        </div>
-      </div>
-    </div>
   </div>
 </section>
 {% endblock %}
