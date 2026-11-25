@@ -11,9 +11,10 @@ class PageMetadata:
     description: str
     robots: str = "index,follow"
     og_type: str = "website"
+    keywords: tuple[str, ...] = ()
 
 
-def excerpt(text: str, limit: int = 155) -> str:
+def excerpt(text: str, limit: int = 160) -> str:
     flat = " ".join(text.split())
     if len(flat) <= limit:
         return flat
@@ -27,6 +28,7 @@ def page_metadata(
     description: str,
     robots: str = "index,follow",
     og_type: str = "website",
+    keywords: tuple[str, ...] = (),
 ) -> PageMetadata:
     full_title = title if site_name in title else f"{title} | {site_name}"
     return PageMetadata(
@@ -34,4 +36,5 @@ def page_metadata(
         description=excerpt(description),
         robots=robots,
         og_type=og_type,
+        keywords=keywords,
     )

@@ -6,10 +6,15 @@
   {{ breadcrumbs(crumbs) }}
   <header class="page-heading page-heading--record">
     <p class="eyebrow">PERSON RECORD <span aria-hidden="true">/</span> {{ person.country_code }}</p>
-    <h1>{{ person.canonical_name }}</h1>
+    <h1 data-pagefind-meta="title:{{ person.canonical_name }}" data-pagefind-weight="10">{{ person.canonical_name }}</h1>
     <p class="meta-line">{{ verification(person.identity_status) }} <span aria-hidden="true">·</span> Identity verified {{ person.verified_at|date_long }}</p>
+    {% if history %}
+    <p class="page-heading__summary" data-pagefind-weight="8">
+      Official Gazette record index for <strong>{{ person.canonical_name }}</strong>{% if distinct_published %} (published in Gazette notices as <strong>{{ distinct_published|join(", ") }}</strong>){% endif %}{% if distinct_orgs %}, linked to {% for org in distinct_orgs %}<a href="{{ org_path(org) }}">{{ org.name }}</a>{% if not loop.last %}, {% endif %}{% endfor %}{% endif %}{% if gazette_nos %} across Gazette No{{ 's' if gazette_nos|length > 1 else '' }}. {{ gazette_nos|join(", ") }}{% endif %}.
+    </p>
+    {% endif %}
     {% if aliases %}
-    <p class="alias-line">Also published as: {% for alias in aliases %}<span class="chip">{{ alias.name }}</span>{% endfor %}</p>
+    <p class="alias-line" data-pagefind-weight="7">Also published or searched as: {% for alias in aliases %}<span class="chip">{{ alias.name }}</span>{% endfor %}</p>
     {% endif %}
   </header>
 
@@ -47,10 +52,13 @@
             </p>
             <p class="timeline__meta">
               {% if item.origin.is_pdf %}Gazette <a href="{{ item.origin.path }}">No. {{ item.origin.issue.gazette_no }}</a>
-              <span aria-hidden="true">·</span> PDF page {{ item.origin.pdf_page }}{% else %}<a href="{{ item.origin.path }}">{{ item.origin.label }}</a>{% endif %}
+              <span aria-hidden="true">·</span> PDF page {{ item.origin.pdf_page }}{% if item.record.source.printed_page %} (printed p. {{ item.record.source.printed_page }}){% endif %}{% else %}<a href="{{ item.origin.path }}">{{ item.origin.label }}</a>{% endif %}
               {% if item.ref.published_name != person.canonical_name %}<span aria-hidden="true">·</span> Published as “{{ item.ref.published_name }}”{% endif %}
               {% if item.source_url %}<span aria-hidden="true">·</span> <a href="{{ item.source_url }}" target="_blank" rel="noopener">Official source ↗</a>{% endif %}
             </p>
+            {% if item.record.source.excerpt %}
+            <blockquote class="timeline__excerpt">“{{ item.record.source.excerpt }}”</blockquote>
+            {% endif %}
           </div>
         </li>
         {% endfor %}

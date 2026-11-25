@@ -1,0 +1,14 @@
+{
+  "issue_id": "LK-2021-2216",
+  "country": "LK",
+  "gazette_no": "2216",
+  "gazette_type": "regular",
+  "edition": "E",
+  "publication_date": "2021-02-19",
+  "source_url": "https://documents.gov.lk/api/content-file-proxy?file=/gazette-content/2021-02-19(I-I)E_1791377572.pdf",
+  "source_file": "Gazette-2021-02-19-E.pdf",
+  "page_count": 53,
+  "parser_version": "0.1.0",
+  "extraction_method": "pymupdf",
+  "extracted_at": "2026-11-25T23:39:05+00:00"
+}

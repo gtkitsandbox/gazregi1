@@ -433,7 +433,7 @@ def _write_page(
     robots = meta.robots
     if site.preview:
         robots = "noindex,nofollow"
-    page_meta = PageMetadata(meta.title, meta.description, robots, meta.og_type)
+    page_meta = PageMetadata(meta.title, meta.description, robots, meta.og_type, meta.keywords)
     html = env.get_template(template).render(
         site=site,
         nav=NAV,
@@ -916,22 +916,64 @@ def build_site(
                 }
             )
         path = _person_path(person)
+        aliases = site.verified_variants_for(person.person_id)
+        distinct_published = [
+            name for name in sorted(published_names) if name.casefold() != person.canonical_name.casefold()
+        ]
+        distinct_orgs_by_id: dict[str, OrganisationEntity] = {}
+        distinct_positions: list[str] = []
+        gazette_nos: list[str] = []
+        for item in history:
+            for org in item["organisations"]:
+                distinct_orgs_by_id.setdefault(org.organisation_id, org)
+            if item["ref"].position and item["ref"].position not in distinct_positions:
+                distinct_positions.append(item["ref"].position)
+            if item["origin"].is_pdf and item["origin"].issue.gazette_no not in gazette_nos:
+                gazette_nos.append(item["origin"].issue.gazette_no)
+        distinct_orgs = list(distinct_orgs_by_id.values())
+
         role_label = "appointments and positions"
         if history:
             latest = history[-1]
             bits = []
             if latest["ref"].position:
-                bits.append(latest["ref"].position)
+                short_pos = latest["ref"].position.split(" — ", 1)[0].strip()
+                bits.append(short_pos)
             if latest["organisations"]:
                 organisation_name = latest["organisations"][0].name
                 if organisation_name.casefold() not in (latest["ref"].position or "").casefold():
-                    bits.append(f"at {organisation_name}")
+                    bits.append(organisation_name)
             if bits:
-                role_label = " ".join(bits)
-        title = f"{person.canonical_name} — {role_label}"
+                role_label = ", ".join(bits)
+
+        name_heading = (
+            f"{person.canonical_name} ({', '.join(distinct_published[:2])})"
+            if distinct_published
+            else person.canonical_name
+        )
+        title = f"{name_heading} — {role_label}"
+        alias_suffix = f" ({distinct_published[0]})" if distinct_published else ""
+        org_summary = f", {', '.join(org.name for org in distinct_orgs[:2])}" if distinct_orgs else ""
+        gazette_summary = f" (Gazettes {', '.join(gazette_nos)})" if gazette_nos else ""
         description = (
-            f"Source-backed Gazette records linked to {person.canonical_name}. "
-            f"{len(history)} record{'s' if len(history) != 1 else ''}, with Gazette number, publication date and page references."
+            f"Official Gazette records for {person.canonical_name}{alias_suffix}{org_summary}: "
+            f"{len(history)} notice{'s' if len(history) != 1 else ''}{gazette_summary}."
+        )
+        all_alternate_names = list(
+            dict.fromkeys([*distinct_published, *(variant.name for variant in aliases)])
+        )
+        meta_keywords = tuple(
+            dict.fromkeys(
+                [
+                    person.canonical_name,
+                    *all_alternate_names,
+                    *(org.name for org in distinct_orgs),
+                    *(f"Gazette {no}" for no in gazette_nos),
+                ]
+            )
+        )
+        latest_mod = _latest_record_date(site, records) or (
+            person.verified_at.isoformat() if person.verified_at else None
         )
         person_crumbs = [home_crumb, people_crumb, Crumb(person.canonical_name, path)]
         _write_page(
@@ -944,6 +986,7 @@ def build_site(
                 title=title,
                 description=description,
                 og_type="profile",
+                keywords=meta_keywords,
             ),
             crumbs=person_crumbs,
             structured_data=profile_page(
@@ -954,19 +997,34 @@ def build_site(
                 site_name=site.config.site_name,
                 site_url=site.site_url,
                 person_name=person.canonical_name,
-                alternate_names=[variant.name for variant in site.verified_variants_for(person.person_id)],
+                alternate_names=all_alternate_names,
+                person_id=person.person_id,
+                job_titles=list(reversed(distinct_positions)),
+                affiliations=[(org.name, _org_path(org)) for org in distinct_orgs],
+                date_modified=latest_mod,
+                subject_of=[
+                    (
+                        item["record"].title,
+                        item["path"],
+                        (site.record_date(item["record"]).isoformat() if site.record_date(item["record"]) else None),
+                    )
+                    for item in history
+                ],
             ),
             section="people",
             context={
                 "person": person,
-                "aliases": site.verified_variants_for(person.person_id),
+                "aliases": aliases,
                 "same_name": site.same_name_people(person),
                 "history": history,
                 "published_names": sorted(published_names),
+                "distinct_published": distinct_published,
+                "distinct_orgs": distinct_orgs,
+                "gazette_nos": gazette_nos,
             },
             site=site,
         )
-        sitemap.add(path, _latest_record_date(site, records) or person.verified_at.isoformat() if person.verified_at else None)
+        sitemap.add(path, latest_mod)
 
     # Appointment, commissioning, promotion and professional-position records
     appointment_records = [

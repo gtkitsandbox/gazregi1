@@ -76,6 +76,10 @@ try {
         { term: "Indian Army", includes: "/people/gb/havelock-hudson/" },
         { term: "29131", includes: "/gazettes/GB-1915-29131/" },
         { term: "Home Office", includes: "/people/gb/gareth-davies/" },
+        { term: "Kumudu Jayalal Deneththi", includes: "/people/lk/kumudu-jayalal-deneththi/" },
+        { term: "Deneththi Kumudu Jayalal", includes: "/people/lk/kumudu-jayalal-deneththi/" },
+        { term: "K. J. Deneththi", includes: "/people/lk/kumudu-jayalal-deneththi/" },
+        { term: "03727", includes: "/people/lk/kumudu-jayalal-deneththi/" },
       ];
 
   const failures = [];

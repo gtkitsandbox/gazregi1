@@ -127,23 +127,59 @@ def profile_page(
     site_url: str,
     person_name: str,
     alternate_names: list[str],
+    person_id: str | None = None,
+    job_titles: list[str] | None = None,
+    affiliations: list[tuple[str, str]] | None = None,
+    date_modified: str | None = None,
+    subject_of: list[tuple[str, str, str | None]] | None = None,
 ) -> str:
+    page_url = canonical_url(path, site_url)
     person: dict[str, Any] = {
         "@type": "Person",
+        "@id": f"{page_url}#person",
         "name": person_name,
-        "url": canonical_url(path, site_url),
+        "url": page_url,
+        "mainEntityOfPage": page_url,
     }
+    if person_id:
+        person["identifier"] = person_id
     if alternate_names:
         person["alternateName"] = alternate_names
-    page = {
+    if job_titles:
+        person["jobTitle"] = job_titles if len(job_titles) > 1 else job_titles[0]
+    if affiliations:
+        person["affiliation"] = [
+            {
+                "@type": "Organization",
+                "name": org_name,
+                "url": canonical_url(org_path, site_url),
+            }
+            for org_name, org_path in affiliations
+        ]
+    if subject_of:
+        person["subjectOf"] = [
+            {
+                "@type": "WebPage",
+                "name": rec_title,
+                "url": canonical_url(rec_path, site_url),
+                **({"datePublished": rec_date} if rec_date else {}),
+            }
+            for rec_title, rec_path, rec_date in subject_of
+        ]
+    page: dict[str, Any] = {
         "@type": "ProfilePage",
-        "@id": canonical_url(path, site_url),
-        "url": canonical_url(path, site_url),
+        "@id": page_url,
+        "url": page_url,
         "name": title,
         "description": description,
         "isPartOf": {"@type": "WebSite", "name": site_name, "url": canonical_url("/", site_url)},
         "mainEntity": person,
     }
+    if date_modified:
+        page["dateModified"] = date_modified
+    keyword_bits = [person_name, *alternate_names, *(org_name for org_name, _ in (affiliations or []))]
+    if keyword_bits:
+        page["keywords"] = ", ".join(dict.fromkeys(keyword_bits))
     graph = {"@context": "https://schema.org", "@graph": [page, breadcrumb_list(crumbs, site_url)]}
     return _serialise(graph)
 

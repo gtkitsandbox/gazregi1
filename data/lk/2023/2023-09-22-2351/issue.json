@@ -1,0 +1,14 @@
+{
+  "issue_id": "LK-2023-2351",
+  "country": "LK",
+  "gazette_no": "2351",
+  "gazette_type": "regular",
+  "edition": "E",
+  "publication_date": "2023-09-22",
+  "source_url": "https://documents.gov.lk/api/content-file-proxy?file=/gazette-content/2023-09-22(I-I)E_1791377970.pdf",
+  "source_file": "Gazette-2023-09-22-E.pdf",
+  "page_count": 123,
+  "parser_version": "0.1.0",
+  "extraction_method": "pymupdf",
+  "extracted_at": "2026-11-25T23:39:15+00:00"
+}

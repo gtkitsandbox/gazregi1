@@ -1,0 +1,14 @@
+{
+  "issue_id": "LK-2017-2019",
+  "country": "LK",
+  "gazette_no": "2019",
+  "gazette_type": "regular",
+  "edition": "E",
+  "publication_date": "2017-05-12",
+  "source_url": "https://documents.gov.lk/api/content-file-proxy?file=/gazette-content/2017-05-12(I-I)E_1791375922.pdf",
+  "source_file": "Gazette-2017-05-12-E.pdf",
+  "page_count": 22,
+  "parser_version": "0.1.0",
+  "extraction_method": "pymupdf",
+  "extracted_at": "2026-11-25T23:39:05+00:00"
+}

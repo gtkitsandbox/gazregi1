@@ -4,14 +4,21 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="{{ meta.description }}">
+  {% if meta.keywords %}
+  <meta name="keywords" content="{{ meta.keywords|join(', ') }}">
+  {% endif %}
   <meta name="robots" content="{{ meta.robots }}">
   <title>{{ meta.title }}</title>
   <link rel="canonical" href="{{ canonical }}">
   <meta property="og:type" content="{{ meta.og_type }}">
-  <meta property="og:site_name" content="{{ site.site_name }}">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:site_name" content="{{ site.config.site_name }}">
   <meta property="og:title" content="{{ meta.title }}">
   <meta property="og:description" content="{{ meta.description }}">
   <meta property="og:url" content="{{ canonical }}">
+  {% if meta.og_type == "profile" and person is defined %}
+  <meta property="profile:username" content="{{ person.person_id }}">
+  {% endif %}
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="{{ meta.title }}">
   <meta name="twitter:description" content="{{ meta.description }}">
@@ -38,7 +45,7 @@
   </div>
   <header class="site-header" data-pagefind-ignore>
     <div class="site-header__inner">
-      <a class="wordmark" href="/" aria-label="{{ site.site_name }} home">
+      <a class="wordmark" href="/" aria-label="{{ site.config.site_name }} home">
         <svg class="wordmark__mark" viewBox="0 0 40 40" aria-hidden="true" focusable="false">
           <defs><linearGradient id="gr-mark" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2A7AA2"/><stop offset="1" stop-color="#1A2656"/></linearGradient></defs>
           <circle cx="20" cy="20" r="19" fill="url(#gr-mark)"/>
@@ -91,7 +98,7 @@
   <footer class="site-footer" data-pagefind-ignore>
     <div class="site-footer__inner">
       <div class="site-footer__brand-block">
-        <a class="site-footer__brand" href="/" aria-label="{{ site.site_name }} home">
+        <a class="site-footer__brand" href="/" aria-label="{{ site.config.site_name }} home">
           <svg viewBox="0 0 40 40" aria-hidden="true" focusable="false">
             <circle cx="20" cy="20" r="19" fill="#2A7AA2"/>
             <path d="M13.5 9.5h9l4.5 4.5v16.5H13.5z" fill="#ffffff"/>
