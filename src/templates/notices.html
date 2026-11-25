@@ -1,14 +1,17 @@
 {% extends "base.html" %}
-{% from "_macros.html" import breadcrumbs, empty_state, record_card %}
+{% from "_macros.html" import breadcrumbs, empty_state, page_visual, record_card %}
 {% block body_class %}page-notices{% endblock %}
 {% block content %}
 <div class="shell">
   {{ breadcrumbs(crumbs) }}
-  <header class="page-heading">
-    <p class="eyebrow">PUBLIC NOTICES</p>
-    <h1>Public notices</h1>
-    <p class="page-heading__lede">Official government, licensing, land, estate and corporate notices from indexed sources across countries. Filter by country to see one jurisdiction at a time.</p>
-  </header>
+  <div class="page-hero">
+    <header class="page-heading">
+      <p class="eyebrow">PUBLIC NOTICES</p>
+      <h1>Public notices</h1>
+      <p class="page-heading__lede">Official government, licensing, land, estate and corporate notices from indexed sources across countries. Filter by country to see one jurisdiction at a time.</p>
+    </header>
+    {{ page_visual("notices") }}
+  </div>
 
   {% if notices %}
   <form class="filter-bar" data-record-filters data-list="notice-list" data-count="notice-count" aria-label="Filter public notices">

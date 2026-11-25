@@ -1,14 +1,17 @@
 {% extends "base.html" %}
-{% from "_macros.html" import badge, breadcrumbs, empty_state %}
+{% from "_macros.html" import badge, breadcrumbs, empty_state, page_visual %}
 {% block body_class %}page-tenders{% endblock %}
 {% block content %}
 <div class="shell">
   {{ breadcrumbs(crumbs) }}
-  <header class="page-heading">
-    <p class="eyebrow">PROCUREMENT</p>
-    <h1>Tenders</h1>
-    <p class="page-heading__lede">Supplier opportunities published in indexed Gazettes. Filter by industry, location, issuing organisation and closing date. GazetteRegistry does not receive bids, run accounts or send alerts.</p>
-  </header>
+  <div class="page-hero">
+    <header class="page-heading">
+      <p class="eyebrow">PROCUREMENT</p>
+      <h1>Tenders</h1>
+      <p class="page-heading__lede">Supplier opportunities published in indexed Gazettes. Filter by industry, location, issuing organisation and closing date. GazetteRegistry does not receive bids, run accounts or send alerts.</p>
+    </header>
+    {{ page_visual("tenders") }}
+  </div>
 
   {% if tenders %}
   <form class="filter-bar" data-tender-filters aria-label="Filter tenders">

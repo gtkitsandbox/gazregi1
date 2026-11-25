@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="880" height="520" viewBox="0 0 880 520" role="img" aria-label="Placeholder: bento-tenders-feature.svg">
+  <defs>
+    <pattern id="grid-bento-tenders-feature" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M 32 0 L 0 0 0 32" fill="none" stroke="#cbd5e1" stroke-width="1" opacity="0.55"/>
+    </pattern>
+  </defs>
+
+  <rect width="880" height="520" fill="#f1f5f9"/>
+  <rect width="880" height="520" fill="url(#grid-bento-tenders-feature)"/>
+  <rect x="0.5" y="0.5" width="879" height="519" fill="none" stroke="#cbd5e1" stroke-width="1"/>
+
+  <rect x="16" y="16" width="848" height="488" fill="none" stroke="#94a3b8" stroke-width="1" stroke-dasharray="5 5"/>
+
+  <g fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="square">
+    <path d="M 16 30 V 16 H 30"/>
+    <path d="M 850 16 H 864 V 30"/>
+    <path d="M 16 490 V 504 H 30"/>
+    <path d="M 850 504 H 864 V 490"/>
+  </g>
+
+  <rect x="106.0" y="148.0" width="668.0" height="224.0" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"/>
+
+  <rect x="360.0" y="172.0" width="160" height="26" rx="999" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1"/>
+  <text x="440.0" y="189.0" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="11.5" font-weight="700" letter-spacing="1.3" text-anchor="middle" fill="#2563eb">PLACEHOLDER ASSET</text>
+
+  <text x="440.0" y="250.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="27" font-weight="700" text-anchor="middle" fill="#0f172a">bento-tenders-feature.svg</text>
+  <text x="440.0" y="288.0" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="16" font-weight="500" text-anchor="middle" fill="#475569">880 × 520 px — Procurement &amp; tender discovery visual</text>
+  <text x="440.0" y="326.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12.5" font-weight="500" text-anchor="middle" fill="#64748b">src/assets/img/placeholders/bento-tenders-feature.svg</text>
+</svg>

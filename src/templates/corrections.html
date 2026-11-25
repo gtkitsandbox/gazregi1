@@ -1,14 +1,17 @@
 {% extends "base.html" %}
-{% from "_macros.html" import breadcrumbs %}
+{% from "_macros.html" import breadcrumbs, page_visual %}
 {% block body_class %}page-corrections{% endblock %}
 {% block content %}
-<div class="shell shell--narrow">
+<div class="shell">
   {{ breadcrumbs(crumbs) }}
-  <header class="page-heading">
-    <p class="eyebrow">CORRECTIONS</p>
-    <h1>Request a correction</h1>
-    <p class="page-heading__lede">Correction requests cover indexing errors, broken source links, transcription problems and identity mappings. They do not change the official publication.</p>
-  </header>
+  <div class="page-hero">
+    <header class="page-heading">
+      <p class="eyebrow">CORRECTIONS</p>
+      <h1>Request a correction</h1>
+      <p class="page-heading__lede">Correction requests cover indexing errors, broken source links, transcription problems and identity mappings. They do not change the official publication.</p>
+    </header>
+    {{ page_visual("corrections") }}
+  </div>
 
   <aside class="callout">
     <strong>Submission channel.</strong>

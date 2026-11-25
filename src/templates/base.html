@@ -17,6 +17,7 @@
   <meta name="twitter:description" content="{{ meta.description }}">
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
   <link rel="preload" href="/assets/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+  <script>document.documentElement.classList.add('js')</script>
   <link rel="stylesheet" href="/assets/styles.css">
   <script type="application/ld+json">{{ structured_data|safe }}</script>
 </head>
@@ -50,6 +51,7 @@
       <form class="header-search" action="/" method="get" role="search">
         <label class="visually-hidden" for="global-search">Search indexed records</label>
         <input id="global-search" name="q" type="search" placeholder="Search records" autocomplete="off">
+        <kbd class="search-kbd" aria-hidden="true">/</kbd>
         <button type="submit" aria-label="Search">
           <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m13 13 4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
         </button>

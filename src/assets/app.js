@@ -1,3 +1,5 @@
+document.documentElement.classList.add("js");
+
 const pagefindImport = "/pagefind/pagefind.js";
 let pagefind;
 let latestSearch = 0;
@@ -323,8 +325,68 @@ function initSourceFilters() {
   applyFilters();
 }
 
+function initSearchShortcut() {
+  document.addEventListener("keydown", (event) => {
+    const active = document.activeElement;
+    const isInput =
+      active &&
+      (active.tagName === "INPUT" ||
+        active.tagName === "TEXTAREA" ||
+        active.tagName === "SELECT" ||
+        active.isContentEditable);
+    const isSlash = event.key === "/" && !event.metaKey && !event.ctrlKey && !event.altKey;
+    const isCommandK = event.key.toLowerCase() === "k" && (event.metaKey || event.ctrlKey);
+    if ((!isSlash && !isCommandK) || (isSlash && isInput)) return;
+
+    const target = document.querySelector("#search-query") || document.querySelector("#global-search");
+    if (!target) return;
+    event.preventDefault();
+    target.focus();
+    target.select();
+  });
+}
+
+function initReveal() {
+  const targets = Array.from(document.querySelectorAll("[data-reveal]"));
+  if (!targets.length) return;
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reduced || typeof IntersectionObserver === "undefined") {
+    targets.forEach((el) => el.classList.add("is-visible"));
+    return;
+  }
+
+  const thresholdY = window.innerHeight * 0.98;
+  const pending = [];
+  for (const el of targets) {
+    if (el.getBoundingClientRect().top < thresholdY) {
+      el.classList.add("is-visible");
+    } else {
+      el.classList.add("is-animated");
+      pending.push(el);
+    }
+  }
+  if (!pending.length) return;
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        entry.target.classList.add("is-visible");
+        observer.unobserve(entry.target);
+      }
+    },
+    { threshold: 0.05, rootMargin: "0px 0px -20px 0px" },
+  );
+
+  for (const el of pending) {
+    observer.observe(el);
+  }
+}
+
 initSiteSearch();
 initTenderFilters();
 initRecordFilters();
 initCountryFilters();
 initSourceFilters();
+initSearchShortcut();
+initReveal();

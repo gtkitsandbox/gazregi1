@@ -72,3 +72,9 @@
   </dl>
 </article>
 {%- endmacro %}
+
+{% macro page_visual(name) -%}
+<figure class="page-hero__media">
+  <img src="/assets/img/placeholders/section-{{ name }}.svg" alt="Placeholder: section-{{ name }}.svg" width="760" height="480" loading="lazy">
+</figure>
+{%- endmacro %}
