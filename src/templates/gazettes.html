@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "_macros.html" import badge, breadcrumbs, empty_state, page_banner %}
+{% from "_macros.html" import badge, breadcrumbs, empty_state %}
 {% block body_class %}page-gazettes{% endblock %}
 {% block content %}
 <div class="shell">
@@ -9,7 +9,6 @@
     <h1>Gazettes</h1>
     <p class="page-heading__lede">Every indexed issue, ordered by publication date. Issue pages preserve the page-level index and link to the official source document where recorded.</p>
   </header>
-  {{ page_banner("gazettes") }}
 
   {% if countries_with_issues %}
     {% for country in countries_with_issues %}

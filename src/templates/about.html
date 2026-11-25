@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "_macros.html" import breadcrumbs, page_banner %}
+{% from "_macros.html" import breadcrumbs %}
 {% block body_class %}page-about{% endblock %}
 {% block content %}
 <div class="shell shell--narrow">
@@ -9,7 +9,6 @@
     <h1>About {{ site.site_name }}</h1>
     <p class="page-heading__lede">{{ site.site_name }} is an independent search and discovery layer over official government Gazette publications. It is not affiliated with, endorsed by or operated by any government.</p>
   </header>
-  {{ page_banner("about") }}
 
   <section class="prose" aria-labelledby="what-title">
     <h2 id="what-title">What the index contains</h2>

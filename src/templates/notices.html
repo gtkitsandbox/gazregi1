@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "_macros.html" import breadcrumbs, empty_state, page_banner, record_card %}
+{% from "_macros.html" import breadcrumbs, empty_state, record_card %}
 {% block body_class %}page-notices{% endblock %}
 {% block content %}
 <div class="shell">
@@ -9,7 +9,6 @@
     <h1>Public notices</h1>
     <p class="page-heading__lede">Official government, licensing, land, estate and corporate notices from indexed sources across countries. Filter by country to see one jurisdiction at a time.</p>
   </header>
-  {{ page_banner("notices") }}
 
   {% if notices %}
   <form class="filter-bar" data-record-filters data-list="notice-list" data-count="notice-count" aria-label="Filter public notices">

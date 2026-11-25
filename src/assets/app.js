@@ -1,5 +1,3 @@
-document.documentElement.classList.add("js");
-
 const pagefindImport = "/pagefind/pagefind.js";
 let pagefind;
 let latestSearch = 0;
@@ -325,103 +323,8 @@ function initSourceFilters() {
   applyFilters();
 }
 
-function initToday() {
-  const nodes = document.querySelectorAll("[data-today]");
-  if (!nodes.length) return;
-  const formatted = new Date().toLocaleDateString("en-GB", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
-  for (const node of nodes) {
-    node.textContent = formatted;
-  }
-}
-
-function initReveal() {
-  const targets = Array.from(document.querySelectorAll("[data-reveal]"));
-  if (!targets.length) return;
-  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if (reduced || typeof IntersectionObserver === "undefined") {
-    targets.forEach((el) => el.classList.add("is-visible"));
-    return;
-  }
-
-  const observer = new IntersectionObserver(
-    (entries) => {
-      for (const entry of entries) {
-        if (!entry.isIntersecting) continue;
-        entry.target.classList.add("is-visible");
-        observer.unobserve(entry.target);
-      }
-    },
-    { threshold: 0.15, rootMargin: "0px 0px -32px 0px" },
-  );
-
-  for (const target of targets) {
-    observer.observe(target);
-  }
-}
-
-function initCountUp() {
-  const values = Array.from(document.querySelectorAll(".hero-stat__value"));
-  if (!values.length) return;
-  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if (reduced) return;
-
-  function animateValue(el) {
-    if (el.dataset.counted === "1") return;
-    const original = el.textContent.trim();
-    const target = Number.parseInt(original.replace(/,/g, ""), 10);
-    if (!Number.isFinite(target) || target <= 0) return;
-    el.dataset.counted = "1";
-
-    const duration = 1200;
-    const start = performance.now();
-    const hasComma = original.includes(",");
-
-    function step(now) {
-      const progress = Math.min(1, (now - start) / duration);
-      const eased = 1 - (1 - progress) ** 3;
-      const current = Math.round(target * eased);
-      el.textContent = hasComma ? current.toLocaleString("en-US") : String(current);
-      if (progress < 1) {
-        window.requestAnimationFrame(step);
-      } else {
-        el.textContent = original;
-      }
-    }
-
-    window.requestAnimationFrame(step);
-  }
-
-  if (typeof IntersectionObserver === "undefined") {
-    values.forEach(animateValue);
-    return;
-  }
-
-  const observer = new IntersectionObserver(
-    (entries) => {
-      for (const entry of entries) {
-        if (!entry.isIntersecting) continue;
-        animateValue(entry.target);
-        observer.unobserve(entry.target);
-      }
-    },
-    { threshold: 0.2 },
-  );
-
-  for (const value of values) {
-    observer.observe(value);
-  }
-}
-
 initSiteSearch();
 initTenderFilters();
 initRecordFilters();
 initCountryFilters();
 initSourceFilters();
-initToday();
-initReveal();
-initCountUp();
