@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="360" viewBox="0 0 1600 360" role="img" aria-label="Placeholder: banner-corrections.svg">
+  <rect x="1" y="1" width="1598" height="358" fill="#e6dfd0" stroke="#b8ab94" stroke-width="2"/>
+  <line x1="2" y1="2" x2="1598" y2="358" stroke="#d3c9b6" stroke-width="1.5"/>
+  <line x1="1598" y1="2" x2="2" y2="358" stroke="#d3c9b6" stroke-width="1.5"/>
+  <rect x="470.0" y="115.5" width="660.0" height="129.0" rx="0" fill="#fbf8f2" stroke="#b8ab94" stroke-width="1.5"/>
+  <g text-anchor="middle">
+    <text x="800.0" y="158.1" font-family="Georgia, 'Times New Roman', serif" font-size="21.5" font-weight="700" fill="#161412">banner-corrections.svg</text>
+    <text x="800.0" y="189.0" font-family="Inter, Arial, sans-serif" font-size="15.0" font-weight="600" fill="#2f2a25">1600 × 360</text>
+    <text x="800.0" y="216.1" font-family="Inter, Arial, sans-serif" font-size="14.0" font-weight="500" fill="#6b645a">Section photo</text>
+  </g>
+</svg>

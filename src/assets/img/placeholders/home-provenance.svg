@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1100" viewBox="0 0 900 1100" role="img" aria-label="Placeholder: home-provenance.svg">
+  <rect x="1" y="1" width="898" height="1098" fill="#e6dfd0" stroke="#b8ab94" stroke-width="2"/>
+  <line x1="2" y1="2" x2="898" y2="1098" stroke="#d3c9b6" stroke-width="1.5"/>
+  <line x1="898" y1="2" x2="2" y2="1098" stroke="#d3c9b6" stroke-width="1.5"/>
+  <rect x="198.0" y="462.0" width="504.0" height="176.0" rx="0" fill="#fbf8f2" stroke="#b8ab94" stroke-width="1.5"/>
+  <g text-anchor="middle">
+    <text x="450.0" y="520.1" font-family="Georgia, 'Times New Roman', serif" font-size="28.0" font-weight="700" fill="#161412">home-provenance.svg</text>
+    <text x="450.0" y="562.3" font-family="Inter, Arial, sans-serif" font-size="19.6" font-weight="600" fill="#2f2a25">900 × 1100</text>
+    <text x="450.0" y="599.3" font-family="Inter, Arial, sans-serif" font-size="18.2" font-weight="500" fill="#6b645a">Portrait photo: annotated gazette page</text>
+  </g>
+</svg>

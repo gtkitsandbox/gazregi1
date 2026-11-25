@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "_macros.html" import breadcrumbs %}
+{% from "_macros.html" import breadcrumbs, page_banner %}
 {% block body_class %}page-corrections{% endblock %}
 {% block content %}
 <div class="shell shell--narrow">
@@ -9,6 +9,7 @@
     <h1>Request a correction</h1>
     <p class="page-heading__lede">Correction requests cover indexing errors, broken source links, transcription problems and identity mappings. They do not change the official publication.</p>
   </header>
+  {{ page_banner("corrections") }}
 
   <aside class="callout">
     <strong>Submission channel.</strong>
