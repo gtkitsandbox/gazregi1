@@ -131,15 +131,9 @@
   ("Search", "Full-text static Pagefind index"),
   ("Links", "Direct citations to official sources")
 ])) %}
-<aside class="index-hero__panel" aria-hidden="true">
-  <div class="index-hero__panel-head">
-    <span class="index-hero__dot"></span>
-    <span>{{ spec[0] }}</span>
-  </div>
-  <dl class="index-hero__specs">
-    {% for label, value in spec[1] %}
-    <div><dt>{{ label }}</dt><dd>{{ value }}</dd></div>
-    {% endfor %}
-  </dl>
-</aside>
+<dl class="index-meta-strip" aria-label="{{ spec[0] }} metadata">
+  {% for label, value in spec[1] %}
+  <div><dt>{{ label }}</dt><dd>{{ value }}</dd></div>
+  {% endfor %}
+</dl>
 {%- endmacro %}

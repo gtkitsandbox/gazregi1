@@ -51,20 +51,20 @@ CONTINENTS: list[list[tuple[float, float]]] = [
 
 # Active GazetteRegistry jurisdictions (lon, lat, color_hex)
 ACTIVE_HUBS: list[tuple[float, float, str]] = [
-    (-0.1, 51.5, "#60a5fa"),   # UK
-    (-6.3, 53.3, "#60a5fa"),   # IE
-    (4.9, 52.4, "#60a5fa"),    # NL
-    (13.4, 52.5, "#60a5fa"),   # DE
+    (-0.1, 51.5, "#f5f5f4"),   # UK
+    (-6.3, 53.3, "#f5f5f4"),   # IE
+    (4.9, 52.4, "#f5f5f4"),    # NL
+    (13.4, 52.5, "#f5f5f4"),   # DE
     (-77.0, 38.9, "#34d399"),  # US
-    (-75.7, 45.4, "#60a5fa"),  # CA
+    (-75.7, 45.4, "#f5f5f4"),  # CA
     (36.8, -1.3, "#f59e0b"),   # KE
     (28.2, -25.7, "#f59e0b"),  # ZA
     (79.9, 6.9, "#f59e0b"),    # LK
     (73.5, 4.2, "#34d399"),    # MV
     (90.4, 23.8, "#f59e0b"),   # BD
     (103.8, 1.3, "#34d399"),   # SG
-    (139.7, 35.7, "#60a5fa"),  # JP
-    (149.1, -35.3, "#60a5fa"), # AU
+    (139.7, 35.7, "#f5f5f4"),  # JP
+    (149.1, -35.3, "#f5f5f4"), # AU
     (174.8, -41.3, "#34d399"), # NZ
 ]
 
@@ -117,13 +117,13 @@ def svg_coverage_world() -> str:
             lon = px / w * 360.0 - 180.0
             lat = 84.0 - py / h * 146.0
             if any(_point_in_poly(lon, lat, poly) for poly in CONTINENTS):
-                dots.append(f'<circle cx="{px}" cy="{py}" r="1.85" fill="#3b6ba5" opacity="0.78"/>')
+                dots.append(f'<circle cx="{px}" cy="{py}" r="1.8" fill="#575652" opacity="0.82"/>')
 
     grat: list[str] = []
     for gx in range(120, w, 120):
-        grat.append(f'<line x1="{gx}" y1="0" x2="{gx}" y2="{h}" stroke="#112847" stroke-width="1"/>')
+        grat.append(f'<line x1="{gx}" y1="0" x2="{gx}" y2="{h}" stroke="#222220" stroke-width="1"/>')
     for gy in range(90, h, 90):
-        grat.append(f'<line x1="0" y1="{gy}" x2="{w}" y2="{gy}" stroke="#112847" stroke-width="1"/>')
+        grat.append(f'<line x1="0" y1="{gy}" x2="{w}" y2="{gy}" stroke="#222220" stroke-width="1"/>')
 
     arcs: list[str] = []
     for (lon1, lat1), (lon2, lat2) in ARCS:
@@ -133,31 +133,31 @@ def svg_coverage_world() -> str:
         my = min(y1, y2) - max(42.0, abs(x2 - x1) * 0.16)
         arcs.append(
             f'<path d="M {x1:.1f} {y1:.1f} Q {mx:.1f} {my:.1f} {x2:.1f} {y2:.1f}" '
-            f'fill="none" stroke="url(#arcGrad)" stroke-width="2" opacity="0.7"/>'
+            f'fill="none" stroke="url(#arcGrad)" stroke-width="1.6" opacity="0.6"/>'
         )
 
     hubs: list[str] = []
     for lon, lat, color in ACTIVE_HUBS:
         x, y = _proj(lon, lat, w, h)
         hubs.append(
-            f'<circle cx="{x:.1f}" cy="{y:.1f}" r="14" fill="{color}" opacity="0.18"/>'
-            f'<circle cx="{x:.1f}" cy="{y:.1f}" r="7" fill="none" stroke="{color}" stroke-width="1.3" opacity="0.75"/>'
-            f'<circle cx="{x:.1f}" cy="{y:.1f}" r="3.8" fill="{color}"/>'
+            f'<circle cx="{x:.1f}" cy="{y:.1f}" r="13" fill="{color}" opacity="0.16"/>'
+            f'<circle cx="{x:.1f}" cy="{y:.1f}" r="6.5" fill="none" stroke="{color}" stroke-width="1.2" opacity="0.7"/>'
+            f'<circle cx="{x:.1f}" cy="{y:.1f}" r="3.6" fill="{color}"/>'
         )
 
     return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{h}" viewBox="0 0 {w} {h}" role="img" aria-label="Global jurisdiction coverage">
   <defs>
     <radialGradient id="mapGlow" cx="55%" cy="45%" r="60%">
-      <stop offset="0%" stop-color="#1d4ed8" stop-opacity="0.28"/>
-      <stop offset="100%" stop-color="#060e1a" stop-opacity="0"/>
+      <stop offset="0%" stop-color="#262624" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#141413" stop-opacity="0"/>
     </radialGradient>
     <linearGradient id="arcGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#60a5fa"/>
-      <stop offset="50%" stop-color="#fbbf24"/>
+      <stop offset="0%" stop-color="#e5e5e0"/>
+      <stop offset="50%" stop-color="#f59e0b"/>
       <stop offset="100%" stop-color="#34d399"/>
     </linearGradient>
   </defs>
-  <rect width="{w}" height="{h}" fill="#060e1a"/>
+  <rect width="{w}" height="{h}" fill="#141413"/>
   <rect width="{w}" height="{h}" fill="url(#mapGlow)"/>
   <g>{"".join(grat)}</g>
   <g>{"".join(dots)}</g>
