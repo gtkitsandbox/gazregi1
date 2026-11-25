@@ -11,3 +11,4 @@ release/
 raw/*.pdf
 
 .DS_Store
+.dev.raw-ref01/

@@ -23,6 +23,8 @@ function initSiteSearch() {
   const initialResults = results.innerHTML;
   const initialCount = count.textContent;
   const scopeButtons = Array.from(document.querySelectorAll(".search-scope"));
+  const scopeSelect = document.querySelector("#hero-scope-select");
+  const countrySelect = document.querySelector("#hero-country-select");
   let scope = "all";
 
   function setScope(nextScope) {
@@ -32,6 +34,18 @@ function initSiteSearch() {
       button.classList.toggle("is-active", active);
       button.setAttribute("aria-selected", active ? "true" : "false");
     }
+    if (scopeSelect && scopeSelect.value !== scope) {
+      scopeSelect.value = scope;
+    }
+  }
+
+  function effectiveQuery(rawQuery) {
+    const trimmed = (rawQuery || "").trim();
+    const countryName = countrySelect?.selectedOptions?.[0]?.dataset?.countryName || "";
+    if (!trimmed) return countryName;
+    return countryName && !trimmed.toLowerCase().includes(countryName.toLowerCase())
+      ? `${trimmed} ${countryName}`
+      : trimmed;
   }
 
   function matchesScope(url) {
@@ -91,8 +105,9 @@ function initSiteSearch() {
   for (const button of scopeButtons) {
     button.addEventListener("click", () => {
       setScope(button.dataset.scope);
-      if (input.value.trim()) {
-        runSearch(input.value);
+      const combined = effectiveQuery(input.value);
+      if (combined) {
+        runSearch(combined);
       } else {
         count.textContent = scope === "all"
           ? initialCount
@@ -101,14 +116,42 @@ function initSiteSearch() {
     });
   }
 
+  if (scopeSelect) {
+    scopeSelect.addEventListener("change", () => {
+      setScope(scopeSelect.value);
+      const combined = effectiveQuery(input.value);
+      if (combined) {
+        runSearch(combined);
+      }
+    });
+  }
+
+  if (countrySelect) {
+    countrySelect.addEventListener("change", () => {
+      const combined = effectiveQuery(input.value);
+      if (combined) {
+        runSearch(combined);
+      } else {
+        count.textContent = initialCount;
+        if (panel) panel.hidden = true;
+      }
+    });
+  }
+
   form.addEventListener("submit", (event) => {
     event.preventDefault();
-    const trimmed = input.value.trim();
-    if (!trimmed) {
+    const raw = input.value.trim();
+    const countryCode = countrySelect?.value || "";
+    if (!raw && countryCode && scope === "tenders") {
+      window.location.href = `/tenders/?country=${encodeURIComponent(countryCode)}`;
+      return;
+    }
+    const combined = effectiveQuery(raw);
+    if (!combined) {
       if (scope !== "all") window.location.href = SEARCH_SCOPES[scope].landing;
       return;
     }
-    runSearch(trimmed);
+    runSearch(combined);
     if (panel) {
       const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       panel.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" });
@@ -117,7 +160,7 @@ function initSiteSearch() {
 
   input.addEventListener("input", () => {
     window.clearTimeout(input.searchTimer);
-    input.searchTimer = window.setTimeout(() => runSearch(input.value), 160);
+    input.searchTimer = window.setTimeout(() => runSearch(effectiveQuery(input.value)), 160);
   });
 
   const query = new URLSearchParams(window.location.search).get("q");
@@ -163,6 +206,10 @@ function initTenderFilters() {
   const cards = Array.from(list.querySelectorAll("[data-tender]"));
   const queryInput = form.querySelector('[data-filter="query"]');
   const selects = Array.from(form.querySelectorAll("select[data-filter]"));
+  const sortSelect = document.querySelector("#tender-sort");
+  const chipsContainer = document.querySelector("#tender-active-chips");
+  const exportBtn = document.querySelector("#tender-export-csv");
+  const viewButtons = Array.from(document.querySelectorAll("[data-view-toggle]"));
 
   function closingState(card) {
     const value = card.dataset.closing;
@@ -174,6 +221,88 @@ function initTenderFilters() {
     if (closing < now) return "closed";
     const days = (closing - now) / 86400000;
     return days <= 30 ? "soon" : "open";
+  }
+
+  function setView(mode) {
+    const isTable = mode === "table";
+    list.classList.toggle("tender-list--table", isTable);
+    for (const btn of viewButtons) {
+      const active = btn.dataset.viewToggle === mode;
+      btn.classList.toggle("is-active", active);
+      btn.setAttribute("aria-pressed", active ? "true" : "false");
+    }
+    try {
+      window.localStorage.setItem("gazregi_tender_view", mode);
+    } catch {
+      // Ignore storage failures
+    }
+  }
+
+  if (viewButtons.length) {
+    let savedView = "cards";
+    try {
+      savedView = window.localStorage.getItem("gazregi_tender_view") || "cards";
+    } catch {
+      savedView = "cards";
+    }
+    setView(savedView === "table" ? "table" : "cards");
+    for (const btn of viewButtons) {
+      btn.addEventListener("click", () => setView(btn.dataset.viewToggle || "cards"));
+    }
+  }
+
+  function renderActiveChips() {
+    if (!chipsContainer) return;
+    const chips = [];
+    if (queryInput && queryInput.value.trim()) {
+      chips.push({
+        label: `Search: “${queryInput.value.trim()}”`,
+        clear: () => { queryInput.value = ""; },
+      });
+    }
+    for (const select of selects) {
+      if (!select.value) continue;
+      const optionText = select.selectedOptions?.[0]?.textContent || select.value;
+      const fieldLabel = form.querySelector(`label[for="${select.id}"]`)?.textContent || select.dataset.filter;
+      chips.push({
+        label: `${fieldLabel}: ${optionText}`,
+        clear: () => { select.value = ""; },
+      });
+    }
+    chipsContainer.replaceChildren();
+    if (!chips.length) {
+      chipsContainer.hidden = true;
+      return;
+    }
+    chipsContainer.hidden = false;
+    for (const chip of chips) {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "active-chip";
+      btn.textContent = `${chip.label} ×`;
+      btn.setAttribute("aria-label", `Remove filter ${chip.label}`);
+      btn.addEventListener("click", () => {
+        chip.clear();
+        applyFilters();
+      });
+      chipsContainer.append(btn);
+    }
+  }
+
+  function applySort() {
+    if (!sortSelect) return;
+    const mode = sortSelect.value || "default";
+    const sorted = [...cards].sort((a, b) => {
+      if (mode === "title") {
+        return (a.dataset.title || "").localeCompare(b.dataset.title || "");
+      }
+      if (mode === "country") {
+        return (a.dataset.countryName || "").localeCompare(b.dataset.countryName || "") ||
+          Number(a.dataset.order || 0) - Number(b.dataset.order || 0);
+      }
+      return Number(a.dataset.order || 0) - Number(b.dataset.order || 0);
+    });
+    for (const card of sorted) list.append(card);
   }
 
   function applyFilters() {
@@ -205,11 +334,47 @@ function initTenderFilters() {
 
     count.textContent = `${visible} ${visible === 1 ? "tender" : "tenders"}`;
     empty.hidden = visible !== 0;
+    renderActiveChips();
+  }
+
+  if (exportBtn) {
+    exportBtn.addEventListener("click", () => {
+      const visibleCards = Array.from(list.querySelectorAll("[data-tender]:not([hidden])"));
+      const escapeCsv = (val) => `"${String(val || "").replace(/"/g, '""')}"`;
+      const header = ["Reference", "Title", "Country", "Issuer", "Sector", "Status", "Closing", "URL"];
+      const rows = visibleCards.map((c) => [
+        c.dataset.reference,
+        c.dataset.title,
+        c.dataset.countryName,
+        c.dataset.issuer,
+        c.dataset.sector,
+        c.dataset.status,
+        c.dataset.closingLabel || c.dataset.closing,
+        new URL(c.dataset.url || "", window.location.origin).href,
+      ].map(escapeCsv).join(","));
+      const csv = [header.join(","), ...rows].join("\n");
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "gazetteregistry-tenders.csv";
+      document.body.append(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    });
   }
 
   form.addEventListener("input", applyFilters);
   form.addEventListener("change", applyFilters);
   form.addEventListener("reset", () => window.setTimeout(applyFilters, 0));
+  if (sortSelect) {
+    sortSelect.addEventListener("change", () => {
+      applySort();
+      applyFilters();
+    });
+  }
+
   const requestedCountry = new URLSearchParams(window.location.search).get("country");
   if (requestedCountry) {
     const select = form.querySelector('[data-filter="country"]');
@@ -335,8 +500,7 @@ function initSearchShortcut() {
         active.tagName === "SELECT" ||
         active.isContentEditable);
     const isSlash = event.key === "/" && !event.metaKey && !event.ctrlKey && !event.altKey;
-    const isCommandK = event.key.toLowerCase() === "k" && (event.metaKey || event.ctrlKey);
-    if ((!isSlash && !isCommandK) || (isSlash && isInput)) return;
+    if (!isSlash || isInput) return;
 
     const target = document.querySelector("#search-query") || document.querySelector("#global-search");
     if (!target) return;
@@ -402,6 +566,118 @@ function initQuickQueries() {
   }
 }
 
+function initCopyButtons() {
+  document.addEventListener("click", async (event) => {
+    const btn = event.target.closest("[data-copy]");
+    if (!btn) return;
+    const text = btn.dataset.copy;
+    if (!text) return;
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      const area = document.createElement("textarea");
+      area.value = text;
+      area.style.position = "fixed";
+      area.style.opacity = "0";
+      document.body.append(area);
+      area.select();
+      try {
+        document.execCommand("copy");
+      } catch {
+        // Ignore fallback failure
+      }
+      area.remove();
+    }
+    btn.classList.add("is-copied");
+    const span = btn.querySelector("span");
+    const origText = span ? span.textContent : null;
+    if (span && origText) span.textContent = "Copied";
+    window.setTimeout(() => {
+      btn.classList.remove("is-copied");
+      if (span && origText) span.textContent = origText;
+    }, 1500);
+  });
+}
+
+function initCommandPalette() {
+  const dialog = document.querySelector("#cmd-palette");
+  const cmdInput = document.querySelector("#cmd-input");
+  const cmdResults = document.querySelector("#cmd-results");
+  if (!dialog || !cmdInput || !cmdResults) return;
+
+  let cmdSearchId = 0;
+  function openCmd() {
+    if (!dialog.open) {
+      if (typeof dialog.showModal === "function") dialog.showModal();
+      else dialog.setAttribute("open", "");
+    }
+    cmdInput.focus();
+    cmdInput.select();
+  }
+  function closeCmd() {
+    if (typeof dialog.close === "function") dialog.close();
+    else dialog.removeAttribute("open");
+  }
+
+  document.querySelectorAll("[data-open-cmd]").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      openCmd();
+    });
+  });
+  document.querySelectorAll("[data-close-cmd]").forEach((btn) => {
+    btn.addEventListener("click", closeCmd);
+  });
+  dialog.addEventListener("click", (event) => {
+    if (event.target === dialog) closeCmd();
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key.toLowerCase() === "k" && (event.metaKey || event.ctrlKey)) {
+      event.preventDefault();
+      if (dialog.open) closeCmd();
+      else openCmd();
+    }
+  });
+
+  cmdInput.addEventListener("input", () => {
+    window.clearTimeout(cmdInput.cmdTimer);
+    cmdInput.cmdTimer = window.setTimeout(async () => {
+      const q = cmdInput.value.trim();
+      const myId = ++cmdSearchId;
+      if (!q) {
+        cmdResults.innerHTML = '<p class="cmd-dialog__empty">Search across all indexed official documents instantly via Pagefind.</p>';
+        return;
+      }
+      cmdResults.innerHTML = '<p class="cmd-dialog__empty">Searching…</p>';
+      try {
+        if (!pagefind) pagefind = await import(pagefindImport);
+        const res = await pagefind.search(q);
+        const matches = await Promise.all(res.results.slice(0, 12).map((r) => r.data()));
+        if (myId !== cmdSearchId) return;
+        if (!matches.length) {
+          cmdResults.innerHTML = '<p class="cmd-dialog__empty">No indexed records match that query.</p>';
+          return;
+        }
+        const nodes = matches.map((m) => {
+          const a = document.createElement("a");
+          a.className = "cmd-result";
+          a.href = m.url;
+          const t = document.createElement("strong");
+          t.textContent = m.meta?.title?.replace(/\s*\|\s*GazetteRegistry\s*$/, "") || m.url;
+          const p = document.createElement("span");
+          p.innerHTML = m.excerpt;
+          a.append(t, p);
+          return a;
+        });
+        cmdResults.replaceChildren(...nodes);
+      } catch {
+        cmdResults.innerHTML = '<p class="cmd-dialog__empty">Search index unavailable right now.</p>';
+      }
+    }, 140);
+  });
+}
+
 initSiteSearch();
 initTenderFilters();
 initRecordFilters();
@@ -410,3 +686,5 @@ initSourceFilters();
 initSearchShortcut();
 initReveal();
 initQuickQueries();
+initCopyButtons();
+initCommandPalette();

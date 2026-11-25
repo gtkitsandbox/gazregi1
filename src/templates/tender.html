@@ -1,59 +1,137 @@
 {% extends "base.html" %}
-{% from "_macros.html" import badge, breadcrumbs, record_source_link %}
+{% from "_macros.html" import badge, breadcrumbs, icon, record_source_link %}
 {% block body_class %}page-tender{% endblock %}
 {% block content %}
-<div class="shell shell--narrow">
-  {{ breadcrumbs(crumbs) }}
-  <header class="page-heading page-heading--record">
-    <p class="eyebrow">TENDER <span aria-hidden="true">/</span> {{ record.tender.reference }}</p>
-    <h1>{{ record.title }}</h1>
-    <p class="meta-line">{{ badge(opportunity_kind_label(record.tender.opportunity_kind), "sector") }} {{ badge(sector_label(record.tender.sector), "sector") }} {{ badge(effective_status|title, "verified" if effective_status == "open" else ("warning" if effective_status in ["closed", "cancelled"] else "neutral")) }} <span aria-hidden="true">·</span> Published {{ origin.issue.publication_date|date_long }} <span aria-hidden="true">·</span> Closing {{ record.tender.closing_date|date_long_or_missing }}{% if record.tender.closing_time %} at {{ record.tender.closing_time }}{% endif %}</p>
-  </header>
-
-  {% if record.summary %}<p class="lede">{{ record.summary }}</p>{% endif %}
-
-  <section class="detail-panel" aria-labelledby="tender-title">
-    <div class="section-heading"><h2 id="tender-title">Tender details</h2></div>
-    <dl class="detail-list detail-list--two">
-      <div><dt>Reference</dt><dd>{{ record.tender.reference }}</dd></div>
-      <div><dt>Issuing organisation</dt><dd>{% if issuer %}<a href="{{ org_path(issuer) }}">{{ issuer.name }}</a>{% else %}Not recorded{% endif %}</dd></div>
-      <div><dt>Opportunity type</dt><dd>{{ opportunity_kind_label(record.tender.opportunity_kind) }}</dd></div>
-      <div><dt>Industry</dt><dd>{{ sector_label(record.tender.sector) }}</dd></div>
-      <div><dt>Location</dt><dd>{{ record.tender.location or "Not recorded" }}</dd></div>
-      <div><dt>Closing date</dt><dd>{{ record.tender.closing_date|date_long_or_missing }}{% if record.tender.closing_time %} at {{ record.tender.closing_time }}{% endif %}</dd></div>
-      <div><dt>Document deadline</dt><dd>{{ record.tender.document_deadline|date_long_or_missing }}</dd></div>
-      <div><dt>Bid security</dt><dd>{% if record.tender.bid_security_lkr is not none %}LKR {{ record.tender.bid_security_lkr|money }}{% elif record.tender.bid_security is not none %}{% if record.tender.currency %}{{ record.tender.currency }} {% endif %}{{ record.tender.bid_security|money }}{% else %}Not stated{% endif %}</dd></div>
-      <div><dt>Source</dt><dd>{% if origin.is_pdf %}<a href="{{ origin.path }}">Gazette No. {{ origin.issue.gazette_no }}</a>, PDF page {{ origin.pdf_page }}{% else %}<a href="{{ origin.path }}">{{ origin.label }}</a>{% endif %}</dd></div>
-      <div><dt>Language</dt><dd>{{ record.language or origin.country.default_language }}</dd></div>
-      <div><dt>Source-reported status</dt><dd>{{ record.tender.source_status or record.tender.status|capitalize }}{% if record.tender.status_as_of %} (as of {{ record.tender.status_as_of|date_long }}){% endif %}</dd></div>
-      <div><dt>Status from closing date</dt><dd>{{ closing_state|capitalize }}{% if record.tender.closing_date %} ({{ record.tender.closing_date|date_long }}{% if record.tender.closing_time %} at {{ record.tender.closing_time }}{% endif %}){% else %} (date not stated){% endif %}</dd></div>
-      {% if record.tender.awarded_to %}<div><dt>Awarded to</dt><dd>{{ record.tender.awarded_to }}</dd></div>{% endif %}
-      {% if record.tender.award_amount is not none %}<div><dt>Award amount</dt><dd>{% if record.tender.currency %}{{ record.tender.currency }} {% endif %}{{ record.tender.award_amount|money }}</dd></div>{% endif %}
-    </dl>
-  </section>
-
-  <section class="source-excerpt" aria-labelledby="excerpt-title">
-    <div class="section-heading">
-      <h2 id="excerpt-title">Source excerpt</h2>
-      {{ record_source_link(record) }}
+<section class="index-hero index-hero--compact">
+  <div class="index-hero__inner">
+    <div class="index-hero__copy">
+      {{ breadcrumbs(crumbs) }}
+      <header class="page-heading page-heading--record">
+        <p class="eyebrow">Tender · {{ record.tender.reference }}</p>
+        <h1>{{ record.title }}</h1>
+        <p class="meta-line">
+          {{ badge(opportunity_kind_label(record.tender.opportunity_kind), "sector") }}
+          {{ badge(sector_label(record.tender.sector), "sector") }}
+          {{ badge(effective_status|title, "verified" if effective_status == "open" else ("warning" if effective_status in ["closed", "cancelled"] else "neutral")) }}
+          <span aria-hidden="true">·</span> Published {{ origin.issue.publication_date|date_long }}
+          <span aria-hidden="true">·</span> Closing {{ record.tender.closing_date|date_long_or_missing }}{% if record.tender.closing_time %} at {{ record.tender.closing_time }}{% endif %}
+        </p>
+      </header>
     </div>
-    <blockquote>{{ record.source.excerpt }}</blockquote>
-    <p class="provenance">Verified against the {% if origin.is_pdf %}extracted text of {{ origin.source.source_file }}, PDF page {{ origin.pdf_page }}{% else %}retrieved official source recorded as {{ origin.source.source_file }}{% endif %}. SHA-256 <code class="checksum">{{ origin.source.sha256 or "Not recorded" }}</code>{% if origin.document %} (checksum scope: {{ origin.document.checksum_scope|replace("_", " ") }}){% endif %}.</p>
-  </section>
+  </div>
+</section>
 
-  {% if record.organisation_ids|length > 1 or record.keywords %}
-  <section class="detail-panel" aria-labelledby="related-title">
-    <div class="section-heading"><h2 id="related-title">Related links</h2></div>
-    <div class="chip-row">
-      {% for org in related_orgs %}<a class="chip" href="{{ org_path(org) }}">{{ org.name }}</a>{% endfor %}
-      {% for keyword in record.keywords %}<span class="chip chip--muted">{{ keyword }}</span>{% endfor %}
+<div class="shell">
+  <div class="detail-layout">
+    <div class="detail-main">
+      {% if record.summary %}<p class="lede">{{ record.summary }}</p>{% endif %}
+
+      <section class="detail-panel" aria-labelledby="tender-title">
+        <div class="section-heading">
+          <h2 id="tender-title">Tender details</h2>
+          <button type="button" class="ref-copy" data-copy="{{ record.tender.reference }}" title="Copy tender reference">
+            <code>{{ record.tender.reference }}</code>
+            {{ icon("copy", 12) }}
+          </button>
+        </div>
+        <dl class="detail-list detail-list--two">
+          <div><dt>Reference</dt><dd><code>{{ record.tender.reference }}</code></dd></div>
+          <div><dt>Issuing organisation</dt><dd>{% if issuer %}<a href="{{ org_path(issuer) }}">{{ issuer.name }}</a>{% else %}Not recorded{% endif %}</dd></div>
+          <div><dt>Opportunity type</dt><dd>{{ opportunity_kind_label(record.tender.opportunity_kind) }}</dd></div>
+          <div><dt>Industry</dt><dd>{{ sector_label(record.tender.sector) }}</dd></div>
+          <div><dt>Location</dt><dd>{{ record.tender.location or "Not recorded" }}</dd></div>
+          <div><dt>Closing date</dt><dd>{{ record.tender.closing_date|date_long_or_missing }}{% if record.tender.closing_time %} at {{ record.tender.closing_time }}{% endif %}</dd></div>
+          <div><dt>Document deadline</dt><dd>{{ record.tender.document_deadline|date_long_or_missing }}</dd></div>
+          <div><dt>Bid security</dt><dd>{% if record.tender.bid_security_lkr is not none %}LKR {{ record.tender.bid_security_lkr|money }}{% elif record.tender.bid_security is not none %}{% if record.tender.currency %}{{ record.tender.currency }} {% endif %}{{ record.tender.bid_security|money }}{% else %}Not stated{% endif %}</dd></div>
+          <div><dt>Language</dt><dd>{{ record.language or origin.country.default_language }}</dd></div>
+          <div><dt>Country</dt><dd><a href="{{ origin.country.path }}">{{ origin.country.name }}</a></dd></div>
+          <div><dt>Source-reported status</dt><dd>{{ record.tender.source_status or record.tender.status|capitalize }}{% if record.tender.status_as_of %} (as of {{ record.tender.status_as_of|date_long }}){% endif %}</dd></div>
+          <div><dt>Closing-date state</dt><dd>{{ closing_state|capitalize }}{% if record.tender.closing_date %} ({{ record.tender.closing_date|date_long }}{% if record.tender.closing_time %} at {{ record.tender.closing_time }}{% endif %}){% else %} (date not stated){% endif %}</dd></div>
+          {% if record.tender.awarded_to %}<div><dt>Awarded to</dt><dd>{{ record.tender.awarded_to }}</dd></div>{% endif %}
+          {% if record.tender.award_amount is not none %}<div><dt>Award amount</dt><dd>{% if record.tender.currency %}{{ record.tender.currency }} {% endif %}{{ record.tender.award_amount|money }}</dd></div>{% endif %}
+        </dl>
+      </section>
+
+      <section class="source-excerpt" aria-labelledby="excerpt-title">
+        <div class="section-heading">
+          <h2 id="excerpt-title">Verbatim source excerpt</h2>
+          {{ record_source_link(record) }}
+        </div>
+        <blockquote>{{ record.source.excerpt }}</blockquote>
+        <p class="provenance">Verified against the {% if origin.is_pdf %}extracted text of {{ origin.source.source_file }}, PDF page {{ origin.pdf_page }}{% else %}retrieved official source recorded as {{ origin.source.source_file }}{% endif %}.</p>
+      </section>
+
+      {% if record.organisation_ids|length > 1 or record.keywords %}
+      <section class="detail-panel" aria-labelledby="related-title">
+        <div class="section-heading"><h2 id="related-title">Related entities &amp; tags</h2></div>
+        <div class="chip-row">
+          {% for org in related_orgs %}<a class="chip" href="{{ org_path(org) }}">{{ org.name }}</a>{% endfor %}
+          {% for keyword in record.keywords %}<span class="chip chip--muted">{{ keyword }}</span>{% endfor %}
+        </div>
+      </section>
+      {% endif %}
+
+      <aside class="callout">
+        <strong>Submission notice.</strong> Send bids directly to the issuing organisation using the official notice. GazetteRegistry does not accept submissions, payments or account registrations, and does not publish contact details absent from the source record.
+      </aside>
     </div>
-  </section>
-  {% endif %}
 
-  <aside class="callout">
-    <strong>Submission.</strong> Send bids directly to the issuing organisation using the official notice. GazetteRegistry does not accept submissions, payments or account registrations, and does not publish contact details not present in the source record.
-  </aside>
-  <p class="inline-note"><a href="/corrections/">Request a correction</a> <span aria-hidden="true">·</span> <a href="/tenders/">Back to all tenders</a></p>
+    <aside class="provenance-rail" aria-label="Provenance and citation actions">
+      <div class="rail-card">
+        <div class="rail-card__head">
+          <span>{{ icon("shield-check", 16) }} Official source</span>
+          {{ badge("Source-verified", "verified") }}
+        </div>
+
+        <div class="rail-card__actions">
+          {{ record_source_link(record) }}
+          <button
+            type="button"
+            class="button button--secondary button--small"
+            data-copy="Tender {{ record.tender.reference }} — {{ record.title }} | {{ issuer.name if issuer else 'Issuer not recorded' }} | {{ origin.label }}{% if origin.is_pdf %}, PDF page {{ origin.pdf_page }}{% endif %} | {{ canonical }}">
+            {{ icon("copy", 13) }}<span>Copy citation</span>
+          </button>
+          <button type="button" class="button button--secondary button--small" data-copy="{{ record.tender.reference }}">
+            {{ icon("copy", 13) }}<span>Copy reference</span>
+          </button>
+        </div>
+
+        <dl class="rail-meta">
+          <div>
+            <dt>Originating Gazette</dt>
+            <dd>{% if origin.is_pdf %}<a href="{{ origin.path }}">Gazette No. {{ origin.issue.gazette_no }}</a>, PDF p. {{ origin.pdf_page }}{% else %}<a href="{{ origin.path }}">{{ origin.label }}</a>{% endif %}</dd>
+          </div>
+          <div>
+            <dt>Source file</dt>
+            <dd><code>{{ origin.source.source_file }}</code></dd>
+          </div>
+          <div>
+            <dt>SHA-256 checksum</dt>
+            <dd>
+              {% if origin.source.sha256 %}
+              <button type="button" class="ref-copy" data-copy="{{ origin.source.sha256 }}" title="Copy full SHA-256 checksum">
+                <code>{{ origin.source.sha256[:16] }}…</code>
+                {{ icon("copy", 12) }}
+              </button>
+              {% else %}
+              Not recorded
+              {% endif %}
+            </dd>
+          </div>
+          {% if origin.document %}
+          <div>
+            <dt>Checksum scope</dt>
+            <dd>{{ origin.document.checksum_scope|replace("_", " ")|capitalize }}</dd>
+          </div>
+          {% endif %}
+        </dl>
+
+        <div class="rail-card__footer">
+          <a href="/corrections/">Request a correction</a>
+          <a href="/tenders/">All tenders →</a>
+        </div>
+      </div>
+    </aside>
+  </div>
 </div>
 {% endblock %}

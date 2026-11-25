@@ -1,8 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="GazetteRegistry">
-  <circle cx="32" cy="32" r="31" fill="#0b2440"/>
-  <circle cx="32" cy="32" r="26.6" fill="none" stroke="#4b7fc4" stroke-width="1.4" opacity="0.6"/>
-  <path d="M21.5 14.6h14.6l7.6 7.6v26.4H21.5z" fill="#ffffff"/>
-  <path d="M36.1 14.6v7.6h7.6" fill="#ef7d1a"/>
-  <path d="M27.2 28.6h11.9M27.2 34h11.9M27.2 39.4h7.4" stroke="#0b2440" stroke-width="2.1" stroke-linecap="round"/>
-  <path d="M32 58.6A26.6 26.6 0 0 1 9.9 46.5" fill="none" stroke="#ef7d1a" stroke-width="2.8" stroke-linecap="round"/>
+  <defs>
+    <linearGradient id="gr-fav" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2A7AA2"/>
+      <stop offset="1" stop-color="#1A2656"/>
+    </linearGradient>
+  </defs>
+  <circle cx="32" cy="32" r="30.5" fill="url(#gr-fav)"/>
+  <path d="M21.6 15.2h14.4l7.2 7.2v26.4H21.6z" fill="#ffffff"/>
+  <path d="M36 15.2v7.2h7.2" fill="#E0ECF3"/>
+  <path d="M26.6 29.4h11.5M26.6 34.8h11.5M26.6 40.2h7" stroke="#0A4575" stroke-width="2.4" stroke-linecap="round"/>
 </svg>

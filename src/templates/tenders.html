@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "_macros.html" import badge, breadcrumbs, empty_state, page_visual %}
+{% from "_macros.html" import badge, breadcrumbs, empty_state, icon, page_visual %}
 {% block body_class %}page-tenders{% endblock %}
 {% block content %}
 <section class="index-hero">
@@ -9,93 +9,163 @@
       <header class="page-heading">
         <p class="eyebrow">PROCUREMENT</p>
         <h1>Tenders</h1>
-        <p class="page-heading__lede">Supplier opportunities published in indexed Gazettes. Filter by industry, location, issuing organisation and closing date. GazetteRegistry does not receive bids, run accounts or send alerts.</p>
+        <p class="page-heading__lede">Filter {{ tenders|length }} verified opportunities by country, industry, issuing organisation and closing window, or export matching rows to CSV.</p>
       </header>
     </div>
     {{ page_visual("tenders") }}
   </div>
 </section>
+
 <div class="shell">
-
   {% if tenders %}
-  <form class="filter-bar" data-tender-filters aria-label="Filter tenders">
-    <div class="filter-field filter-field--search">
-      <label for="tender-query">Search</label>
-      <input id="tender-query" data-filter="query" type="search" placeholder="Title, reference, issuer" autocomplete="off">
-    </div>
-    <div class="filter-field">
-      <label for="tender-country">Country</label>
-      <select id="tender-country" data-filter="country">
-        <option value="">All countries</option>
-        {% for value, label in country_options %}<option value="{{ value }}">{{ label }}</option>{% endfor %}
-      </select>
-    </div>
-    <div class="filter-field">
-      <label for="tender-kind">Type</label>
-      <select id="tender-kind" data-filter="kind">
-        <option value="">All opportunity types</option>
-        {% for value, label in kind_options %}<option value="{{ value }}">{{ label }}</option>{% endfor %}
-      </select>
-    </div>
-    <div class="filter-field">
-      <label for="tender-sector">Industry</label>
-      <select id="tender-sector" data-filter="sector">
-        <option value="">All industries</option>
-        {% for value, label in sector_options %}<option value="{{ value }}">{{ label }}</option>{% endfor %}
-      </select>
-    </div>
-    <div class="filter-field">
-      <label for="tender-location">Location</label>
-      <select id="tender-location" data-filter="location">
-        <option value="">All locations</option>
-        {% for value in location_options %}<option value="{{ value }}">{{ value }}</option>{% endfor %}
-      </select>
-    </div>
-    <div class="filter-field">
-      <label for="tender-org">Organisation</label>
-      <select id="tender-org" data-filter="organisation">
-        <option value="">All organisations</option>
-        {% for value, label in organisation_options %}<option value="{{ value }}">{{ label }}</option>{% endfor %}
-      </select>
-    </div>
-    <div class="filter-field">
-      <label for="tender-closing">Closing date</label>
-      <select id="tender-closing" data-filter="closing">
-        <option value="">Any closing date</option>
-        <option value="open">Open now</option>
-        <option value="soon">Closing within 30 days</option>
-        <option value="closed">Closed</option>
-        <option value="unknown">Date not stated</option>
-      </select>
-    </div>
-    <button class="button button--secondary" type="reset" data-filter-reset>Reset</button>
-  </form>
-  <div class="filter-summary">
-    <p id="tender-count" aria-live="polite">{{ tenders|length }} tender{% if tenders|length != 1 %}s{% endif %}</p>
-    <p class="filter-hint">Source-reported status and closing-date status are kept separate. Expired opportunities are never shown as open.</p>
-  </div>
+  <div class="workspace-layout">
+    <aside class="facet-sidebar" aria-label="Tender filters">
+      <details class="facet-drawer" open>
+        <summary class="facet-drawer__summary">
+          <span>{{ icon("sliders-horizontal", 15) }} Refine results</span>
+          {{ icon("chevron-down", 15, "facet-drawer__chev") }}
+        </summary>
+        <form class="facet-form" data-tender-filters aria-label="Filter tenders">
+          <div class="filter-field">
+            <label for="tender-query">Keywords</label>
+            <input id="tender-query" data-filter="query" type="search" placeholder="Title, ref, issuer…" autocomplete="off">
+          </div>
+          <div class="filter-field">
+            <label for="tender-country">Country</label>
+            <select id="tender-country" data-filter="country">
+              <option value="">All countries</option>
+              {% for value, label in country_options %}<option value="{{ value }}">{{ label }}</option>{% endfor %}
+            </select>
+          </div>
+          <div class="filter-field">
+            <label for="tender-closing">Closing window</label>
+            <select id="tender-closing" data-filter="closing">
+              <option value="">Any closing date</option>
+              <option value="open">Open now</option>
+              <option value="soon">Closing within 30 days</option>
+              <option value="closed">Closed</option>
+              <option value="unknown">Date not stated</option>
+            </select>
+          </div>
+          <div class="filter-field">
+            <label for="tender-kind">Opportunity type</label>
+            <select id="tender-kind" data-filter="kind">
+              <option value="">All opportunity types</option>
+              {% for value, label in kind_options %}<option value="{{ value }}">{{ label }}</option>{% endfor %}
+            </select>
+          </div>
+          <div class="filter-field">
+            <label for="tender-sector">Industry</label>
+            <select id="tender-sector" data-filter="sector">
+              <option value="">All industries</option>
+              {% for value, label in sector_options %}<option value="{{ value }}">{{ label }}</option>{% endfor %}
+            </select>
+          </div>
+          <div class="filter-field">
+            <label for="tender-location">Location</label>
+            <select id="tender-location" data-filter="location">
+              <option value="">All locations</option>
+              {% for value in location_options %}<option value="{{ value }}">{{ value }}</option>{% endfor %}
+            </select>
+          </div>
+          <div class="filter-field">
+            <label for="tender-org">Issuing organisation</label>
+            <select id="tender-org" data-filter="organisation">
+              <option value="">All organisations</option>
+              {% for value, label in organisation_options %}<option value="{{ value }}">{{ label }}</option>{% endfor %}
+            </select>
+          </div>
+          <button class="button button--secondary facet-form__reset" type="reset" data-filter-reset>Reset all filters</button>
+        </form>
+      </details>
+    </aside>
 
-  <div class="tender-list" data-tender-list>
-    {% for item in tenders %}
-    <article class="tender-card" data-tender data-kind="{{ item.record.tender.opportunity_kind }}" data-sector="{{ item.record.tender.sector }}" data-location="{{ item.record.tender.location or '' }}" data-organisation="{{ item.record.tender.issuer_organisation_id or '' }}" data-country="{{ item.country.country_code|lower }}" data-closing="{{ item.record.tender.closing_date or '' }}" data-closing-time="{{ item.record.tender.closing_time or '' }}">
-      <div class="tender-card__top">
-        <span>{{ badge(opportunity_kind_label(item.record.tender.opportunity_kind), "sector") }} {{ badge(sector_label(item.record.tender.sector), "sector") }} {{ badge(item.effective_status|title, "verified" if item.effective_status == "open" else ("warning" if item.effective_status in ["closed", "cancelled"] else "neutral")) }}</span>
-        <span class="tender-card__reference">{{ item.record.tender.reference }}</span>
+    <div class="workspace-main">
+      <div class="workspace-toolbar">
+        <div class="workspace-toolbar__meta">
+          <p id="tender-count" class="filter-count" aria-live="polite">{{ tenders|length }} tender{% if tenders|length != 1 %}s{% endif %}</p>
+          
+        </div>
+        <div class="workspace-toolbar__controls">
+          <label class="visually-hidden" for="tender-sort">Sort tenders</label>
+          <select id="tender-sort" class="toolbar-select" aria-label="Sort tenders">
+            <option value="default">Closing soonest</option>
+            <option value="title">Title (A–Z)</option>
+            <option value="country">Country (A–Z)</option>
+          </select>
+          <div class="view-toggle" role="group" aria-label="Display mode">
+            <button type="button" class="view-toggle__btn is-active" data-view-toggle="cards" aria-pressed="true" title="Card view">
+              {{ icon("layout-grid", 14) }}<span>Cards</span>
+            </button>
+            <button type="button" class="view-toggle__btn" data-view-toggle="table" aria-pressed="false" title="Compact table view">
+              {{ icon("list", 14) }}<span>Table</span>
+            </button>
+          </div>
+          <button type="button" id="tender-export-csv" class="button button--secondary button--small">
+            {{ icon("download", 14) }}<span>Export CSV</span>
+          </button>
+        </div>
       </div>
-      <h2><a href="{{ record_path(item.record) }}">{{ item.record.title }}</a></h2>
-      {% if item.record.summary %}<p class="tender-card__summary">{{ item.record.summary }}</p>{% endif %}
-      <dl class="tender-facts">
-        <div><dt>Issuer</dt><dd>{% if item.org %}<a href="{{ org_path(item.org) }}">{{ item.org.name }}</a>{% else %}Not recorded{% endif %}</dd></div>
-        <div><dt>Location</dt><dd>{{ item.record.tender.location or "Not recorded" }}</dd></div>
-        <div><dt>Closing</dt><dd>{{ item.record.tender.closing_date|date_long_or_missing }}{% if item.record.tender.closing_time %} at {{ item.record.tender.closing_time }}{% endif %}</dd></div>
-        <div><dt>Source</dt><dd><a href="{{ item.origin.path }}">{{ item.origin.label }}</a></dd></div>
-      </dl>
-    </article>
-    {% endfor %}
-  </div>
-  <div class="empty-state" data-tender-empty hidden>
-    <h2>No tenders match these filters</h2>
-    <p>Clear one or more filters to see published tender records.</p>
+
+      <div id="tender-active-chips" class="active-chips" aria-live="polite" hidden></div>
+
+      <div class="tender-list" data-tender-list>
+        {% for item in tenders %}
+        {% set closing_str = item.record.tender.closing_date|date_long_or_missing %}
+        <article
+          class="tender-card"
+          data-tender
+          data-order="{{ loop.index0 }}"
+          data-kind="{{ item.record.tender.opportunity_kind }}"
+          data-sector="{{ item.record.tender.sector }}"
+          data-location="{{ item.record.tender.location or '' }}"
+          data-organisation="{{ item.record.tender.issuer_organisation_id or '' }}"
+          data-country="{{ item.country.country_code|lower }}"
+          data-country-name="{{ item.country.name }}"
+          data-closing="{{ item.record.tender.closing_date or '' }}"
+          data-closing-time="{{ item.record.tender.closing_time or '' }}"
+          data-title="{{ item.record.title }}"
+          data-reference="{{ item.record.tender.reference }}"
+          data-issuer="{{ item.org.name if item.org else 'Not recorded' }}"
+          data-status="{{ item.effective_status|title }}"
+          data-closing-label="{{ closing_str }}"
+          data-url="{{ record_path(item.record) }}">
+          <div class="tender-card__body">
+            <div class="tender-card__main">
+              <div class="tender-card__top">
+                <span class="tender-card__badges">
+                  {{ badge(item.effective_status|title, "verified" if item.effective_status == "open" else ("warning" if item.effective_status in ["closed", "cancelled"] else "neutral")) }}
+                  {{ badge(opportunity_kind_label(item.record.tender.opportunity_kind), "sector") }}
+                  {{ badge(sector_label(item.record.tender.sector), "sector") }}
+                </span>
+                <button type="button" class="ref-copy" data-copy="{{ item.record.tender.reference }}" title="Copy reference {{ item.record.tender.reference }}">
+                  <code>{{ item.record.tender.reference }}</code>
+                  {{ icon("copy", 12) }}
+                </button>
+              </div>
+              <h2><a href="{{ record_path(item.record) }}">{{ item.record.title }}</a></h2>
+              {% if item.record.summary %}<p class="tender-card__summary">{{ item.record.summary }}</p>{% endif %}
+              <dl class="tender-facts">
+                <div><dt>Country</dt><dd>{{ item.country.name }}</dd></div>
+                <div><dt>Organisation</dt><dd>{% if item.org %}<a href="{{ org_path(item.org) }}">{{ item.org.name }}</a>{% else %}Not recorded{% endif %}</dd></div>
+                <div><dt>Location</dt><dd>{{ item.record.tender.location or "Not recorded" }}</dd></div>
+                <div><dt>Closing</dt><dd>{{ closing_str }}{% if item.record.tender.closing_time %} at {{ item.record.tender.closing_time }}{% endif %}</dd></div>
+                <div><dt>Source</dt><dd><a href="{{ item.origin.path }}">{{ item.origin.label }}</a></dd></div>
+              </dl>
+            </div>
+            <div class="tender-card__action">
+              <a class="button" href="{{ record_path(item.record) }}">View tender</a>
+            </div>
+          </div>
+        </article>
+        {% endfor %}
+      </div>
+
+      <div class="empty-state" data-tender-empty hidden>
+        <h2>No tenders match these filters</h2>
+        <p>Clear one or more filters to restore matching tender records.</p>
+      </div>
+    </div>
   </div>
   {% else %}
     {{ empty_state("No tender records published yet", "Tender records appear only after an operator verifies the source excerpt and publishes the structured record. No placeholder opportunities are shown.", "/gazettes/", "Browse Gazettes") }}
