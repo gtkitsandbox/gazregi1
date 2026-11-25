@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "_macros.html" import badge, breadcrumbs, empty_state, page_banner %}
+{% from "_macros.html" import badge, breadcrumbs, empty_state %}
 {% block body_class %}page-tenders{% endblock %}
 {% block content %}
 <div class="shell">
@@ -9,7 +9,6 @@
     <h1>Tenders</h1>
     <p class="page-heading__lede">Supplier opportunities published in indexed Gazettes. Filter by industry, location, issuing organisation and closing date. GazetteRegistry does not receive bids, run accounts or send alerts.</p>
   </header>
-  {{ page_banner("tenders") }}
 
   {% if tenders %}
   <form class="filter-bar" data-tender-filters aria-label="Filter tenders">

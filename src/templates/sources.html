@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "_macros.html" import badge, breadcrumbs, empty_state, page_banner %}
+{% from "_macros.html" import badge, breadcrumbs, empty_state %}
 {% block body_class %}page-sources{% endblock %}
 {% block content %}
 <div class="shell">
@@ -9,7 +9,6 @@
     <h1>Source registry</h1>
     <p class="page-heading__lede">Every official publisher used by the index, with publication type, supported formats, access method, reuse restrictions and current access status. Sources marked restricted or unavailable are documented, not silently omitted.</p>
   </header>
-  {{ page_banner("sources") }}
 
   <div class="stat-grid" aria-label="Source overview">
     <div class="stat"><span class="stat__value">{{ stats.sources }}</span><span class="stat__label">Registered sources</span></div>
