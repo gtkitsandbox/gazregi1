@@ -5,7 +5,7 @@
 <section class="hero" aria-labelledby="page-title">
   <div class="hero__inner">
     <div class="hero__content">
-      <p class="hero__pill"><span class="hero__pulse" aria-hidden="true"></span>Tenders · Gazettes · Public notices</p>
+      <p class="hero__pill"><span class="hero__pulse" aria-hidden="true"></span>{{ stats.with_records }} active jurisdictions · Page-level provenance</p>
       <h1 id="page-title">Your next contract is already published.<span class="hero__kicker">Find it in seconds.</span></h1>
       <p class="hero__lede">Official gazettes publish tenders, notices and appointments first — inside long PDFs, local languages and references scattered across {{ stats.with_records }} countries. GazetteRegistry brings those records into one search, with every result linked to the page it came from.</p>
 
@@ -27,26 +27,48 @@
           </div>
         </div>
       </form>
-      <p class="search-note" id="result-count" aria-live="polite">Search {{ stats.countries }} configured countries. Coverage is incomplete; every result links to its source page.</p>
 
-      <dl class="hero-stats" aria-label="Index coverage">
-        <div class="hero-stat"><dt class="hero-stat__label">Procurement records</dt><dd class="hero-stat__value">{{ stats.tenders }}</dd></div>
-        <div class="hero-stat"><dt class="hero-stat__label">Countries with records</dt><dd class="hero-stat__value">{{ stats.with_records }}</dd></div>
-        <div class="hero-stat"><dt class="hero-stat__label">Curated records</dt><dd class="hero-stat__value">{{ stats.records }}</dd></div>
-        <div class="hero-stat"><dt class="hero-stat__label">Registered sources</dt><dd class="hero-stat__value">{{ stats.sources }}</dd></div>
-      </dl>
+      <div class="quick-queries" aria-label="Example searches">
+        <span class="quick-queries__label">Try:</span>
+        {% if preview %}
+        <button type="button" class="quick-query" data-quick-query="drainage">drainage</button>
+        <button type="button" class="quick-query" data-quick-query="stationery">stationery</button>
+        <button type="button" class="quick-query" data-quick-query="Nordmark">Nordmark</button>
+        <button type="button" class="quick-query" data-quick-query="Coralia">Coralia</button>
+        {% else %}
+        <button type="button" class="quick-query" data-quick-query="network equipment">network equipment</button>
+        <button type="button" class="quick-query" data-quick-query="Gazette">Gazette</button>
+        <button type="button" class="quick-query" data-quick-query="United Kingdom">United Kingdom</button>
+        <button type="button" class="quick-query" data-quick-query="Home Office">Home Office</button>
+        {% endif %}
+      </div>
+
+      <p class="search-note" id="result-count" aria-live="polite">Search {{ stats.countries }} configured countries. Coverage is incomplete; every result links to its source page.</p>
     </div>
 
     <div class="hero__visual">
-      <div class="app-window">
-        <div class="app-window__bar" aria-hidden="true">
-          <span class="app-window__dots"><span></span><span></span><span></span></span>
-          <span class="app-window__title">GazetteRegistry — Verified Index</span>
-          <span class="app-window__badge">SHA-256 Provenance</span>
+      <div class="hero-showcase">
+        <img src="/assets/img/hero-main.jpg" alt="Layered official documents converging into a structured index" width="1200" height="900" fetchpriority="high">
+        <div class="hero-showcase__card">
+          <span class="hero-showcase__icon" aria-hidden="true">
+            <svg viewBox="0 0 20 20"><path d="m4.5 10.5 3.5 3.5 7.5-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          <div>
+            <strong>SHA-256 &amp; Excerpt Verified</strong>
+            <span>{{ stats.records }} curated records · {{ stats.pages }} gazette pages</span>
+          </div>
         </div>
-        <img src="/assets/img/placeholders/hero-platform-ui.svg" alt="Placeholder: hero-platform-ui.svg" width="1200" height="920" fetchpriority="high">
       </div>
     </div>
+  </div>
+
+  <div class="hero-telemetry">
+    <dl class="hero-stats" aria-label="Index coverage">
+      <div class="hero-stat"><dt class="hero-stat__label">Procurement records</dt><dd class="hero-stat__value">{{ stats.tenders }}</dd></div>
+      <div class="hero-stat"><dt class="hero-stat__label">Countries with records</dt><dd class="hero-stat__value">{{ stats.with_records }}</dd></div>
+      <div class="hero-stat"><dt class="hero-stat__label">Curated records</dt><dd class="hero-stat__value">{{ stats.records }}</dd></div>
+      <div class="hero-stat"><dt class="hero-stat__label">Registered sources</dt><dd class="hero-stat__value">{{ stats.sources }}</dd></div>
+    </dl>
   </div>
 </section>
 
@@ -102,40 +124,70 @@
       </div>
       <a class="button button--secondary button--small" href="/tenders/">All {{ stats.tenders }} tenders <span aria-hidden="true">→</span></a>
     </div>
-    <div class="opportunity-list">
-      {% for item in latest_tenders %}
-      <article class="opportunity" data-reveal style="--d: {{ loop.index0 * 50 }}ms">
-        <div class="opportunity__date" aria-hidden="true">
-          <span class="opportunity__month">{{ item.closing_month }}</span>
-          <strong class="opportunity__day">{{ item.closing_day }}</strong>
-        </div>
-        <div class="opportunity__body">
-          <div class="opportunity__top">
-            <span class="opportunity__country">{{ item.country_name }}</span>
-            {{ badge(item.status_label, item.status_tone) }}
+
+    {% set lead = latest_tenders[0] %}
+    {% set rest = latest_tenders[1:] %}
+    <div class="opportunities-layout{% if not rest %} opportunities-layout--single{% endif %}">
+      <article class="lead-tender" data-reveal style="--d: 0ms">
+        <div class="lead-tender__media">
+          <img src="/assets/img/bento-procurement.svg" alt="Public infrastructure and procurement" width="800" height="500" loading="lazy">
+          <div class="lead-tender__scrim" aria-hidden="true"></div>
+          <div class="lead-tender__badges">
+            <span class="opportunity__country">{{ lead.country_name }}</span>
+            {{ badge(lead.status_label, lead.status_tone) }}
           </div>
-          <h3><a href="{{ item.path }}">{{ item.record.title }}</a></h3>
-          <p class="opportunity__meta">
-            <span>{% if item.issuer_path %}<a href="{{ item.issuer_path }}">{{ item.issuer_name }}</a>{% else %}{{ item.issuer_name }}{% endif %}</span>
-            <span class="opportunity__reference">{{ item.reference }}</span>
-          </p>
         </div>
-        <div class="opportunity__side">
-          <p class="opportunity__closing"><span>Closes</span><strong>{{ item.closing_note }}</strong></p>
-          <a class="button button--small" href="{{ item.path }}">View tender <span aria-hidden="true">→</span></a>
+        <div class="lead-tender__body">
+          <h3><a href="{{ lead.path }}">{{ lead.record.title }}</a></h3>
+          <p class="lead-tender__issuer">
+            {% if lead.issuer_path %}<a href="{{ lead.issuer_path }}">{{ lead.issuer_name }}</a>{% else %}{{ lead.issuer_name }}{% endif %}
+            <span class="opportunity__reference">{{ lead.reference }}</span>
+          </p>
+          <div class="lead-tender__deadline">
+            <span>Closing date</span>
+            <strong>{{ lead.closing_note }}</strong>
+          </div>
+          <a class="button lead-tender__cta" href="{{ lead.path }}">View tender notice <span aria-hidden="true">→</span></a>
         </div>
       </article>
-      {% endfor %}
+
+      {% if rest %}
+      <div class="tender-stack">
+        {% for item in rest %}
+        <article class="tender-row" data-reveal style="--d: {{ loop.index * 50 }}ms">
+          <div class="opportunity__date" aria-hidden="true">
+            <span class="opportunity__month">{{ item.closing_month }}</span>
+            <strong class="opportunity__day">{{ item.closing_day }}</strong>
+          </div>
+          <div class="tender-row__body">
+            <div class="opportunity__top">
+              <span class="opportunity__country">{{ item.country_name }}</span>
+              {{ badge(item.status_label, item.status_tone) }}
+            </div>
+            <h3><a href="{{ item.path }}">{{ item.record.title }}</a></h3>
+            <p class="opportunity__meta">
+              <span>{% if item.issuer_path %}<a href="{{ item.issuer_path }}">{{ item.issuer_name }}</a>{% else %}{{ item.issuer_name }}{% endif %}</span>
+              <span class="opportunity__reference">{{ item.reference }}</span>
+            </p>
+          </div>
+          <div class="tender-row__side">
+            <span class="tender-row__close">{{ item.closing_note }}</span>
+            <a class="tender-row__go" href="{{ item.path }}" aria-label="View {{ item.record.title }}">→</a>
+          </div>
+        </article>
+        {% endfor %}
+      </div>
+      {% endif %}
     </div>
   </div>
 </section>
 {% endif %}
 
-<section class="section section--muted" aria-labelledby="problem-title">
+<section class="section section--dark" aria-labelledby="problem-title">
   <div class="section-inner">
-    <div class="section-head">
+    <div class="section-head section-head--dark">
       <div>
-        <p class="eyebrow">Why this exists</p>
+        <p class="eyebrow eyebrow--on-dark">Why this exists</p>
         <h2 id="problem-title">Public records are not the same as findable records.</h2>
       </div>
       <p class="section-head__note">The information exists. The access is what is broken.</p>
@@ -143,7 +195,7 @@
     <div class="problem-grid">
       <article class="problem-card" data-reveal style="--d: 0ms">
         <figure class="problem-card__media">
-          <img src="/assets/img/placeholders/workflow-ingest.svg" alt="Placeholder: workflow-ingest.svg" width="800" height="520" loading="lazy">
+          <img src="/assets/img/workflow-pdfs.svg" alt="Layered official gazette documents" width="800" height="500" loading="lazy">
         </figure>
         <div class="problem-card__body">
           <span class="problem-card__num" aria-hidden="true">01</span>
@@ -153,7 +205,7 @@
       </article>
       <article class="problem-card" data-reveal style="--d: 70ms">
         <figure class="problem-card__media">
-          <img src="/assets/img/placeholders/workflow-extract.svg" alt="Placeholder: workflow-extract.svg" width="800" height="520" loading="lazy">
+          <img src="/assets/img/workflow-index.svg" alt="Optical prism aligning scattered record channels" width="800" height="500" loading="lazy">
         </figure>
         <div class="problem-card__body">
           <span class="problem-card__num" aria-hidden="true">02</span>
@@ -163,7 +215,7 @@
       </article>
       <article class="problem-card" data-reveal style="--d: 140ms">
         <figure class="problem-card__media">
-          <img src="/assets/img/placeholders/workflow-verify.svg" alt="Placeholder: workflow-verify.svg" width="800" height="520" loading="lazy">
+          <img src="/assets/img/workflow-deadlines.svg" alt="Precision chronometer ring highlighting closing deadlines" width="800" height="500" loading="lazy">
         </figure>
         <div class="problem-card__body">
           <span class="problem-card__num" aria-hidden="true">03</span>
@@ -194,7 +246,7 @@
           <span class="bento-card__more">Browse tenders <span aria-hidden="true">→</span></span>
         </div>
         <div class="bento-card__media">
-          <img src="/assets/img/placeholders/bento-tenders-feature.svg" alt="Placeholder: bento-tenders-feature.svg" width="880" height="520" loading="lazy">
+          <img src="/assets/img/bento-procurement.svg" alt="Procurement opportunity pipeline preview" width="800" height="500" loading="lazy">
         </div>
       </a>
 
@@ -207,7 +259,7 @@
           <span class="bento-card__more">Browse gazettes <span aria-hidden="true">→</span></span>
         </div>
         <div class="bento-card__media">
-          <img src="/assets/img/placeholders/bento-gazettes-feature.svg" alt="Placeholder: bento-gazettes-feature.svg" width="880" height="520" loading="lazy">
+          <img src="/assets/img/bento-archive.svg" alt="Page-level gazette archive spread preview" width="800" height="500" loading="lazy">
         </div>
       </a>
 
@@ -261,24 +313,23 @@
           <a class="button button--on-dark" href="/countries/">View country coverage <span aria-hidden="true">→</span></a>
         </div>
       </div>
-      <div class="app-window app-window--compact" data-reveal>
-        <div class="app-window__bar" aria-hidden="true">
-          <span class="app-window__dots"><span></span><span></span><span></span></span>
-          <span class="app-window__title">Jurisdiction Coverage Matrix</span>
-          <span class="app-window__badge">{{ stats.countries }} Countries</span>
-        </div>
-        <img src="/assets/img/placeholders/coverage-map-visual.svg" alt="Placeholder: coverage-map-visual.svg" width="1200" height="680" loading="lazy">
+      <div class="coverage-map-frame" data-reveal>
+        <img src="/assets/img/coverage-world.svg" alt="Global cartography visualization of configured jurisdictions" width="1200" height="675" loading="lazy">
       </div>
     </div>
 
     <div class="region-grid">
       {% for region in region_stats %}
+      {% set pct = ((region.with_records / region.countries) * 100)|round|int if region.countries else 0 %}
       <a class="region-card" href="/countries/" data-reveal style="--d: {{ loop.index0 * 40 }}ms">
-        <span>
-          <span class="region-card__name">{{ region.name }}</span>
-          <span class="region-card__meta">{{ region.countries }} countr{{ "y" if region.countries == 1 else "ies" }} · {{ region.with_records }} with records</span>
-        </span>
-        <span class="region-card__count">{{ region.records }}</span>
+        <div class="region-card__top">
+          <span>
+            <span class="region-card__name">{{ region.name }}</span>
+            <span class="region-card__meta">{{ region.countries }} countr{{ "y" if region.countries == 1 else "ies" }} · {{ region.with_records }} with records</span>
+          </span>
+          <span class="region-card__count">{{ region.records }}</span>
+        </div>
+        <span class="region-card__bar" aria-hidden="true"><span style="width: {{ pct }}%"></span></span>
       </a>
       {% endfor %}
     </div>
@@ -292,9 +343,9 @@
       <figure class="doc-frame" data-reveal>
         <div class="doc-frame__bar" aria-hidden="true">
           <span class="doc-frame__dot"></span>
-          <span>Source Verification · Verbatim Excerpt &amp; Checksum</span>
+          <span>SHA-256 Checksum · Verbatim Source Match</span>
         </div>
-        <img src="/assets/img/placeholders/provenance-audit-preview.svg" alt="Placeholder: provenance-audit-preview.svg" width="960" height="720" loading="lazy">
+        <img src="/assets/img/provenance-verify.jpg" alt="Optical verification lens inspecting archival source weave" width="960" height="720" loading="lazy">
       </figure>
 
       <div class="provenance-split__body">

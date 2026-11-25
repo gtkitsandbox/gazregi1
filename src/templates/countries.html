@@ -2,16 +2,20 @@
 {% from "_macros.html" import badge, breadcrumbs, page_visual %}
 {% block body_class %}page-countries{% endblock %}
 {% block content %}
-<div class="shell">
-  {{ breadcrumbs(crumbs) }}
-  <div class="page-hero">
-    <header class="page-heading">
-      <p class="eyebrow">COVERAGE</p>
-      <h1>Countries</h1>
-      <p class="page-heading__lede">Coverage is listed alphabetically by country and grouped by region. A verified flag means records have been retrieved from an official source and passed provenance checks; planned countries have no published records yet.</p>
-    </header>
+<section class="index-hero">
+  <div class="index-hero__inner">
+    <div class="index-hero__copy">
+      {{ breadcrumbs(crumbs) }}
+      <header class="page-heading">
+        <p class="eyebrow eyebrow--on-dark">COVERAGE</p>
+        <h1>Countries</h1>
+        <p class="page-heading__lede">Coverage is listed alphabetically by country and grouped by region. A verified flag means records have been retrieved from an official source and passed provenance checks; planned countries have no published records yet.</p>
+      </header>
+    </div>
     {{ page_visual("countries") }}
   </div>
+</section>
+<div class="shell">
 
   <div class="stat-grid" aria-label="Coverage overview">
     <div class="stat"><span class="stat__value">{{ stats.countries }}</span><span class="stat__label">Countries configured</span></div>

@@ -2,16 +2,20 @@
 {% from "_macros.html" import badge, breadcrumbs, empty_state, page_visual %}
 {% block body_class %}page-sources{% endblock %}
 {% block content %}
-<div class="shell">
-  {{ breadcrumbs(crumbs) }}
-  <div class="page-hero">
-    <header class="page-heading">
-      <p class="eyebrow">PROVENANCE</p>
-      <h1>Source registry</h1>
-      <p class="page-heading__lede">Every official publisher used by the index, with publication type, supported formats, access method, reuse restrictions and current access status. Sources marked restricted or unavailable are documented, not silently omitted.</p>
-    </header>
+<section class="index-hero">
+  <div class="index-hero__inner">
+    <div class="index-hero__copy">
+      {{ breadcrumbs(crumbs) }}
+      <header class="page-heading">
+        <p class="eyebrow eyebrow--on-dark">PROVENANCE</p>
+        <h1>Source registry</h1>
+        <p class="page-heading__lede">Every official publisher used by the index, with publication type, supported formats, access method, reuse restrictions and current access status. Sources marked restricted or unavailable are documented, not silently omitted.</p>
+      </header>
+    </div>
     {{ page_visual("sources") }}
   </div>
+</section>
+<div class="shell">
 
   <div class="stat-grid" aria-label="Source overview">
     <div class="stat"><span class="stat__value">{{ stats.sources }}</span><span class="stat__label">Registered sources</span></div>

@@ -74,7 +74,20 @@
 {%- endmacro %}
 
 {% macro page_visual(name) -%}
-<figure class="page-hero__media">
-  <img src="/assets/img/placeholders/section-{{ name }}.svg" alt="Placeholder: section-{{ name }}.svg" width="760" height="480" loading="lazy">
+{% set visuals = {
+  "tenders": ("bento-procurement.svg", "Infrastructure and public procurement"),
+  "gazettes": ("bento-archive.svg", "Official gazette archive volumes"),
+  "people": ("workflow-index.svg", "Structured appointment and position index"),
+  "organisations": ("bento-procurement.svg", "Public bodies and issuing organisations"),
+  "notices": ("workflow-pdfs.svg", "Official public notices and filings"),
+  "regulations": ("bento-archive.svg", "Acts, instruments and official regulations"),
+  "countries": ("coverage-world.svg", "International jurisdiction coverage"),
+  "sources": ("provenance-verify.jpg", "Official publisher source verification"),
+  "about": ("hero-main.jpg", "Layered official documents converging into a structured index"),
+  "corrections": ("provenance-verify.jpg", "Record verification and corrections")
+} %}
+{% set asset = visuals.get(name, ("bento-archive.svg", "GazetteRegistry")) %}
+<figure class="index-hero__media">
+  <img src="/assets/img/{{ asset[0] }}" alt="{{ asset[1] }}" width="800" height="500" loading="eager">
 </figure>
 {%- endmacro %}

@@ -383,6 +383,25 @@ function initReveal() {
   }
 }
 
+function initQuickQueries() {
+  const buttons = document.querySelectorAll("[data-quick-query]");
+  const form = document.querySelector("#search-form");
+  const input = document.querySelector("#search-query");
+  if (!buttons.length || !form || !input) return;
+
+  for (const button of buttons) {
+    button.addEventListener("click", () => {
+      const q = button.dataset.quickQuery || "";
+      input.value = q;
+      if (typeof form.requestSubmit === "function") {
+        form.requestSubmit();
+      } else {
+        form.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true }));
+      }
+    });
+  }
+}
+
 initSiteSearch();
 initTenderFilters();
 initRecordFilters();
@@ -390,3 +409,4 @@ initCountryFilters();
 initSourceFilters();
 initSearchShortcut();
 initReveal();
+initQuickQueries();

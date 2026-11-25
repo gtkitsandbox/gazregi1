@@ -2,16 +2,20 @@
 {% from "_macros.html" import breadcrumbs, empty_state, page_visual, record_card %}
 {% block body_class %}page-regulations{% endblock %}
 {% block content %}
-<div class="shell">
-  {{ breadcrumbs(crumbs) }}
-  <div class="page-hero">
-    <header class="page-heading">
-      <p class="eyebrow">REGULATIONS</p>
-      <h1>Regulations</h1>
-      <p class="page-heading__lede">Acts, regulations, orders, rules, determinations and notifications published by official sources, linked to the original publication.</p>
-    </header>
+<section class="index-hero">
+  <div class="index-hero__inner">
+    <div class="index-hero__copy">
+      {{ breadcrumbs(crumbs) }}
+      <header class="page-heading">
+        <p class="eyebrow eyebrow--on-dark">REGULATIONS</p>
+        <h1>Regulations</h1>
+        <p class="page-heading__lede">Acts, regulations, orders, rules, determinations and notifications published by official sources, linked to the original publication.</p>
+      </header>
+    </div>
     {{ page_visual("regulations") }}
   </div>
+</section>
+<div class="shell">
 
   {% if regulations %}
   <form class="filter-bar" data-record-filters data-list="regulation-list" data-count="regulation-count" aria-label="Filter regulations">

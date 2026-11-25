@@ -2,16 +2,20 @@
 {% from "_macros.html" import breadcrumbs, page_visual %}
 {% block body_class %}page-about{% endblock %}
 {% block content %}
-<div class="shell">
-  {{ breadcrumbs(crumbs) }}
-  <div class="page-hero">
-    <header class="page-heading">
-      <p class="eyebrow">ABOUT</p>
-      <h1>About {{ site.site_name }}</h1>
-      <p class="page-heading__lede">{{ site.site_name }} is an independent search and discovery layer over official government Gazette publications. It is not affiliated with, endorsed by or operated by any government.</p>
-    </header>
+<section class="index-hero">
+  <div class="index-hero__inner">
+    <div class="index-hero__copy">
+      {{ breadcrumbs(crumbs) }}
+      <header class="page-heading">
+        <p class="eyebrow eyebrow--on-dark">ABOUT</p>
+        <h1>About {{ site.site_name }}</h1>
+        <p class="page-heading__lede">{{ site.site_name }} is an independent search and discovery layer over official government Gazette publications. It is not affiliated with, endorsed by or operated by any government.</p>
+      </header>
+    </div>
     {{ page_visual("about") }}
   </div>
+</section>
+<div class="shell">
 
   <section class="prose" aria-labelledby="what-title">
     <h2 id="what-title">What the index contains</h2>

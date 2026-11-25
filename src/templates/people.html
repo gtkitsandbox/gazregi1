@@ -2,17 +2,21 @@
 {% from "_macros.html" import badge, breadcrumbs, empty_state, page_visual, verification %}
 {% block body_class %}page-people{% endblock %}
 {% block content %}
-<div class="shell">
-  {{ breadcrumbs(crumbs) }}
-  <div class="page-hero">
-    <header class="page-heading">
-      <p class="eyebrow">PEOPLE &amp; ORGANISATIONS</p>
-      <h1>People</h1>
-      <p class="page-heading__lede">Official appointments, promotions and professional positions. Each person page is a navigation layer into Gazette records, not a biography.</p>
-      <p class="page-heading__actions"><a class="button button--secondary" href="/organisations/">Browse organisations</a></p>
-    </header>
+<section class="index-hero">
+  <div class="index-hero__inner">
+    <div class="index-hero__copy">
+      {{ breadcrumbs(crumbs) }}
+      <header class="page-heading">
+        <p class="eyebrow eyebrow--on-dark">PEOPLE &amp; ORGANISATIONS</p>
+        <h1>People</h1>
+        <p class="page-heading__lede">Official appointments, promotions and professional positions. Each person page is a navigation layer into Gazette records, not a biography.</p>
+        <p class="page-heading__actions"><a class="button button--on-dark" href="/organisations/">Browse organisations</a></p>
+      </header>
+    </div>
     {{ page_visual("people") }}
   </div>
+</section>
+<div class="shell">
 
   <aside class="callout">
     <strong>Identity policy.</strong> A person page is published only after operator verification. Names are never merged because they look similar; each identity has its own record references and verified name variants. Unverified mappings are held out of the public index.
